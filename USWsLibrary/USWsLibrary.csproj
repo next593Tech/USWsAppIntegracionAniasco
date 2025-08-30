@@ -1,0 +1,1499 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{6289730B-D708-4E6E-9A1F-FD3B5AB22FDA}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>USWsLibrary</RootNamespace>
+    <AssemblyName>USWsLibrary</AssemblyName>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.1\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.EntityFramework, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.EntityFramework.2.2.1\lib\net45\Microsoft.AspNet.Identity.EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Owin, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Owin.2.2.1\lib\net45\Microsoft.AspNet.Identity.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin, Version=2.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.2.1.0\lib\net45\Microsoft.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security, Version=2.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.2.1.0\lib\net45\Microsoft.Owin.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.Cookies, Version=2.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.Cookies.2.1.0\lib\net45\Microsoft.Owin.Security.Cookies.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.OAuth, Version=2.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.OAuth.2.1.0\lib\net45\Microsoft.Owin.Security.OAuth.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
+      <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Net.Http.Formatting, Version=5.2.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.4\lib\net45\System.Net.Http.Formatting.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.Helpers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Http, Version=5.2.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.5.2.4\lib\net45\System.Web.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.2.3\lib\net45\System.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Razor.3.2.3\lib\net45\System.Web.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Deployment, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Common\ConstGeneralCode.cs" />
+    <Compile Include="Common\HelperConvert.cs" />
+    <Compile Include="ModelDobraDatabase\ACC_ASIENTOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACC_ASIENTOS_DAY.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACC_ASIENTOS_DAY_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACC_ASIENTOS_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACC_ASIENTOS_PLANTILLAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACC_ASIENTOS_PLANTILLAS_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACC_CUENTAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACR_ACREEDORES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACR_ACREEDORES_ANEXOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACR_ACREEDORES_AUTORIZACIONES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACR_ACREEDORES_DEUDAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACR_CREDITOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACR_CREDITOS_DEUDAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACR_CREDITOS_RUBROS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACR_CRUCES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACR_CRUCES_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACR_CRUCE_ACREEDORES_DEUDAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACR_DEBITOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACR_DEBITOS_DEUDAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACR_DEBITOS_PRODUCTOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACR_DEBITOS_RUBROS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACR_GRUPOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACR_RECIBOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACR_RECIBOS_DEUDAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACR_RECIBOS_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACR_RETENCIONES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACR_RETENCIONES_DEUDAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACR_RETENCIONES_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACR_RUBROS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACT_ACTIVOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACT_ACTIVOS_CARDEX.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACT_ASIGNACIONES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACT_ASIGNACIONES_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACT_DEPRECIACIONES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACT_DEPRECIACIONES_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACT_EGRESOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACT_EGRESOS_ACTIVOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACT_EGRESOS_CUENTAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACT_FACTURAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACT_FACTURAS_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACT_FACTURAS_PAGOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACT_GRUPOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACT_INGRESOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACT_INGRESOS_ACTIVOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACT_INGRESOS_CUENTAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACT_ORDENES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACT_ORDENES_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ACT_TIPOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\AST_ASISTENCIAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\AST_TAREAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\BAN_BANCOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\BAN_BANCOS_CARDEX.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\BAN_CHEQUES_PROTESTADOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\BAN_CHEQUES_PROTESTADOS_RUBROS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\BAN_CREDITOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\BAN_CREDITOS_CUENTAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\BAN_DEBITOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\BAN_DEBITOS_CUENTAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\BAN_DEPOSITOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\BAN_DEPOSITOS_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\BAN_DEPOSITOS_PAPELETAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\BAN_EGRESOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\BAN_EGRESOS_ANEXOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\BAN_EGRESOS_ANTICIPOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\BAN_EGRESOS_CUENTAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\BAN_EGRESOS_DEUDAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\BAN_EGRESOS_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\BAN_EGRESOS_PAGOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\BAN_EGRESOS_RETENCIONES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\BAN_GRUPOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\BAN_INGRESOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\BAN_INGRESOS_CUENTAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\BAN_INGRESOS_DEUDAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\BAN_INGRESOS_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\BAN_INGRESOS_PINPAD.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\BAN_INGRESOS_TARJETAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\BAN_PAPELETAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\BAN_TRANSFERENCIAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\BAN_TRANSFERENCIAS_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\BGT_CODIGOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\BGT_CODIGOS_CUENTAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\BGT_CODIGOS_VALORES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\BGT_PROVEEDORES_CATEGORIAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\citas.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\CLI_AMORTIZACIONES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\CLI_AMORTIZACIONES_CUPONES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\CLI_AMORTIZACIONES_DEUDAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\CLI_AMORTIZACIONES_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\CLI_CLIENTES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\CLI_CLIENTES_ANEXOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\CLI_CLIENTES_DEUDAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\CLI_CLIENTES_GARANTIAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\CLI_CLIENTES_OBSERVACIONES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\CLI_COBRANZAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\CLI_COBRANZAS_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\CLI_COBRANZAS_INGRESOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\CLI_CONTRATOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\CLI_CONTRATOS_SERVICIOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\CLI_COTIZACIONES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\CLI_COTIZACIONES_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\CLI_CREDITOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\CLI_CREDITOS_DEUDAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\CLI_CREDITOS_PRODUCTOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\CLI_CREDITOS_RUBROS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\CLI_CRUCE.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\CLI_CRUCE_CLIENTES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\CLI_CRUCE_CLIENTES_DEUDAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\CLI_CRUCE_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\CLI_DEBITOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\CLI_DEBITOS_RUBROS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\CLI_FACTURAS_KARDEX.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\CLI_GRUPOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\CLI_LETRAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\CLI_LETRAS_DEUDAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\CLI_LETRAS_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\CLI_RECIBOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\CLI_RECIBOS_DEUDAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\CLI_RECIBOS_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\CLI_RETENCIONES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\CLI_RETENCIONES_DEUDAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\CLI_RETENCIONES_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\CLI_RUBROS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\COM_DEVOLUCIONES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\COM_DEVOLUCIONES_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\COM_FACTURAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\COM_FACTURAS_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\COM_FACTURAS_LOTE_UBICACIONES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\COM_FACTURAS_PAGOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\COM_FACTURAS_TALLAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\COM_GUIAS_REMISION.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\COM_LIQUIDACIONES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\COM_LIQUIDACIONES_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\COM_ORDENES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\COM_ORDENES_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\COM_RUBROS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\CRM_WHATSAPP.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\DBReplica.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\DobraModel.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DobraModel.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\DobraModel.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\DobraModel.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DobraModel.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\dtproperties.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\EMP_COMISIONES_PAGOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\EMP_CONTRATOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\EMP_CREDITOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\EMP_CREDITOS_DEUDAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\EMP_CREDITOS_RUBROS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\EMP_DEBITOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\EMP_DEBITOS_COMIDA.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\EMP_DEBITOS_RUBROS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\EMP_DECIMOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\EMP_DECIMOS_DEUDAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\EMP_DECIMOS_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\EMP_DECIMOS_PROVISIONES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\EMP_DECLARACIONES_GASTOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\EMP_EMPLEADOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\EMP_EMPLEADOS_AMONESTACIONES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\EMP_EMPLEADOS_CARGAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\EMP_EMPLEADOS_DEUDAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\EMP_EMPLEADOS_HISTORIAL.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\EMP_EMPLEADOS_HORAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\EMP_EMPLEADOS_PRESUPUESTO.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\EMP_EMPLEADOS_SUBSIDIOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\EMP_EMPLEADOS_VACACIONES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\EMP_FUNCIONES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\EMP_GRUPOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\EMP_LIQUIDACION.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\EMP_LIQUIDACION_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\EMP_MARCADAS_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\EMP_ROLES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\EMP_ROLES_EMPLEADOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\EMP_ROLES_RUBROS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\EMP_RUBROS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\EMP_TABLAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\EMP_TABLAS_RUBROS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\EMP_UTILIDADES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\EMP_UTILIDADES_DEUDAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\EMP_UTILIDADES_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\EXP_FACTURAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\EXP_FACTURAS_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\EXP_INFORMES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\EXP_ORDENES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\EXP_ORDENES_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\EXP_PERFILES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\FLW_CODIGOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\FLW_CODIGOS_CUENTAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\FLW_EGRESOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\IMP_ANALISIS_COSTOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\IMP_ANALISIS_COSTOS_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\IMP_LIQUIDACION.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\IMP_LIQUIDACION_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\IMP_LIQUIDACION_PEDIDOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\IMP_PEDIDOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\IMP_PEDIDOS_DEUDAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\IMP_PEDIDOS_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\IMP_PEDIDOS_EMPAQUES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\IMP_PEDIDOS_MASTER.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\IMP_PEDIDOS_MASTER_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\IMP_PREPEDIDOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\IMP_PREPEDIDOS_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\IMP_PROJECCION_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\IMP_PROJECCION_GASTOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\IMP_PROJECCION_PAGOS_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_BODEGAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_COMBOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_COMBOS_COMPONENTES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_CONTEO.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_CONTEO_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_CONVERSIONES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_CONVERSIONES_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_EGRESOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_EGRESOS_PRODUCTOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_EGRESOS_RUBROS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_EMPAQUES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_ENSAMBLAJE.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_ENSAMBLAJE_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_ESCALAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_ESCALAS_TALLAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_FACTURAS_TALLAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_FISICO.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_FISICO_CUENTAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_FISICO_PRODUCTOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_GIFT_CARD.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_GRUPOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_GUIAS_REMISION.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_GUIAS_REMISION_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_INGRESOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_INGRESOS_LOTE_UBICACIONES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_INGRESOS_PRODUCTOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_INGRESOS_RUBROS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_PARTIDAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_PD_BODEGA_STOCK.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_PRECIOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_PRECIOS_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_PRODUCTOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_PRODUCTOS_CARDEX.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_PRODUCTOS_CARDEX_DAY.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_PRODUCTOS_EMPAQUES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_PRODUCTOS_ENSAMBLAJE.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_PRODUCTOS_EXHIBICION.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_PRODUCTOS_LOTES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_PRODUCTOS_MINIMOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_PRODUCTOS_PRECIOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_PRODUCTOS_PRECIOS_HISTORICO.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_PRODUCTOS_PROMOCIONES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_PRODUCTOS_PROVEEDORES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_PRODUCTOS_STOCK.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_PRODUCTOS_UBICACIONES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_PROMOCIONES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_PROMOCIONES_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_PROMOCIONES_DT2.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_RUBROS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_SKU.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_TRANSFERENCIAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\INV_TRANSFERENCIAS_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\lista_eventos.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\NIIF_CODIGOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\NIIF_CODIGOS_CUENTAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ORG_BUZONES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ORG_CITAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ORG_CONTACTOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ORG_DOCUMENTOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ORG_PERFILES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ORG_TAREAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ORG_TASK.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\ORG_TASK_SOLUCIONES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\POS_ACCESOS_DIRECTOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\POS_CIERRES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\POS_CIERRES_CAJA.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\POS_FACTURAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\POS_FACTURAS_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\POS_TRANSFERENCIAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\POS_TRANSFERENCIAS_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRD_EGRESOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRD_EGRESOS_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRD_INDIRECTOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRD_INDIRECTOS_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRD_INGRESOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRD_INGRESOS_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRD_JORNALES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRD_JORNALES_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRD_LIQUIDACIONES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRD_ORDENES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRD_ORDENES_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PREGUNTA.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRV_BODEGAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRV_CONSUMOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRV_CONSUMOS_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRV_DEVOLUCIONES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRV_DEVOLUCIONES_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRV_EGRESOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRV_EGRESOS_PRODUCTOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRV_EGRESOS_RUBROS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRV_FACTURAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRV_FACTURASCTA_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRV_FACTURASREM_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRV_FACTURAS_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRV_FACTURAS_GASTOS_MOVIL.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRV_FACTURAS_PAGOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRV_FISICO.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRV_FISICO_CUENTAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRV_FISICO_PRODUCTOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRV_GRUPOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRV_GUIAS_REMISION.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRV_INGRESOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRV_INGRESOS_PRODUCTOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRV_INGRESOS_RUBROS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRV_LIQUIDACION.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRV_LIQUIDACION_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRV_ORDENES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRV_ORDENES_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRV_PRODUCTOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRV_PRODUCTOS_CARDEX.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRV_PRODUCTOS_EMPAQUES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRV_PRODUCTOS_PROVEEDORES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRV_REINTEGROS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRV_REINTEGROS_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRV_RUBROS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRV_TRANSFERENCIAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PRV_TRANSFERENCIAS_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\RESPUESTA.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\RMA_DOCUMENTOS_SERIES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\RMA_FACTURAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\RMA_FACTURAS_COMPRAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\RMA_FACTURAS_COMPRAS_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\RMA_FACTURAS_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\RMA_PRODUCTOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\RMA_PRODUCTOS_SERIES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SEG_GRUPOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SEG_PERFILES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SEG_PERFILES_RECURSOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SEG_RECURSOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SEG_USUARIOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SEG_USUARIOS_BITACORA.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SIS_BINARY_FILES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SIS_CENTROS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SIS_CONTADORES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SIS_DEPARTAMENTOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SIS_DIVISAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SIS_DIVISIONES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SIS_DIVISIONES_PAGOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SIS_INFORMES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SIS_INTERFASE_VENTAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SIS_PARAMETROS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SIS_PERIODOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SIS_RANGOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SIS_RANGOS_SECUENCIAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SIS_REPLICAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SIS_SUCURSALES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SIS_SUCURSALES_PRESUPUESTO.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SIS_ZONAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SRI_CREDITO_TRIBUTARIO.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SRI_DOCUMENTOS_RECIBIDOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SRI_PERIODOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SRI_PORCENTAJE_ICE.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SRI_PORCENTAJE_IVA.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SRI_PORCENTAJE_RETENCION_FUENTE.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SRI_PORCENTAJE_RETENCION_IVA.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SRI_RANGOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SRI_RANGOS_SECUENCIAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SRI_SECUENCIAL.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SRI_TIPOCOMPROBANTE.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SRI_TIPO_TRANSACCION.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SRV_EGRESOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SRV_EGRESOS_PRODUCTOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SRV_ETAPAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SRV_ORDENES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SRV_ORDENES_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SRV_ORDENES_TIPOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SRV_TIPOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\sysdiagrams.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\VEN_CONCILIACION.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\VEN_CONCILIACION_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\VEN_CONCILIACION_ORDENES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\VEN_CONCILIACION_PRODUCTOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\VEN_CROQUIS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\VEN_CROQUIS_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\VEN_DESPACHOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\VEN_DESPACHOS_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\VEN_DEVOLUCIONES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\VEN_DEVOLUCIONES_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\VEN_ENTREGA.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\VEN_ENTREGAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\VEN_ENTREGAS_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\VEN_ENTREGA_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\VEN_FACTURAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\VEN_FACTURASREM_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\VEN_FACTURAS_DAY.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\VEN_FACTURAS_DAY_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\VEN_FACTURAS_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\VEN_FACTURAS_PAGOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\VEN_FACTURAS_TALLAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\VEN_OPCIONES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\VEN_ORDENES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\VEN_ORDENES_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\VEN_PLANACUMULATIVO.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\VEN_PLANACUMULATIVO_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\VEN_PRODUCTOS_RESERVADOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\VEN_RULETA_REGALONA.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\AbonoAsientoDT_InputDto.cs" />
+    <Compile Include="Models\AbonoAsiento_InputDto.cs" />
+    <Compile Include="Models\AbonoBanco_Kardex_InputDto.cs" />
+    <Compile Include="Models\AbonoCabDto.cs" />
+    <Compile Include="Models\AbonoCargaOut.cs" />
+    <Compile Include="Models\AbonoClienteDeudas_InputDto.cs" />
+    <Compile Include="Models\AbonoConsulta_InputDto.cs" />
+    <Compile Include="Models\AbonoConsulta_OutputDto.cs" />
+    <Compile Include="Models\AbonoDetDto.cs" />
+    <Compile Include="Models\AbonoDistribucionDto.cs" />
+    <Compile Include="Models\AbonoFiltroInp.cs" />
+    <Compile Include="Models\AbonoMinOut.cs" />
+    <Compile Include="Models\AbonoNextIDOutputDto.cs" />
+    <Compile Include="Models\AbonoReporteOut.cs" />
+    <Compile Include="Models\AccountViewModels.cs" />
+    <Compile Include="Models\ActivoInput.cs" />
+    <Compile Include="Models\ACT_ACTIVO.cs" />
+    <Compile Include="Models\ACT_ASIGNACIONES.cs" />
+    <Compile Include="Models\AsignacionInput.cs" />
+    <Compile Include="Models\BusesDto.cs" />
+    <Compile Include="Models\CIERRECAJA_DTO.cs" />
+    <Compile Include="Models\ClienteAbonoInputDto.cs" />
+    <Compile Include="Models\ClienteAbonoOutputDto.cs" />
+    <Compile Include="Models\ClienteDetalleNumero_InputDto.cs" />
+    <Compile Include="Models\ClienteDetalleNumero_OutputDto.cs" />
+    <Compile Include="Models\ClienteFiltroInputDto.cs" />
+    <Compile Include="Models\ClienteMinInputDto.cs" />
+    <Compile Include="Models\ClienteMinInputDtoGeo.cs" />
+    <Compile Include="Models\ClienteMinInputDtoGrabar.cs" />
+    <Compile Include="Models\ClienteMinOutputDto.cs" />
+    <Compile Include="Models\ClienteOutputDto.cs" />
+    <Compile Include="Models\CLI_CLIENTE.cs" />
+    <Compile Include="Models\CLI_CREDITOS.cs" />
+    <Compile Include="Models\CLI_CREDITOS_DTO.cs" />
+    <Compile Include="Models\CLI_CREDITOS_PRODUCTOS.cs" />
+    <Compile Include="Models\CLI_DEUDA_DTO.cs" />
+    <Compile Include="Models\CLI_DEUDA_FILTRO_DTO.cs" />
+    <Compile Include="Models\CLI_LISTA_DEUDAS_DTO.cs" />
+    <Compile Include="Models\CLI_RETENCION_DTO.cs" />
+    <Compile Include="Models\Code_DeudorID_OutPutDto.cs" />
+    <Compile Include="Models\CompositeReturn.cs" />
+    <Compile Include="Models\ConsultaDocumentoDto.cs" />
+    <Compile Include="Models\ConsultaPaginadaDto.cs" />
+    <Compile Include="Models\Croquis.cs" />
+    <Compile Include="Models\DashBoard\QueryFilterInp.cs" />
+    <Compile Include="Models\DashBoard\SalesByCustomerDto.cs" />
+    <Compile Include="Models\DashBoard\SalesByCustomerMonthlyDto.cs" />
+    <Compile Include="Models\DashBoard\SalesByDayDto.cs" />
+    <Compile Include="Models\DashBoard\SalesByHourDto.cs" />
+    <Compile Include="Models\DashBoard\SalesByMonthDto.cs" />
+    <Compile Include="Models\DashBoard\SalesByProductDto.cs" />
+    <Compile Include="Models\DashBoard\SalesRankedDto.cs" />
+    <Compile Include="Models\DashBoard\SalesTopValues.cs" />
+    <Compile Include="Models\DataModel.cs" />
+    <Compile Include="Models\DbContextExtensions.cs" />
+    <Compile Include="Models\DevGeneralInput.cs" />
+    <Compile Include="Models\DevProductsFilter.cs" />
+    <Compile Include="Models\EmploymentFilterInp.cs" />
+    <Compile Include="Models\EmploymentMinOut.cs" />
+    <Compile Include="Models\EMP_EMPLEADO.cs" />
+    <Compile Include="Models\ErrorClienteCedula.cs" />
+    <Compile Include="Models\ErrorItem.cs" />
+    <Compile Include="Models\ErrorSave.cs" />
+    <Compile Include="Models\FAC_DEV_PRODUCTO_CB.cs" />
+    <Compile Include="Models\FAC_DEV_PRODUCTO_DT.cs" />
+    <Compile Include="Models\FAC_DEV_PRODUCTO_DTO.cs" />
+    <Compile Include="Models\FAC_DTO.cs" />
+    <Compile Include="Models\FAC_DT_DTO.cs" />
+    <Compile Include="Models\FilterIdReservation.cs" />
+    <Compile Include="Models\FilterReservation.cs" />
+    <Compile Include="Models\FiltroDto.cs" />
+    <Compile Include="Models\FiltroPedido.cs" />
+    <Compile Include="Models\FiltroProdPrecioDto.cs" />
+    <Compile Include="Models\FiltroTxtProdDto.cs" />
+    <Compile Include="Models\FrecuenciaDto.cs" />
+    <Compile Include="Models\GenericFilterInp.cs" />
+    <Compile Include="Models\GenericFilterInpCliente.cs" />
+    <Compile Include="Models\GenericFilterStockOnline.cs" />
+    <Compile Include="Models\IdentityModels.cs" />
+    <Compile Include="Models\InputFilter.cs" />
+    <Compile Include="Models\INV_CONTEO_DT.cs" />
+    <Compile Include="Models\INV_CONTEO_DTO.cs" />
+    <Compile Include="Models\INV_CONTEO_DT_DTO.cs" />
+    <Compile Include="Models\INV_CONTEO_INPUT.cs" />
+    <Compile Include="Models\INV_FISICO_DTO.cs" />
+    <Compile Include="Models\INV_INGRESOS.cs" />
+    <Compile Include="Models\INV_INGRESOS_DTO.cs" />
+    <Compile Include="Models\INV_INGRESOS_PRODUCTOS.cs" />
+    <Compile Include="Models\INV_PRODUCTO.cs" />
+    <Compile Include="Models\INV_PRODUCTOS_DTO.cs" />
+    <Compile Include="Models\INV_PRODUCTOS_EMPAQUE_DTO.cs" />
+    <Compile Include="Models\INV_PRODUCTOS_PRECIO_DTO.cs" />
+    <Compile Include="Models\INV_PRODUCTO_PRECIO.cs" />
+    <Compile Include="Models\INV_PRODUCTO_PROMOCIONES.cs" />
+    <Compile Include="Models\INV_PRODUCTO_UNITARIO.cs" />
+    <Compile Include="Models\INV_PRODUCTOS_STOCK_ONLINE.cs" />
+    <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\MultiResultSetReader.cs" />
+    <Compile Include="Models\NextIDOutputDto.cs" />
+    <Compile Include="Models\ParametroOutputDto.cs" />
+    <Compile Include="Models\PasajeroDto.cs" />
+    <Compile Include="Models\PaymentDT_Item_InputDto.cs" />
+    <Compile Include="Models\RegistroDocumentoDto.cs" />
+    <Compile Include="Models\Reports\FAC_Filter.cs" />
+    <Compile Include="Models\Reports\VEN_CUADRE_DE_CAJADT.cs" />
+    <Compile Include="Models\Reports\VEN_REPORTE_VENTAS.cs" />
+    <Compile Include="Models\ReservaDto.cs" />
+    <Compile Include="Models\ReturnReservation.cs" />
+    <Compile Include="Models\RutasDetalleDto.cs" />
+    <Compile Include="Models\RutasDto.cs" />
+    <Compile Include="Models\SimpleReturn.cs" />
+    <Compile Include="Models\SIS_PARAMETRO.cs" />
+    <Compile Include="Models\TarifarioDto.cs" />
+    <Compile Include="Models\UpdateDevueltoFilter.cs" />
+    <Compile Include="Models\VEN_CAJEROS.cs" />
+    <Compile Include="Models\VEN_ENTREGAS_DTO.cs" />
+    <Compile Include="Models\VEN_ENTREGAS_DT_DTO.cs" />
+    <Compile Include="Models\VEN_ENTREGAS_MIN_DTO.cs" />
+    <Compile Include="Models\VEN_ENTREGAS_MIN_DT_DTO.cs" />
+    <Compile Include="Models\VEN_ENTREGAS_UPDATE_DTO.cs" />
+    <Compile Include="Models\VEN_FACTURA.cs" />
+    <Compile Include="Models\VEN_FACTURA_DT.cs" />
+    <Compile Include="Models\VEN_FACTURA_DT_LIST.cs" />
+    <Compile Include="Models\VEN_OPCIONES.cs" />
+    <Compile Include="Models\VEN_ORDENESDESPACHO_DTO.cs" />
+    <Compile Include="Models\VEN_ORDENESDESPACHO_DT_DTO.cs" />
+    <Compile Include="Models\VEN_ORDENESDESPACHO_DT_DTO_PRINT.cs" />
+    <Compile Include="Models\VEN_ORDENESDESPACHO_MIN_DTO.cs" />
+    <Compile Include="Models\VEN_ORDENESDESPACHO_UPDATE_DTO.cs" />
+    <Compile Include="Models\VEN_ORDENES_DESPACHO2.cs" />
+    <Compile Include="Models\VEN_ORDENES_DESPACHO2DT.cs" />
+    <Compile Include="Models\VEN_ORDENES_DTO.cs" />
+    <Compile Include="Models\VEN_ORDENES_DT_DTO.cs" />
+    <Compile Include="Models\VEN_ORDENES_DT_DTO_PRINT.cs" />
+    <Compile Include="Models\VEN_ORDENES_MIN_DTO.cs" />
+    <Compile Include="Models\VEN_ORD_ENT_DTO.cs" />
+    <Compile Include="Models\VisitaMinInput.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\AbonosServices.cs" />
+    <Compile Include="Services\ActivosService.cs" />
+    <Compile Include="Services\CajasServices.cs" />
+    <Compile Include="Services\ClientesServices.cs" />
+    <Compile Include="Services\DashBoardServices.cs" />
+    <Compile Include="Services\DespachoService.cs" />
+    <Compile Include="Services\DevolucionesServices.cs" />
+    <Compile Include="Services\DocumentosServices.cs" />
+    <Compile Include="Services\EmploymentsServices.cs" />
+    <Compile Include="Services\FacturasServices.cs" />
+    <Compile Include="Services\IngresoProductosServices.cs" />
+    <Compile Include="Services\OrdenesServices.cs" />
+    <Compile Include="Services\ParametrosServices.cs" />
+    <Compile Include="Services\PasajesServices.cs" />
+    <Compile Include="Services\ProductosServices.cs" />
+    <Compile Include="Services\ReportsServices.cs" />
+    <Compile Include="Services\TomaFisicaServices.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Models\General\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <EntityDeploy Include="ModelDobraDatabase\DobraModel.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>DobraModel.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <None Include="ModelDobraDatabase\DobraModel.edmx.diagram">
+      <DependentUpon>DobraModel.edmx</DependentUpon>
+    </None>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="ModelDobraDatabase\DobraModel.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>DobraModel.edmx</DependentUpon>
+      <LastGenOutput>DobraModel.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="ModelDobraDatabase\DobraModel.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>DobraModel.edmx</DependentUpon>
+      <LastGenOutput>DobraModel.cs</LastGenOutput>
+    </Content>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

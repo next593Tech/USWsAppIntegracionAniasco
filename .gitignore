@@ -1,0 +1,32 @@
+# Ignorar archivos de compilación de .NET
+bin/
+obj/
+*.exe
+*.dll
+*.pdb
+*.cache
+*.ilk
+*.log
+*.suo
+*.user
+*.rsuser
+*.sln.docstates
+
+# Ignorar paquetes NuGet
+*.nupkg
+*.snupkg
+packages/
+
+# Ignorar archivos de publicación
+*.PublishProfiles/
+
+# Ignorar configuraciones de usuario locales
+.vscode/
+.idea/
+*.csproj.user
+
+# Ignorar archivos generados automáticamente
+Generated Files/
+
+# Ignorar directorios de depuración
+_debug/
