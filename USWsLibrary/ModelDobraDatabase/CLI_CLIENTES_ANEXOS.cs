@@ -22,5 +22,8 @@ namespace USWsLibrary.ModelDobraDatabase
         public string Movil { get; set; }
         public string Email { get; set; }
         public Nullable<bool> Notificar { get; set; }
+        public System.DateTime CreadoDate { get; set; }
+        public bool Exportado { get; set; }
+        public bool ExportadoUpdate { get; set; }
     }
 }

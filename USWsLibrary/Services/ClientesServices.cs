@@ -175,6 +175,8 @@ namespace USWsLibrary.Services
 		}
 
 
+
+
 		public PagedList<INV_PRODUCTOS> listProductsByIDerror(ErrorSave errorSave)
 		{
 			PagedList<INV_PRODUCTOS> products = new PagedList<INV_PRODUCTOS>();
@@ -664,7 +666,7 @@ namespace USWsLibrary.Services
 			PagedList<INV_PRODUCTOS_STOCK> packages = new PagedList<INV_PRODUCTOS_STOCK>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				packages.Results = db.INV_PRODUCTOS_STOCK.Where(e => e.Exportadodate > lastUpdate).ToList<INV_PRODUCTOS_STOCK>();
+				packages.Results = db.INV_PRODUCTOS_STOCK.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList<INV_PRODUCTOS_STOCK>();
 				packages.Total = packages.Results.Count;
 				packages.Count = packages.Results.Count;
 			}
@@ -1334,6 +1336,64 @@ namespace USWsLibrary.Services
 
 		}
 
+
+		public PagedList<SIS_ZONAS> listSisZonas(DateTime lastUpdate, DateTime lastUpdate2)
+		{
+			PagedList<SIS_ZONAS> sucursales = new PagedList<SIS_ZONAS>();
+			using (DobraConnection db = new DobraConnection())
+			{
+				sucursales.Results = db.SIS_ZONAS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
+
+				sucursales.Total = sucursales.Results.Count;
+				sucursales.Count = sucursales.Results.Count;
+			}
+			return sucursales;
+
+		}
+
+		public ErrorSave saveSisZonas(PagedList<SIS_ZONAS> sisZonas)
+		{
+			ErrorSave errorSave = new ErrorSave();
+
+			errorSave.errorMessage = "ID:  ";
+
+			using (DobraConnection db = new DobraConnection())
+			{
+				try
+				{
+					foreach (var item in sisZonas.Results)
+					{
+						errorSave.errorMessage = errorSave.errorMessage + "\n" + "ID:  " + item.ID;
+
+						try
+						{
+							if (db.SIS_ZONAS.Any(sisSucursal => sisSucursal.ID == item.ID))
+							{
+								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
+								db.SaveChanges();
+							}
+							else
+							{
+								db.SIS_ZONAS.Add(item);
+								db.SaveChanges();
+							}
+						}
+						catch (Exception e)
+						{
+							encontrarError(e, errorSave);
+						}
+					}
+				}
+				catch (Exception e)
+				{
+					encontrarError(e, errorSave);
+				}
+			}
+			return errorSave;
+		}
+
+
+
 		public ErrorSave saveSisSucursales(PagedList<SIS_SUCURSALES> sisSucursales)
 		{
 			ErrorSave errorSave = new ErrorSave();
@@ -1934,7 +1994,7 @@ namespace USWsLibrary.Services
 			return errorSave;
 		}
 
-		/*public PagedList<POS_CIERRES_CAJA> listPosCierresCajas(DateTime lastUpdate, DateTime lastUpdate2)
+		public PagedList<POS_CIERRES_CAJA> listPosCierresCajas(DateTime lastUpdate, DateTime lastUpdate2)
 		{
 			PagedList<POS_CIERRES_CAJA> posCierresCaja = new PagedList<POS_CIERRES_CAJA>();
 			using (DobraConnection db = new DobraConnection())
@@ -1946,13 +2006,13 @@ namespace USWsLibrary.Services
 			}
 			return posCierresCaja;
 
-		}*/
+		}
 
-	/*	public ErrorSave savePosCierresCajas(PagedList<POS_CIERRES_CAJA> productosCardex)
+		public ErrorSave savePosCierresCajas(PagedList<POS_CIERRES_CAJA> productosCardex)
 		{
 			ErrorSave errorSave = new ErrorSave();
 
-			errorSave.errorMessage="ID:  ";
+			errorSave.errorMessage = "ID:  ";
 
 			using (DobraConnection db = new DobraConnection())
 			{
@@ -1960,7 +2020,7 @@ namespace USWsLibrary.Services
 				{
 					foreach (var item in productosCardex.Results)
 					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
+						errorSave.errorMessage = errorSave.errorMessage + "\n" + "ID:  " + item.ID;
 
 						try
 						{
@@ -1987,7 +2047,7 @@ namespace USWsLibrary.Services
 				}
 			}
 			return errorSave;
-		}*/
+		}
 
 
 		public PagedList<POS_CIERRES> listPosCierres(DateTime lastUpdate, DateTime lastUpdate2)
@@ -2045,7 +2105,6 @@ namespace USWsLibrary.Services
 			}
 			return errorSave;
 		}
-
 
 		public PagedList<VEN_FACTURAS> listVenFacturas(DateTime lastUpdate, DateTime lastUpdate2)
 		{
@@ -2408,25 +2467,25 @@ namespace USWsLibrary.Services
 		}
 
 
-		/*public PagedList<BAN_DEPOSITOS_PAPELETAS> listBanDepositoPapeletas(DateTime lastUpdate, DateTime lastUpdate2)
+		public PagedList<BAN_DEPOSITOS_PAPELETAS> listBanDepositoPapeletas(DateTime lastUpdate, DateTime lastUpdate2)
 		{
 			PagedList<BAN_DEPOSITOS_PAPELETAS> banDepositosDt = new PagedList<BAN_DEPOSITOS_PAPELETAS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				banDepositosDt.Results = db.BAN_DEPOSITOS_PAPELETAS.Where(e => e.Fecha >= lastUpdate).ToList();
+				banDepositosDt.Results = db.BAN_DEPOSITOS_PAPELETAS.Where(e => e.CreadoDAte >= lastUpdate).ToList();
 				//banDepositosDt.Results = db.BAN_DEPOSITOS_PAPELETAS.Where(e => e.CreadoDate >= lastUpdate).ToList();
 				banDepositosDt.Total = banDepositosDt.Results.Count;
 				banDepositosDt.Count = banDepositosDt.Results.Count;
 			}
 			return banDepositosDt;
 
-		}*/
+		}
 
-		/*public ErrorSave saveBanDepositoPapeletas(PagedList<BAN_DEPOSITOS_PAPELETAS> banDepositosPapeletas)
+		public ErrorSave saveBanDepositoPapeletas(PagedList<BAN_DEPOSITOS_PAPELETAS> banDepositosPapeletas)
 		{
 			ErrorSave errorSave = new ErrorSave();
 
-			errorSave.errorMessage="ID:  ";
+			errorSave.errorMessage = "ID:  ";
 
 			using (DobraConnection db = new DobraConnection())
 			{
@@ -2434,7 +2493,7 @@ namespace USWsLibrary.Services
 				{
 					foreach (var item in banDepositosPapeletas.Results)
 					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
+						errorSave.errorMessage = errorSave.errorMessage + "\n" + "ID:  " + item.ID;
 
 						try
 						{
@@ -2461,7 +2520,7 @@ namespace USWsLibrary.Services
 				}
 			}
 			return errorSave;
-		}*/
+		}
 
 		public PagedList<COM_FACTURAS> listComFacturas(DateTime lastUpdate, DateTime lastUpdate2)
 		{
@@ -4721,7 +4780,7 @@ namespace USWsLibrary.Services
 			return errorSave;
 		}
 
-		/*public PagedList<BAN_INGRESOS_TARJETAS> listbanIngresosTarjetas(DateTime lastUpdate, DateTime lastUpdate2)
+		public PagedList<BAN_INGRESOS_TARJETAS> listbanIngresosTarjetas(DateTime lastUpdate, DateTime lastUpdate2)
 		{
 			PagedList<BAN_INGRESOS_TARJETAS> banIngresosTarjetas = new PagedList<BAN_INGRESOS_TARJETAS>();
 			using (DobraConnection db = new DobraConnection())
@@ -4733,13 +4792,13 @@ namespace USWsLibrary.Services
 			}
 			return banIngresosTarjetas;
 
-		}*/
+		}
 
-		/*public ErrorSave savebanIngresosTarjetas(PagedList<BAN_INGRESOS_TARJETAS> banIngresosTarjetas)
+		public ErrorSave savebanIngresosTarjetas(PagedList<BAN_INGRESOS_TARJETAS> banIngresosTarjetas)
 		{
 			ErrorSave errorSave = new ErrorSave();
 
-			errorSave.errorMessage="ID:  ";
+			errorSave.errorMessage = "ID:  ";
 
 			using (DobraConnection db = new DobraConnection())
 			{
@@ -4747,7 +4806,7 @@ namespace USWsLibrary.Services
 				{
 					foreach (var item in banIngresosTarjetas.Results)
 					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
+						errorSave.errorMessage = errorSave.errorMessage + "\n" + "ID:  " + item.ID;
 
 						try
 						{
@@ -4774,7 +4833,7 @@ namespace USWsLibrary.Services
 				}
 			}
 			return errorSave;
-		}*/
+		}
 
 
 		public PagedList<BAN_PAPELETAS> listbanPapeletas(DateTime lastUpdate, DateTime lastUpdate2)
@@ -5340,25 +5399,25 @@ namespace USWsLibrary.Services
 			return errorSave;
 		}
 
-		/*public PagedList<INV_PROMOCIONES> listinvPromociones(DateTime lastUpdate, DateTime lastUpdate2)
+		public PagedList<INV_PROMOCIONES> listinvPromociones(DateTime lastUpdate, DateTime lastUpdate2)
 		{
 			PagedList<INV_PROMOCIONES> invPromociones = new PagedList<INV_PROMOCIONES>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				invPromociones.Results = db.INV_PROMOCIONES.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				invPromociones.Results = db.INV_PROMOCIONES.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
 
 				invPromociones.Total = invPromociones.Results.Count;
 				invPromociones.Count = invPromociones.Results.Count;
 			}
 			return invPromociones;
 
-		}*/
+		}
 
-		/*public ErrorSave saveinvPromociones(PagedList<INV_PROMOCIONES> invPromociones)
+		public ErrorSave saveinvPromociones(PagedList<INV_PROMOCIONES> invPromociones)
 		{
 			ErrorSave errorSave = new ErrorSave();
 
-			errorSave.errorMessage="ID:  ";
+			errorSave.errorMessage = "ID:  ";
 
 			using (DobraConnection db = new DobraConnection())
 			{
@@ -5366,7 +5425,7 @@ namespace USWsLibrary.Services
 				{
 					foreach (var item in invPromociones.Results)
 					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
+						errorSave.errorMessage = errorSave.errorMessage + "\n" + "ID:  " + item.ID;
 
 						try
 						{
@@ -5393,9 +5452,9 @@ namespace USWsLibrary.Services
 				}
 			}
 			return errorSave;
-		}*/
+		}
 
-		/*public PagedList<INV_PROMOCIONES_DT> listInvPromocionesDt(DateTime lastUpdate, DateTime lastUpdate2)
+		public PagedList<INV_PROMOCIONES_DT> listInvPromocionesDt(DateTime lastUpdate, DateTime lastUpdate2)
 		{
 			PagedList<INV_PROMOCIONES_DT> invPromocionesDt = new PagedList<INV_PROMOCIONES_DT>();
 			using (DobraConnection db = new DobraConnection())
@@ -5407,13 +5466,13 @@ namespace USWsLibrary.Services
 			}
 			return invPromocionesDt;
 
-		}*/
+		}
 
-	/*	public ErrorSave saveInvPromocionesDt(PagedList<INV_PROMOCIONES_DT> invPromocionesDt)
+		public ErrorSave saveInvPromocionesDt(PagedList<INV_PROMOCIONES_DT> invPromocionesDt)
 		{
 			ErrorSave errorSave = new ErrorSave();
 
-			errorSave.errorMessage="ID:  ";
+			errorSave.errorMessage = "ID:  ";
 
 			using (DobraConnection db = new DobraConnection())
 			{
@@ -5421,11 +5480,11 @@ namespace USWsLibrary.Services
 				{
 					foreach (var item in invPromocionesDt.Results)
 					{
-						errorSave.errorMessage=item.ID.ToString();
+						errorSave.errorMessage = item.id.ToString();
 
 						try
 						{
-							if (db.INV_PROMOCIONES_DT.Any(invPromocionDt => invPromocionDt.ID == item.ID))
+							if (db.INV_PROMOCIONES_DT.Any(invPromocionDt => invPromocionDt.id == item.id))
 							{
 								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
 								db.SaveChanges();
@@ -5448,9 +5507,9 @@ namespace USWsLibrary.Services
 				}
 			}
 			return errorSave;
-		}*/
+		}
 
-		/*public PagedList<INV_PROMOCIONES_DT2> listInvPromocionesDt2(DateTime lastUpdate, DateTime lastUpdate2)
+		public PagedList<INV_PROMOCIONES_DT2> listInvPromocionesDt2(DateTime lastUpdate, DateTime lastUpdate2)
 		{
 			PagedList<INV_PROMOCIONES_DT2> invPromocionesDt2 = new PagedList<INV_PROMOCIONES_DT2>();
 			using (DobraConnection db = new DobraConnection())
@@ -5462,9 +5521,9 @@ namespace USWsLibrary.Services
 			}
 			return invPromocionesDt2;
 
-		}*/
+		}
 
-		/*public ErrorSave saveInvPromocionesDt2(PagedList<INV_PROMOCIONES_DT2> invPromocionesDt2)
+		public ErrorSave saveInvPromocionesDt2(PagedList<INV_PROMOCIONES_DT2> invPromocionesDt2)
 		{
 			ErrorSave errorSave = new ErrorSave();
 
@@ -5476,11 +5535,11 @@ namespace USWsLibrary.Services
 				{
 					foreach (var item in invPromocionesDt2.Results)
 					{
-						errorSave.errorMessage=item.ID.ToString();
+						errorSave.errorMessage = item.id.ToString();
 
 						try
 						{
-							if (db.INV_PROMOCIONES_DT2.Any(invPromocionDt2 => invPromocionDt2.ID == item.ID))
+							if (db.INV_PROMOCIONES_DT2.Any(invPromocionDt2 => invPromocionDt2.id == item.id))
 							{
 								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
 								db.SaveChanges();
@@ -5503,7 +5562,7 @@ namespace USWsLibrary.Services
 				}
 			}
 			return errorSave;
-		}*/
+		}
 
 
 

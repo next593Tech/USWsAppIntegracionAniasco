@@ -17,9 +17,9 @@ namespace USWsLibrary.ModelDobraDatabase
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public ACC_CUENTAS()
         {
+            this.ACC_ASIENTOS_DAY_DT = new HashSet<ACC_ASIENTOS_DAY_DT>();
             this.ACC_ASIENTOS_DT = new HashSet<ACC_ASIENTOS_DT>();
             this.ACC_ASIENTOS_PLANTILLAS_DT = new HashSet<ACC_ASIENTOS_PLANTILLAS_DT>();
-            this.ACC_ASIENTOS_DAY_DT = new HashSet<ACC_ASIENTOS_DAY_DT>();
             this.ACC_CUENTAS1 = new HashSet<ACC_CUENTAS>();
             this.BGT_CODIGOS_CUENTAS = new HashSet<BGT_CODIGOS_CUENTAS>();
             this.EMP_DEBITOS_RUBROS = new HashSet<EMP_DEBITOS_RUBROS>();
@@ -54,11 +54,11 @@ namespace USWsLibrary.ModelDobraDatabase
         public string Código_Alterno { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ACC_ASIENTOS_DAY_DT> ACC_ASIENTOS_DAY_DT { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ACC_ASIENTOS_DT> ACC_ASIENTOS_DT { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ACC_ASIENTOS_PLANTILLAS_DT> ACC_ASIENTOS_PLANTILLAS_DT { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<ACC_ASIENTOS_DAY_DT> ACC_ASIENTOS_DAY_DT { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ACC_CUENTAS> ACC_CUENTAS1 { get; set; }
         public virtual ACC_CUENTAS ACC_CUENTAS2 { get; set; }

@@ -272,6 +272,12 @@
     <Compile Include="ModelDobraDatabase\BAN_CHEQUES_PROTESTADOS_RUBROS.cs">
       <DependentUpon>DobraModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="ModelDobraDatabase\BAN_CONCILIACION.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\BAN_CONCILIACION_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="ModelDobraDatabase\BAN_CREDITOS.cs">
       <DependentUpon>DobraModel.tt</DependentUpon>
     </Compile>
@@ -303,6 +309,9 @@
       <DependentUpon>DobraModel.tt</DependentUpon>
     </Compile>
     <Compile Include="ModelDobraDatabase\BAN_EGRESOS_CUENTAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\BAN_EGRESOS_DATOS_CASH.cs">
       <DependentUpon>DobraModel.tt</DependentUpon>
     </Compile>
     <Compile Include="ModelDobraDatabase\BAN_EGRESOS_DEUDAS.cs">
@@ -357,9 +366,6 @@
       <DependentUpon>DobraModel.tt</DependentUpon>
     </Compile>
     <Compile Include="ModelDobraDatabase\BGT_PROVEEDORES_CATEGORIAS.cs">
-      <DependentUpon>DobraModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="ModelDobraDatabase\citas.cs">
       <DependentUpon>DobraModel.tt</DependentUpon>
     </Compile>
     <Compile Include="ModelDobraDatabase\CLI_AMORTIZACIONES.cs">
@@ -878,9 +884,6 @@
     <Compile Include="ModelDobraDatabase\INV_TRANSFERENCIAS_DT.cs">
       <DependentUpon>DobraModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="ModelDobraDatabase\lista_eventos.cs">
-      <DependentUpon>DobraModel.tt</DependentUpon>
-    </Compile>
     <Compile Include="ModelDobraDatabase\NIIF_CODIGOS.cs">
       <DependentUpon>DobraModel.tt</DependentUpon>
     </Compile>
@@ -963,9 +966,6 @@
       <DependentUpon>DobraModel.tt</DependentUpon>
     </Compile>
     <Compile Include="ModelDobraDatabase\PRD_ORDENES_DT.cs">
-      <DependentUpon>DobraModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="ModelDobraDatabase\PREGUNTA.cs">
       <DependentUpon>DobraModel.tt</DependentUpon>
     </Compile>
     <Compile Include="ModelDobraDatabase\PRV_BODEGAS.cs">
@@ -1071,9 +1071,6 @@
       <DependentUpon>DobraModel.tt</DependentUpon>
     </Compile>
     <Compile Include="ModelDobraDatabase\PRV_TRANSFERENCIAS_DT.cs">
-      <DependentUpon>DobraModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="ModelDobraDatabase\RESPUESTA.cs">
       <DependentUpon>DobraModel.tt</DependentUpon>
     </Compile>
     <Compile Include="ModelDobraDatabase\RMA_DOCUMENTOS_SERIES.cs">

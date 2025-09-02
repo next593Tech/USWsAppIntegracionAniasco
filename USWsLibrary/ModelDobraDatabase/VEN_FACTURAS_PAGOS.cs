@@ -32,5 +32,8 @@ namespace USWsLibrary.ModelDobraDatabase
         public string TipoPago { get; set; }
         public string id { get; set; }
         public string FormaPago { get; set; }
+        public string Nombre { get; set; }
+        public string Numero { get; set; }
+        public string Autorizacion { get; set; }
     }
 }

@@ -75,6 +75,9 @@ namespace USWsLibrary.ModelDobraDatabase
         public decimal Ice { get; set; }
         public decimal Saldo { get; set; }
         public decimal BaseCons { get; set; }
+        public bool Aprobado { get; set; }
+        public System.DateTime AprobadoDate { get; set; }
+        public string AprobadoPor { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<CLI_CREDITOS_PRODUCTOS> CLI_CREDITOS_PRODUCTOS { get; set; }

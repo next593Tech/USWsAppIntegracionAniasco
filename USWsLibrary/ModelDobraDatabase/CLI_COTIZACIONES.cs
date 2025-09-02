@@ -65,6 +65,7 @@ namespace USWsLibrary.ModelDobraDatabase
         public string BodegaID { get; set; }
         public decimal Financiero { get; set; }
         public string PlazoID { get; set; }
+        public string Estado { get; set; }
     
         public virtual CLI_CLIENTES CLI_CLIENTES { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

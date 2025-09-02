@@ -25,5 +25,6 @@ namespace USWsLibrary.ModelDobraDatabase
         public string SucursalID { get; set; }
         public Nullable<decimal> ExportadoUpdate { get; set; }
         public decimal Exportadocandidate { get; set; }
+        public System.DateTime CreadoDate { get; set; }
     }
 }

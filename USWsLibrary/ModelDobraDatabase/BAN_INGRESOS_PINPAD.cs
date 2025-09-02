@@ -60,5 +60,7 @@ namespace USWsLibrary.ModelDobraDatabase
         public decimal TermTime { get; set; }
         public decimal CodDiferido { get; set; }
         public decimal MesGracia { get; set; }
+        public bool Exportado { get; set; }
+        public bool ExportadoUpdate { get; set; }
     }
 }

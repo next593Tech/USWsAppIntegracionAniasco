@@ -42,6 +42,10 @@ namespace USWsLibrary.ModelDobraDatabase
         public Nullable<decimal> Exportado { get; set; }
         public Nullable<decimal> ExportadoUpdate { get; set; }
         public Nullable<decimal> ExportadoCandidate { get; set; }
+        public string AprobadoPor { get; set; }
+        public System.DateTime AprobadoDate { get; set; }
+        public bool Aprobado { get; set; }
+        public string Estado { get; set; }
     
         public virtual BAN_BANCOS BAN_BANCOS { get; set; }
     }

@@ -46,6 +46,7 @@ namespace USWsLibrary.ModelDobraDatabase
         public string SmallIcon { get; set; }
         public string descripcion { get; set; }
         public string Icon16 { get; set; }
+        public bool ConAprobacion { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<SEG_RECURSOS> SEG_RECURSOS1 { get; set; }

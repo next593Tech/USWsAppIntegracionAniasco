@@ -73,5 +73,7 @@ namespace USWsLibrary.ModelDobraDatabase
         public string AprobadoPor { get; set; }
         public string LiqTarjeta { get; set; }
         public bool Entregado { get; set; }
+        public bool IsDébito { get; set; }
+        public bool IsCargado { get; set; }
     }
 }

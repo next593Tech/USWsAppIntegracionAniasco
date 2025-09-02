@@ -78,6 +78,10 @@ namespace USWsLibrary.ModelDobraDatabase
         public byte[] Foto { get; set; }
         public string Categoria { get; set; }
         public string EmailOC { get; set; }
+        public bool SinRetF { get; set; }
+        public bool SinRetIVA { get; set; }
+        public string RFID { get; set; }
+        public string RIVAID { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ACR_RECIBOS> ACR_RECIBOS { get; set; }

@@ -12,10 +12,17 @@ namespace USWsLibrary.ModelDobraDatabase
     using System;
     using System.Collections.Generic;
     
-    public partial class lista_eventos
+    public partial class BAN_EGRESOS_DATOS_CASH
     {
-        public int id_etiqueta { get; set; }
-        public string descripcion { get; set; }
-        public string color { get; set; }
+        public string EgresoID { get; set; }
+        public string BancoCode { get; set; }
+        public string TipoCuenta { get; set; }
+        public string Cuenta { get; set; }
+        public string Telefono { get; set; }
+        public string ZonaID { get; set; }
+        public string Email { get; set; }
+        public System.DateTime CreadoDate { get; set; }
+        public bool Exportado { get; set; }
+        public bool ExportadoUpdate { get; set; }
     }
 }

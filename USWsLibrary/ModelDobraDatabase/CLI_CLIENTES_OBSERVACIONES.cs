@@ -34,6 +34,7 @@ namespace USWsLibrary.ModelDobraDatabase
         public bool Proxllamada { get; set; }
         public decimal Recaudado { get; set; }
         public string ID { get; set; }
+        public string TipoGestion { get; set; }
     
         public virtual CLI_CLIENTES CLI_CLIENTES { get; set; }
     }

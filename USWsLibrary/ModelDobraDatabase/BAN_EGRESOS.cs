@@ -78,9 +78,10 @@ namespace USWsLibrary.ModelDobraDatabase
         public Nullable<System.DateTime> AprobadoDate { get; set; }
         public string FormaPago { get; set; }
         public bool Cerrada { get; set; }
-        public bool CierreID { get; set; }
+        public string CierreID { get; set; }
         public bool Entregado { get; set; }
         public string TipoGastoID { get; set; }
+        public bool IsCargado { get; set; }
     
         public virtual BAN_BANCOS BAN_BANCOS { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

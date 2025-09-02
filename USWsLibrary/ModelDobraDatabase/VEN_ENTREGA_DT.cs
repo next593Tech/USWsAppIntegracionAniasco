@@ -50,6 +50,8 @@ namespace USWsLibrary.ModelDobraDatabase
         public Nullable<decimal> Ancho { get; set; }
         public string Colores { get; set; }
         public string BodegaID { get; set; }
+        public Nullable<decimal> devuelto { get; set; }
+        public bool ExportadoUpdate { get; set; }
     
         public virtual INV_PRODUCTOS INV_PRODUCTOS { get; set; }
         public virtual VEN_ENTREGA VEN_ENTREGA { get; set; }

@@ -27,6 +27,7 @@ namespace USWsLibrary.ModelDobraDatabase
     
         public virtual DbSet<ACC_ASIENTOS> ACC_ASIENTOS { get; set; }
         public virtual DbSet<ACC_ASIENTOS_DAY> ACC_ASIENTOS_DAY { get; set; }
+        public virtual DbSet<ACC_ASIENTOS_DAY_DT> ACC_ASIENTOS_DAY_DT { get; set; }
         public virtual DbSet<ACC_ASIENTOS_DT> ACC_ASIENTOS_DT { get; set; }
         public virtual DbSet<ACC_ASIENTOS_PLANTILLAS> ACC_ASIENTOS_PLANTILLAS { get; set; }
         public virtual DbSet<ACC_ASIENTOS_PLANTILLAS_DT> ACC_ASIENTOS_PLANTILLAS_DT { get; set; }
@@ -73,6 +74,7 @@ namespace USWsLibrary.ModelDobraDatabase
         public virtual DbSet<BAN_BANCOS_CARDEX> BAN_BANCOS_CARDEX { get; set; }
         public virtual DbSet<BAN_CHEQUES_PROTESTADOS> BAN_CHEQUES_PROTESTADOS { get; set; }
         public virtual DbSet<BAN_CHEQUES_PROTESTADOS_RUBROS> BAN_CHEQUES_PROTESTADOS_RUBROS { get; set; }
+        public virtual DbSet<BAN_CONCILIACION> BAN_CONCILIACION { get; set; }
         public virtual DbSet<BAN_CREDITOS> BAN_CREDITOS { get; set; }
         public virtual DbSet<BAN_CREDITOS_CUENTAS> BAN_CREDITOS_CUENTAS { get; set; }
         public virtual DbSet<BAN_DEBITOS> BAN_DEBITOS { get; set; }
@@ -96,12 +98,10 @@ namespace USWsLibrary.ModelDobraDatabase
         public virtual DbSet<BAN_INGRESOS_TARJETAS> BAN_INGRESOS_TARJETAS { get; set; }
         public virtual DbSet<BAN_PAPELETAS> BAN_PAPELETAS { get; set; }
         public virtual DbSet<BAN_TRANSFERENCIAS> BAN_TRANSFERENCIAS { get; set; }
-        public virtual DbSet<BAN_TRANSFERENCIAS_DT> BAN_TRANSFERENCIAS_DT { get; set; }
         public virtual DbSet<BGT_CODIGOS> BGT_CODIGOS { get; set; }
         public virtual DbSet<BGT_CODIGOS_CUENTAS> BGT_CODIGOS_CUENTAS { get; set; }
         public virtual DbSet<BGT_CODIGOS_VALORES> BGT_CODIGOS_VALORES { get; set; }
         public virtual DbSet<BGT_PROVEEDORES_CATEGORIAS> BGT_PROVEEDORES_CATEGORIAS { get; set; }
-        public virtual DbSet<citas> citas { get; set; }
         public virtual DbSet<CLI_CLIENTES> CLI_CLIENTES { get; set; }
         public virtual DbSet<CLI_CLIENTES_ANEXOS> CLI_CLIENTES_ANEXOS { get; set; }
         public virtual DbSet<CLI_CLIENTES_DEUDAS> CLI_CLIENTES_DEUDAS { get; set; }
@@ -123,7 +123,6 @@ namespace USWsLibrary.ModelDobraDatabase
         public virtual DbSet<CLI_RECIBOS> CLI_RECIBOS { get; set; }
         public virtual DbSet<CLI_RECIBOS_DEUDAS> CLI_RECIBOS_DEUDAS { get; set; }
         public virtual DbSet<CLI_RECIBOS_DT> CLI_RECIBOS_DT { get; set; }
-        public virtual DbSet<CLI_RETENCIONES> CLI_RETENCIONES { get; set; }
         public virtual DbSet<CLI_RETENCIONES_DEUDAS> CLI_RETENCIONES_DEUDAS { get; set; }
         public virtual DbSet<CLI_RETENCIONES_DT> CLI_RETENCIONES_DT { get; set; }
         public virtual DbSet<CLI_RUBROS> CLI_RUBROS { get; set; }
@@ -224,7 +223,6 @@ namespace USWsLibrary.ModelDobraDatabase
         public virtual DbSet<INV_PRODUCTOS_CARDEX> INV_PRODUCTOS_CARDEX { get; set; }
         public virtual DbSet<INV_PRODUCTOS_CARDEX_DAY> INV_PRODUCTOS_CARDEX_DAY { get; set; }
         public virtual DbSet<INV_PRODUCTOS_EMPAQUES> INV_PRODUCTOS_EMPAQUES { get; set; }
-        public virtual DbSet<INV_PRODUCTOS_EXHIBICION> INV_PRODUCTOS_EXHIBICION { get; set; }
         public virtual DbSet<INV_PRODUCTOS_LOTES> INV_PRODUCTOS_LOTES { get; set; }
         public virtual DbSet<INV_PRODUCTOS_MINIMOS> INV_PRODUCTOS_MINIMOS { get; set; }
         public virtual DbSet<INV_PRODUCTOS_PRECIOS> INV_PRODUCTOS_PRECIOS { get; set; }
@@ -237,7 +235,6 @@ namespace USWsLibrary.ModelDobraDatabase
         public virtual DbSet<INV_SKU> INV_SKU { get; set; }
         public virtual DbSet<INV_TRANSFERENCIAS> INV_TRANSFERENCIAS { get; set; }
         public virtual DbSet<INV_TRANSFERENCIAS_DT> INV_TRANSFERENCIAS_DT { get; set; }
-        public virtual DbSet<lista_eventos> lista_eventos { get; set; }
         public virtual DbSet<NIIF_CODIGOS> NIIF_CODIGOS { get; set; }
         public virtual DbSet<NIIF_CODIGOS_CUENTAS> NIIF_CODIGOS_CUENTAS { get; set; }
         public virtual DbSet<ORG_BUZONES> ORG_BUZONES { get; set; }
@@ -250,7 +247,6 @@ namespace USWsLibrary.ModelDobraDatabase
         public virtual DbSet<POS_TRANSFERENCIAS> POS_TRANSFERENCIAS { get; set; }
         public virtual DbSet<POS_TRANSFERENCIAS_DT> POS_TRANSFERENCIAS_DT { get; set; }
         public virtual DbSet<PRD_INDIRECTOS_DT> PRD_INDIRECTOS_DT { get; set; }
-        public virtual DbSet<PREGUNTA> PREGUNTA { get; set; }
         public virtual DbSet<PRV_BODEGAS> PRV_BODEGAS { get; set; }
         public virtual DbSet<PRV_CONSUMOS> PRV_CONSUMOS { get; set; }
         public virtual DbSet<PRV_CONSUMOS_DT> PRV_CONSUMOS_DT { get; set; }
@@ -283,7 +279,6 @@ namespace USWsLibrary.ModelDobraDatabase
         public virtual DbSet<PRV_REINTEGROS> PRV_REINTEGROS { get; set; }
         public virtual DbSet<PRV_REINTEGROS_DT> PRV_REINTEGROS_DT { get; set; }
         public virtual DbSet<PRV_RUBROS> PRV_RUBROS { get; set; }
-        public virtual DbSet<RESPUESTA> RESPUESTA { get; set; }
         public virtual DbSet<RMA_DOCUMENTOS_SERIES> RMA_DOCUMENTOS_SERIES { get; set; }
         public virtual DbSet<RMA_FACTURAS> RMA_FACTURAS { get; set; }
         public virtual DbSet<RMA_FACTURAS_COMPRAS> RMA_FACTURAS_COMPRAS { get; set; }
@@ -354,13 +349,15 @@ namespace USWsLibrary.ModelDobraDatabase
         public virtual DbSet<VEN_PLANACUMULATIVO_DT> VEN_PLANACUMULATIVO_DT { get; set; }
         public virtual DbSet<VEN_PRODUCTOS_RESERVADOS> VEN_PRODUCTOS_RESERVADOS { get; set; }
         public virtual DbSet<VEN_RULETA_REGALONA> VEN_RULETA_REGALONA { get; set; }
-        public virtual DbSet<ACC_ASIENTOS_DAY_DT> ACC_ASIENTOS_DAY_DT { get; set; }
         public virtual DbSet<ACR_ACREEDORES_AUTORIZACIONES> ACR_ACREEDORES_AUTORIZACIONES { get; set; }
         public virtual DbSet<ACR_RETENCIONES_DT> ACR_RETENCIONES_DT { get; set; }
         public virtual DbSet<ACT_ASIGNACIONES> ACT_ASIGNACIONES { get; set; }
         public virtual DbSet<ACT_ASIGNACIONES_DT> ACT_ASIGNACIONES_DT { get; set; }
         public virtual DbSet<ACT_EGRESOS> ACT_EGRESOS { get; set; }
+        public virtual DbSet<BAN_CONCILIACION_DT> BAN_CONCILIACION_DT { get; set; }
+        public virtual DbSet<BAN_EGRESOS_DATOS_CASH> BAN_EGRESOS_DATOS_CASH { get; set; }
         public virtual DbSet<BAN_EGRESOS_RETENCIONES> BAN_EGRESOS_RETENCIONES { get; set; }
+        public virtual DbSet<BAN_TRANSFERENCIAS_DT> BAN_TRANSFERENCIAS_DT { get; set; }
         public virtual DbSet<CLI_AMORTIZACIONES> CLI_AMORTIZACIONES { get; set; }
         public virtual DbSet<CLI_AMORTIZACIONES_CUPONES> CLI_AMORTIZACIONES_CUPONES { get; set; }
         public virtual DbSet<CLI_AMORTIZACIONES_DEUDAS> CLI_AMORTIZACIONES_DEUDAS { get; set; }
@@ -374,6 +371,7 @@ namespace USWsLibrary.ModelDobraDatabase
         public virtual DbSet<CLI_CRUCE_CLIENTES_DEUDAS> CLI_CRUCE_CLIENTES_DEUDAS { get; set; }
         public virtual DbSet<CLI_CRUCE_DT> CLI_CRUCE_DT { get; set; }
         public virtual DbSet<CLI_FACTURAS_KARDEX> CLI_FACTURAS_KARDEX { get; set; }
+        public virtual DbSet<CLI_RETENCIONES> CLI_RETENCIONES { get; set; }
         public virtual DbSet<COM_FACTURAS_LOTE_UBICACIONES> COM_FACTURAS_LOTE_UBICACIONES { get; set; }
         public virtual DbSet<COM_FACTURAS_TALLAS> COM_FACTURAS_TALLAS { get; set; }
         public virtual DbSet<COM_RUBROS> COM_RUBROS { get; set; }
@@ -390,6 +388,7 @@ namespace USWsLibrary.ModelDobraDatabase
         public virtual DbSet<INV_GUIAS_REMISION_DT> INV_GUIAS_REMISION_DT { get; set; }
         public virtual DbSet<INV_INGRESOS_LOTE_UBICACIONES> INV_INGRESOS_LOTE_UBICACIONES { get; set; }
         public virtual DbSet<INV_PRODUCTOS_ENSAMBLAJE> INV_PRODUCTOS_ENSAMBLAJE { get; set; }
+        public virtual DbSet<INV_PRODUCTOS_EXHIBICION> INV_PRODUCTOS_EXHIBICION { get; set; }
         public virtual DbSet<INV_PRODUCTOS_PRECIOS_HISTORICO> INV_PRODUCTOS_PRECIOS_HISTORICO { get; set; }
         public virtual DbSet<INV_PRODUCTOS_PROMOCIONES> INV_PRODUCTOS_PROMOCIONES { get; set; }
         public virtual DbSet<INV_PRODUCTOS_PROVEEDORES> INV_PRODUCTOS_PROVEEDORES { get; set; }

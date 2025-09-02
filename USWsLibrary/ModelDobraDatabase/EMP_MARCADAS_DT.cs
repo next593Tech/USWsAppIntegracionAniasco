@@ -21,5 +21,7 @@ namespace USWsLibrary.ModelDobraDatabase
         public Nullable<System.DateTime> CreadoDate { get; set; }
         public string PcID { get; set; }
         public string ID { get; set; }
+        public bool Exportado { get; set; }
+        public bool ExportadoUpdate { get; set; }
     }
 }

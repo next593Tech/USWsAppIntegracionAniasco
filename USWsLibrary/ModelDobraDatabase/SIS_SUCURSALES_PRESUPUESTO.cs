@@ -18,5 +18,8 @@ namespace USWsLibrary.ModelDobraDatabase
         public int Anio { get; set; }
         public int Mes { get; set; }
         public decimal Valor { get; set; }
+        public System.DateTime CreadoDate { get; set; }
+        public bool Exportado { get; set; }
+        public bool ExportadoUpdate { get; set; }
     }
 }

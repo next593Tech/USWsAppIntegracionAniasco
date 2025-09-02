@@ -12,51 +12,48 @@ namespace USWsLibrary.ModelDobraDatabase
     using System;
     using System.Collections.Generic;
     
-    public partial class INV_INGRESOS
+    public partial class BAN_CONCILIACION
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public INV_INGRESOS()
+        public BAN_CONCILIACION()
         {
-            this.INV_INGRESOS_PRODUCTOS = new HashSet<INV_INGRESOS_PRODUCTOS>();
-            this.INV_INGRESOS_RUBROS = new HashSet<INV_INGRESOS_RUBROS>();
+            this.BAN_CONCILIACION_DT = new HashSet<BAN_CONCILIACION_DT>();
         }
     
         public string ID { get; set; }
-        public string AsientoID { get; set; }
-        public string OrdenID { get; set; }
-        public string BodegaID { get; set; }
-        public string Bodega_Num { get; set; }
+        public string BancoID { get; set; }
+        public string SucursalID { get; set; }
+        public string PcID { get; set; }
         public string Número { get; set; }
-        public System.DateTime Fecha { get; set; }
+        public Nullable<System.DateTime> FechaDesde { get; set; }
+        public Nullable<System.DateTime> FechaHasta { get; set; }
         public string Detalle { get; set; }
-        public string Tipo { get; set; }
-        public decimal Valor_Base { get; set; }
-        public string Nota { get; set; }
         public bool Anulado { get; set; }
+        public decimal Saldo_Anterior { get; set; }
+        public decimal Total_Débitos { get; set; }
+        public Nullable<decimal> TotalCréditos { get; set; }
+        public Nullable<decimal> Saldo_Conciliado { get; set; }
+        public string Nota { get; set; }
+        public string DivisaID { get; set; }
+        public Nullable<decimal> Cambio { get; set; }
+        public string Tipo { get; set; }
+        public string CreadoPor { get; set; }
+        public Nullable<System.DateTime> ExportadoDate { get; set; }
+        public string EditadoPor { get; set; }
         public string AnuladoPor { get; set; }
         public Nullable<System.DateTime> AnuladoDate { get; set; }
         public string AnuladoNota { get; set; }
-        public Nullable<System.DateTime> ExportadoDate { get; set; }
-        public string CreadoPor { get; set; }
         public Nullable<System.DateTime> CreadoDate { get; set; }
-        public string SucursalID { get; set; }
-        public string PcID { get; set; }
+        public Nullable<System.DateTime> EditadoDate { get; set; }
         public string DivisiónID { get; set; }
         public string ExportadoPor { get; set; }
         public Nullable<decimal> Exportado { get; set; }
         public Nullable<decimal> ExportadoUpdate { get; set; }
         public Nullable<decimal> ExportadoCandidate { get; set; }
-        public string MovUniqueId { get; set; }
-        public string FacturaID { get; set; }
-        public Nullable<System.DateTime> Editadodate { get; set; }
-        public bool Aprobado { get; set; }
-        public string AprobadoPor { get; set; }
-        public System.DateTime AprobadoDate { get; set; }
+        public Nullable<decimal> Saldo_Banco { get; set; }
         public string Estado { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<INV_INGRESOS_PRODUCTOS> INV_INGRESOS_PRODUCTOS { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<INV_INGRESOS_RUBROS> INV_INGRESOS_RUBROS { get; set; }
+        public virtual ICollection<BAN_CONCILIACION_DT> BAN_CONCILIACION_DT { get; set; }
     }
 }

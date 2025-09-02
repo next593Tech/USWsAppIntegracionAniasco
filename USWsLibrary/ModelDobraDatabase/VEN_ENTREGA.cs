@@ -76,6 +76,8 @@ namespace USWsLibrary.ModelDobraDatabase
         public string FacturaID { get; set; }
         public string Despacho { get; set; }
         public string Secuencia { get; set; }
+        public Nullable<decimal> devuelto { get; set; }
+        public bool ExportadoUpdate { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<VEN_ENTREGA_DT> VEN_ENTREGA_DT { get; set; }

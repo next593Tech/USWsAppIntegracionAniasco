@@ -12,37 +12,35 @@ namespace USWsLibrary.ModelDobraDatabase
     using System;
     using System.Collections.Generic;
     
-    public partial class CLI_CRUCE_CLIENTES
+    public partial class BAN_CONCILIACION_DT
     {
         public string ID { get; set; }
-        public string ClienteID { get; set; }
-        public string AsientoID { get; set; }
-        public string Número { get; set; }
-        public System.DateTime Fecha { get; set; }
-        public string Detalle { get; set; }
+        public string ConciliacionID { get; set; }
+        public Nullable<System.DateTime> Fecha { get; set; }
+        public Nullable<System.DateTime> Fecha_Banco { get; set; }
         public string Tipo { get; set; }
-        public decimal Total { get; set; }
-        public string Nota { get; set; }
-        public bool Anulado { get; set; }
+        public string Número { get; set; }
+        public string Cheque { get; set; }
+        public string Beneficiario { get; set; }
+        public string Detalle { get; set; }
+        public Nullable<decimal> Valor { get; set; }
+        public bool Conciliado { get; set; }
+        public string SucursalID { get; set; }
+        public string PcID { get; set; }
         public Nullable<System.DateTime> ExportadoDate { get; set; }
         public string CreadoPor { get; set; }
         public Nullable<System.DateTime> CreadoDate { get; set; }
         public string EditadoPor { get; set; }
         public Nullable<System.DateTime> EditadoDate { get; set; }
-        public string AnuladoPor { get; set; }
-        public Nullable<System.DateTime> AnuladoDate { get; set; }
-        public string AnuladoNota { get; set; }
-        public string SucursalID { get; set; }
-        public string PcID { get; set; }
-        public string DivisiónID { get; set; }
-        public Nullable<bool> Impresa { get; set; }
+        public string DivisaID { get; set; }
+        public decimal Cambio { get; set; }
         public string ExportadoPor { get; set; }
         public Nullable<decimal> Exportado { get; set; }
         public Nullable<decimal> ExportadoUpdate { get; set; }
         public Nullable<decimal> ExportadoCandidate { get; set; }
-        public bool Aprobado { get; set; }
-        public System.DateTime AprobadoDate { get; set; }
-        public string AprobadoPor { get; set; }
-        public string Estado { get; set; }
+        public string DocumentoID { get; set; }
+        public Nullable<bool> Débito { get; set; }
+    
+        public virtual BAN_CONCILIACION BAN_CONCILIACION { get; set; }
     }
 }

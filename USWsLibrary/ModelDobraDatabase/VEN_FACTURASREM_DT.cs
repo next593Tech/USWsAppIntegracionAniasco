@@ -42,5 +42,6 @@ namespace USWsLibrary.ModelDobraDatabase
         public Nullable<decimal> SubtotalDoce { get; set; }
         public decimal Compensacion { get; set; }
         public Nullable<System.DateTime> Fecha { get; set; }
+        public bool ExportadoUpdate { get; set; }
     }
 }

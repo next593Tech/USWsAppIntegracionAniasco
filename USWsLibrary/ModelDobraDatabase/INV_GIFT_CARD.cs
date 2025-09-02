@@ -23,5 +23,8 @@ namespace USWsLibrary.ModelDobraDatabase
         public decimal Valor { get; set; }
         public decimal Saldo { get; set; }
         public bool Anulado { get; set; }
+        public System.DateTime CreadoDate { get; set; }
+        public bool Exportado { get; set; }
+        public bool ExportadoUpdate { get; set; }
     }
 }

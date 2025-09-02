@@ -578,17 +578,17 @@ namespace USWsApp.Controllers
             return _objclisrv.saveInvProductosCardex(invProductosCardex);
         }
 
-       /* [HttpPost]
-        public PagedList<POS_CIERRES_CAJA> listPosCierresCaja(DateTime lastUpdate,DateTime lastUpdate2)
+        [HttpPost]
+        public PagedList<POS_CIERRES_CAJA> listPosCierresCaja(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listPosCierresCajas( lastUpdate, lastUpdate2);
+            return _objclisrv.listPosCierresCajas(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
         public ErrorSave savePosCierresCajas(PagedList<POS_CIERRES_CAJA> posCierresCajas)
         {
             return _objclisrv.savePosCierresCajas(posCierresCajas);
-        }*/
+        }
 
         [HttpPost]
         public PagedList<POS_CIERRES> listPosCierre(DateTime lastUpdate,DateTime lastUpdate2)
@@ -677,11 +677,11 @@ namespace USWsApp.Controllers
         {
             return _objclisrv.saveBanDepositosDt(banDepositosDt);
         }
-/*
+
         [HttpPost]
-        public PagedList<BAN_DEPOSITOS_PAPELETAS> listBanDepositoPapeletas(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<BAN_DEPOSITOS_PAPELETAS> listBanDepositoPapeletas(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listBanDepositoPapeletas(lastUpdate,lastUpdate2);
+            return _objclisrv.listBanDepositoPapeletas(lastUpdate, lastUpdate2);
         }
 
 
@@ -690,7 +690,7 @@ namespace USWsApp.Controllers
         {
             return _objclisrv.saveBanDepositoPapeletas(banPapeletas);
         }
-        */
+
         [HttpPost]
         public PagedList<COM_FACTURAS> listComFacturas(DateTime lastUpdate,DateTime lastUpdate2)
         {
@@ -1214,20 +1214,20 @@ namespace USWsApp.Controllers
             return _objclisrv.savebanIngresosCuentas(banIngresosCuentas);
         }
 
-        /*[HttpPost]
-        public PagedList<BAN_INGRESOS_TARJETAS> listbanIngresosTarjetas(DateTime lastUpdate,DateTime lastUpdate2)
-        {
-            return _objclisrv.listbanIngresosTarjetas(lastUpdate,lastUpdate2);
-        }
+		[HttpPost]
+		public PagedList<BAN_INGRESOS_TARJETAS> listbanIngresosTarjetas(DateTime lastUpdate, DateTime lastUpdate2)
+		{
+			return _objclisrv.listbanIngresosTarjetas(lastUpdate, lastUpdate2);
+		}
 
-        [HttpPost]
-        public ErrorSave savebanIngresosTarjetas(PagedList<BAN_INGRESOS_TARJETAS> banIngresosTarjetas)
-        {
-            return _objclisrv.savebanIngresosTarjetas(banIngresosTarjetas);
-        }*/
+		[HttpPost]
+		public ErrorSave savebanIngresosTarjetas(PagedList<BAN_INGRESOS_TARJETAS> banIngresosTarjetas)
+		{
+			return _objclisrv.savebanIngresosTarjetas(banIngresosTarjetas);
+		}
 
 
-        [HttpPost]
+		[HttpPost]
         public PagedList<BAN_PAPELETAS> listbanPapeletas(DateTime lastUpdate,DateTime lastUpdate2)
         {
             return _objclisrv.listbanPapeletas(lastUpdate,lastUpdate2);
@@ -1354,41 +1354,41 @@ namespace USWsApp.Controllers
         }
 
 
-      /*  [HttpPost]
-        public PagedList<INV_PROMOCIONES> listInvPromociones(DateTime lastUpdate,DateTime lastUpdate2)
+        [HttpPost]
+        public PagedList<INV_PROMOCIONES> listInvPromociones(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listinvPromociones(lastUpdate,lastUpdate2);
+            return _objclisrv.listinvPromociones(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
         public ErrorSave saveInvPromociones(PagedList<INV_PROMOCIONES> invPromociones)
         {
             return _objclisrv.saveinvPromociones(invPromociones);
-        }*/
+        }
 
-        /*[HttpPost]
-        public PagedList<INV_PROMOCIONES_DT> listInvPromocionesDt(DateTime lastUpdate,DateTime lastUpdate2)
+        [HttpPost]
+        public PagedList<INV_PROMOCIONES_DT> listInvPromocionesDt(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listInvPromocionesDt(lastUpdate,lastUpdate2);
+            return _objclisrv.listInvPromocionesDt(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
         public ErrorSave saveInvPromocionesDt(PagedList<INV_PROMOCIONES_DT> invPromocionesDt)
         {
             return _objclisrv.saveInvPromocionesDt(invPromocionesDt);
-        }*/
+        }
 
-        /*[HttpPost]
-        public PagedList<INV_PROMOCIONES_DT2> listInvPromocionesDt2(DateTime lastUpdate,DateTime lastUpdate2)
+        [HttpPost]
+        public PagedList<INV_PROMOCIONES_DT2> listInvPromocionesDt2(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listInvPromocionesDt2(lastUpdate,lastUpdate2);
+            return _objclisrv.listInvPromocionesDt2(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
         public ErrorSave saveInvPromocionesDt2(PagedList<INV_PROMOCIONES_DT2> invPromocionesDT2)
         {
             return _objclisrv.saveInvPromocionesDt2(invPromocionesDT2);
-        }*/
+        }
 
 
         [HttpPost]
@@ -1627,6 +1627,19 @@ namespace USWsApp.Controllers
             return _objclisrv.saveOrgTareas(orgTareas);
         }
 
+		[HttpPost]
+		public PagedList<SIS_ZONAS> listSisZonas(DateTime lastUpdate, DateTime lastUpdate2)
+		{
+			return _objclisrv.listSisZonas(lastUpdate, lastUpdate2);
+		}
 
-    }
+		[HttpPost]
+		public ErrorSave saveSisZonas(PagedList<SIS_ZONAS> sisZonas)
+		{
+			return _objclisrv.saveSisZonas(sisZonas);
+		}
+
+
+
+	}
 }

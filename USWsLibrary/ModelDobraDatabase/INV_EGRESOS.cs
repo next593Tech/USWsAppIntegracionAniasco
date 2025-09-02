@@ -56,6 +56,9 @@ namespace USWsLibrary.ModelDobraDatabase
         public System.DateTime FechaEntrega { get; set; }
         public bool impreso { get; set; }
         public string MotivoID { get; set; }
+        public bool Aprobado { get; set; }
+        public string AprobadoPor { get; set; }
+        public System.DateTime AprobadoDate { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<INV_EGRESOS_PRODUCTOS> INV_EGRESOS_PRODUCTOS { get; set; }
