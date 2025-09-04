@@ -18,12 +18,17 @@ namespace USWsLibrary.ModelDobraDatabase
         public DobraConnection()
             : base("name=DobraConnection")
         {
-        }
+			this.Configuration.ProxyCreationEnabled = false;
+			this.Configuration.LazyLoadingEnabled = false;
+
+			((IObjectContextAdapter)this).ObjectContext.CommandTimeout = 400;
+
+		}
     
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            throw new UnintentionalCodeFirstException();
-        }
+			base.OnModelCreating(modelBuilder);
+		}
     
         public virtual DbSet<ACC_ASIENTOS> ACC_ASIENTOS { get; set; }
         public virtual DbSet<ACC_ASIENTOS_DAY> ACC_ASIENTOS_DAY { get; set; }
