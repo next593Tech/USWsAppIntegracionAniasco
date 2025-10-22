@@ -46,6 +46,6 @@ namespace USWsLibrary.ModelDobraDatabase
         public string SupervisorID { get; set; }
         public string GerenteID { get; set; }
         public string ClusterID { get; set; }
-        public bool ControlaStock { get; set; }
+        public Nullable<bool> ControlaStock { get; set; }
     }
 }

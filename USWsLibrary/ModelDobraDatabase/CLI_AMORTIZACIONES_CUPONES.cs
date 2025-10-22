@@ -19,8 +19,5 @@ namespace USWsLibrary.ModelDobraDatabase
         public decimal Valor { get; set; }
         public Nullable<bool> Aplicado { get; set; }
         public string ID { get; set; }
-        public System.DateTime CreadoDate { get; set; }
-        public bool Exportado { get; set; }
-        public bool ExportadoUpdate { get; set; }
     }
 }

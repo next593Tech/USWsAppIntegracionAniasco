@@ -57,9 +57,9 @@ namespace USWsLibrary.ModelDobraDatabase
         public Nullable<bool> Virtual { get; set; }
         public string MotivoID { get; set; }
         public bool Aprobado { get; set; }
-        public string AprobadoPor { get; set; }
         public System.DateTime AprobadoDate { get; set; }
-        public bool Croquis { get; set; }
+        public string AprobadoPor { get; set; }
+        public Nullable<bool> Croquis { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<INV_TRANSFERENCIAS_DT> INV_TRANSFERENCIAS_DT { get; set; }

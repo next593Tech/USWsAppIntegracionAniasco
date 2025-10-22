@@ -50,8 +50,8 @@ namespace USWsLibrary.ModelDobraDatabase
         public string FacturaID { get; set; }
         public Nullable<System.DateTime> Editadodate { get; set; }
         public bool Aprobado { get; set; }
-        public string AprobadoPor { get; set; }
         public System.DateTime AprobadoDate { get; set; }
+        public string AprobadoPor { get; set; }
         public string Estado { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

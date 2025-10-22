@@ -37,6 +37,8 @@ namespace USWsLibrary.ModelDobraDatabase
         public string ID { get; set; }
         public Nullable<bool> Anulado { get; set; }
         public Nullable<bool> MayorEmpaque { get; set; }
-        public Nullable<System.DateTime> EditadoDate { get; set; }
-    }
+		public Nullable<System.DateTime> EditadoDate { get; set; }
+
+
+	}
 }

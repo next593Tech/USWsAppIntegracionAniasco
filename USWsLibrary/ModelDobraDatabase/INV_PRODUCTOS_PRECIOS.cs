@@ -31,8 +31,8 @@ namespace USWsLibrary.ModelDobraDatabase
         public Nullable<bool> Anulado { get; set; }
         public decimal tasaUtilidad { get; set; }
         public bool placa { get; set; }
-        public Nullable<System.DateTime> EditadoDate { get; set; }
-    
-        public virtual INV_PRODUCTOS INV_PRODUCTOS { get; set; }
+		public Nullable<System.DateTime> EditadoDate { get; set; }
+
+		public virtual INV_PRODUCTOS INV_PRODUCTOS { get; set; }
     }
 }

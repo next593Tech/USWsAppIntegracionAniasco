@@ -59,5 +59,7 @@ namespace USWsLibrary.ModelDobraDatabase
         public Nullable<decimal> ExportadoUpdate { get; set; }
         public Nullable<decimal> ExportadoCandidate { get; set; }
         public decimal Cert_Origen { get; set; }
+        public Nullable<bool> ConIva { get; set; }
+        public Nullable<decimal> IvaCert_Origen { get; set; }
     }
 }

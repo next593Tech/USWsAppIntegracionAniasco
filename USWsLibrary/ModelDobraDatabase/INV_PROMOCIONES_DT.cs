@@ -29,7 +29,6 @@ namespace USWsLibrary.ModelDobraDatabase
         public decimal Maximo { get; set; }
         public decimal Stock { get; set; }
         public string id { get; set; }
-        public bool ExportadoUpdate { get; set; }
     
         public virtual INV_PRODUCTOS INV_PRODUCTOS { get; set; }
         public virtual INV_PROMOCIONES INV_PROMOCIONES { get; set; }

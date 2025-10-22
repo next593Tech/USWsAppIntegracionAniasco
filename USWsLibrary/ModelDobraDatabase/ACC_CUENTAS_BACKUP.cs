@@ -12,48 +12,43 @@ namespace USWsLibrary.ModelDobraDatabase
     using System;
     using System.Collections.Generic;
     
-    public partial class BAN_CONCILIACION
+    public partial class ACC_CUENTAS_BACKUP
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public BAN_CONCILIACION()
+        public ACC_CUENTAS_BACKUP()
         {
-            this.BAN_CONCILIACION_DT = new HashSet<BAN_CONCILIACION_DT>();
+            this.ACC_CUENTAS_BACKUP1 = new HashSet<ACC_CUENTAS_BACKUP>();
         }
     
         public string ID { get; set; }
-        public string BancoID { get; set; }
-        public string SucursalID { get; set; }
-        public string PcID { get; set; }
-        public string Número { get; set; }
-        public Nullable<System.DateTime> FechaDesde { get; set; }
-        public Nullable<System.DateTime> FechaHasta { get; set; }
-        public string Detalle { get; set; }
-        public bool Anulado { get; set; }
-        public decimal Saldo_Anterior { get; set; }
-        public decimal Total_Débitos { get; set; }
-        public Nullable<decimal> TotalCréditos { get; set; }
-        public Nullable<decimal> Saldo_Conciliado { get; set; }
-        public string Nota { get; set; }
-        public string DivisaID { get; set; }
-        public Nullable<decimal> Cambio { get; set; }
+        public string Código { get; set; }
+        public string Nombre { get; set; }
+        public string Clase { get; set; }
         public string Tipo { get; set; }
-        public string CreadoPor { get; set; }
+        public string Ruta { get; set; }
+        public string Orden { get; set; }
+        public bool Anulado { get; set; }
+        public string PadreID { get; set; }
+        public string Nota { get; set; }
         public Nullable<System.DateTime> ExportadoDate { get; set; }
-        public string EditadoPor { get; set; }
-        public string AnuladoPor { get; set; }
-        public Nullable<System.DateTime> AnuladoDate { get; set; }
-        public string AnuladoNota { get; set; }
+        public string PCID { get; set; }
+        public string SucursalID { get; set; }
+        public string CreadoPor { get; set; }
         public Nullable<System.DateTime> CreadoDate { get; set; }
+        public string EditadoPor { get; set; }
         public Nullable<System.DateTime> EditadoDate { get; set; }
-        public string DivisiónID { get; set; }
+        public string Presupuesto { get; set; }
         public string ExportadoPor { get; set; }
         public Nullable<decimal> Exportado { get; set; }
         public Nullable<decimal> ExportadoUpdate { get; set; }
         public Nullable<decimal> ExportadoCandidate { get; set; }
-        public Nullable<decimal> Saldo_Banco { get; set; }
-        public string Estado { get; set; }
+        public string CódigoRF { get; set; }
+        public string F101 { get; set; }
+        public bool IsEnlace { get; set; }
+        public string Código_Alterno { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<BAN_CONCILIACION_DT> BAN_CONCILIACION_DT { get; set; }
+        public virtual ICollection<ACC_CUENTAS_BACKUP> ACC_CUENTAS_BACKUP1 { get; set; }
+        public virtual ACC_CUENTAS_BACKUP ACC_CUENTAS_BACKUP2 { get; set; }
     }
 }

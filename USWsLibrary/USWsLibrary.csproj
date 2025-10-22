@@ -131,6 +131,9 @@
     <Compile Include="ModelDobraDatabase\ACC_CUENTAS.cs">
       <DependentUpon>DobraModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="ModelDobraDatabase\ACC_CUENTAS_BACKUP.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="ModelDobraDatabase\ACR_ACREEDORES.cs">
       <DependentUpon>DobraModel.tt</DependentUpon>
     </Compile>
@@ -272,12 +275,6 @@
     <Compile Include="ModelDobraDatabase\BAN_CHEQUES_PROTESTADOS_RUBROS.cs">
       <DependentUpon>DobraModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="ModelDobraDatabase\BAN_CONCILIACION.cs">
-      <DependentUpon>DobraModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="ModelDobraDatabase\BAN_CONCILIACION_DT.cs">
-      <DependentUpon>DobraModel.tt</DependentUpon>
-    </Compile>
     <Compile Include="ModelDobraDatabase\BAN_CREDITOS.cs">
       <DependentUpon>DobraModel.tt</DependentUpon>
     </Compile>
@@ -366,6 +363,9 @@
       <DependentUpon>DobraModel.tt</DependentUpon>
     </Compile>
     <Compile Include="ModelDobraDatabase\BGT_PROVEEDORES_CATEGORIAS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\citas.cs">
       <DependentUpon>DobraModel.tt</DependentUpon>
     </Compile>
     <Compile Include="ModelDobraDatabase\CLI_AMORTIZACIONES.cs">
@@ -680,6 +680,15 @@
     <Compile Include="ModelDobraDatabase\FLW_EGRESOS.cs">
       <DependentUpon>DobraModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="ModelDobraDatabase\GeoTECKSoftware_CamposEtiqueta.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\GeoTECKSoftware_LabelPrinter.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\GeoTECKSoftware_ListPrinter.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="ModelDobraDatabase\IMP_ANALISIS_COSTOS.cs">
       <DependentUpon>DobraModel.tt</DependentUpon>
     </Compile>
@@ -884,6 +893,9 @@
     <Compile Include="ModelDobraDatabase\INV_TRANSFERENCIAS_DT.cs">
       <DependentUpon>DobraModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="ModelDobraDatabase\lista_eventos.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="ModelDobraDatabase\NIIF_CODIGOS.cs">
       <DependentUpon>DobraModel.tt</DependentUpon>
     </Compile>
@@ -966,6 +978,9 @@
       <DependentUpon>DobraModel.tt</DependentUpon>
     </Compile>
     <Compile Include="ModelDobraDatabase\PRD_ORDENES_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\PREGUNTA.cs">
       <DependentUpon>DobraModel.tt</DependentUpon>
     </Compile>
     <Compile Include="ModelDobraDatabase\PRV_BODEGAS.cs">
@@ -1071,6 +1086,9 @@
       <DependentUpon>DobraModel.tt</DependentUpon>
     </Compile>
     <Compile Include="ModelDobraDatabase\PRV_TRANSFERENCIAS_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\RESPUESTA.cs">
       <DependentUpon>DobraModel.tt</DependentUpon>
     </Compile>
     <Compile Include="ModelDobraDatabase\RMA_DOCUMENTOS_SERIES.cs">

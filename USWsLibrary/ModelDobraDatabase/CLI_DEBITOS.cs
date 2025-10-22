@@ -52,9 +52,6 @@ namespace USWsLibrary.ModelDobraDatabase
         public string SRI_DHA { get; set; }
         public string Estado { get; set; }
         public decimal Compensacion { get; set; }
-        public bool Aprobado { get; set; }
-        public System.DateTime AprobadoDate { get; set; }
-        public string AprobadoPor { get; set; }
     
         public virtual CLI_CLIENTES CLI_CLIENTES { get; set; }
     }

@@ -45,6 +45,5 @@ namespace USWsLibrary.ModelDobraDatabase
         public Nullable<System.DateTime> ExportadoDate { get; set; }
         public string SucursalID { get; set; }
         public string PcID { get; set; }
-        public bool ExportadoUpdate { get; set; }
     }
 }

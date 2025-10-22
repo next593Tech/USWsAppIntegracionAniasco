@@ -54,6 +54,8 @@ namespace USWsLibrary.ModelDobraDatabase
         public Nullable<decimal> TasaImpuestoIce { get; set; }
         public Nullable<decimal> ImpuestoIce { get; set; }
         public string VendedorID { get; set; }
+        public Nullable<decimal> TasaFinanciero { get; set; }
+        public Nullable<decimal> Financiero { get; set; }
     
         public virtual INV_PRODUCTOS INV_PRODUCTOS { get; set; }
         public virtual VEN_ORDENES VEN_ORDENES { get; set; }

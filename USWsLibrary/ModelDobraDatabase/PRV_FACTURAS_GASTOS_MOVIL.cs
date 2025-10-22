@@ -36,7 +36,5 @@ namespace USWsLibrary.ModelDobraDatabase
         public Nullable<decimal> Impuesto { get; set; }
         public bool procesado { get; set; }
         public string Tipo { get; set; }
-        public bool Exportado { get; set; }
-        public bool ExportadoUpdate { get; set; }
     }
 }

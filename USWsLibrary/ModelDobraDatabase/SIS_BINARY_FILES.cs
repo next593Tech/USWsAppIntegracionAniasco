@@ -20,8 +20,5 @@ namespace USWsLibrary.ModelDobraDatabase
         public string Tipo { get; set; }
         public string Valor { get; set; }
         public byte[] FileBinary { get; set; }
-        public System.DateTime CreadoDate { get; set; }
-        public bool Exportado { get; set; }
-        public bool ExportadoUpdate { get; set; }
     }
 }

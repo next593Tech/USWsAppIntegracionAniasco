@@ -19,8 +19,5 @@ namespace USWsLibrary.ModelDobraDatabase
         public string Id_Tabla { get; set; }
         public string Accion { get; set; }
         public Nullable<System.DateTime> fecha_Accion { get; set; }
-        public System.DateTime CreadoDate { get; set; }
-        public bool Exportado { get; set; }
-        public bool ExportadoUpdate { get; set; }
     }
 }

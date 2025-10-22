@@ -78,6 +78,7 @@ namespace USWsLibrary.ModelDobraDatabase
         public decimal DescuentoEspecial { get; set; }
         public System.DateTime FechaEntrega { get; set; }
         public string EmpresariaID { get; set; }
+        public Nullable<decimal> Financiero { get; set; }
     
         public virtual SIS_DIVISIONES SIS_DIVISIONES { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

@@ -30,6 +30,5 @@ namespace USWsLibrary.ModelDobraDatabase
         public string LiquidaciónTipo { get; set; }
         public decimal Exportadocandidate { get; set; }
         public string ID { get; set; }
-        public System.DateTime CreadoDate { get; set; }
     }
 }

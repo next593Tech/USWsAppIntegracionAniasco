@@ -21,8 +21,5 @@ namespace USWsLibrary.ModelDobraDatabase
         public string Teléfonos { get; set; }
         public string Movil { get; set; }
         public string Email { get; set; }
-        public System.DateTime CreadoDate { get; set; }
-        public bool Exportado { get; set; }
-        public bool ExportadoUpdate { get; set; }
     }
 }
