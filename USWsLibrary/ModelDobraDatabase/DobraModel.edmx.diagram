@@ -4,7 +4,7 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="a2d6a7e3305a4bc796e52f72b04f92c7" Name="Diagram1">
+      <Diagram DiagramId="f4cfd985a24b460e9867e234a6588acc" Name="Diagram1">
         <EntityTypeShape EntityType="DobraModel.ACC_ASIENTOS" Width="1.5" PointX="23.75" PointY="29.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.ACC_ASIENTOS_DAY" Width="1.5" PointX="3.75" PointY="8.25" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.ACC_ASIENTOS_DT" Width="1.5" PointX="3" PointY="20.5" IsExpanded="true" />
@@ -12,7 +12,7 @@
         <EntityTypeShape EntityType="DobraModel.ACC_ASIENTOS_PLANTILLAS_DT" Width="1.5" PointX="6" PointY="20.75" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.ACC_CUENTAS" Width="1.5" PointX="0.75" PointY="19.375" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.ACC_CUENTAS_BACKUP" Width="1.5" PointX="21.75" PointY="29.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.ACR_ACREEDORES" Width="1.5" PointX="0.75" PointY="111.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.ACR_ACREEDORES" Width="1.5" PointX="0.75" PointY="112.125" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.ACR_ACREEDORES_ANEXOS" Width="1.5" PointX="5.75" PointY="9.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.ACR_ACREEDORES_DEUDAS" Width="1.5" PointX="5.75" PointY="35.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.ACR_CREDITOS" Width="1.5" PointX="28.75" PointY="36.5" IsExpanded="true" />
@@ -21,12 +21,12 @@
         <EntityTypeShape EntityType="DobraModel.ACR_CRUCE_ACREEDORES_DEUDAS" Width="1.5" PointX="30.75" PointY="38.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.ACR_CRUCES" Width="1.5" PointX="35.75" PointY="37.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.ACR_CRUCES_DT" Width="1.5" PointX="36.75" PointY="3.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.ACR_DEBITOS" Width="1.5" PointX="3" PointY="167" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.ACR_DEBITOS" Width="1.5" PointX="3" PointY="167.375" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.ACR_DEBITOS_DEUDAS" Width="1.5" PointX="36.75" PointY="10.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.ACR_DEBITOS_PRODUCTOS" Width="1.5" PointX="5.25" PointY="142.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.ACR_DEBITOS_PRODUCTOS" Width="1.5" PointX="5.25" PointY="143.125" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.ACR_DEBITOS_RUBROS" Width="1.5" PointX="11.75" PointY="3.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.ACR_GRUPOS" Width="1.5" PointX="21.75" PointY="3.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.ACR_RECIBOS" Width="1.5" PointX="3" PointY="97.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.ACR_RECIBOS" Width="1.5" PointX="3" PointY="98.125" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.ACR_RECIBOS_DEUDAS" Width="1.5" PointX="36.75" PointY="17.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.ACR_RECIBOS_DT" Width="1.5" PointX="36.75" PointY="24.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.ACR_RETENCIONES" Width="1.5" PointX="31.75" PointY="15.5" IsExpanded="true" />
@@ -48,11 +48,11 @@
         <EntityTypeShape EntityType="DobraModel.ACT_ORDENES" Width="1.5" PointX="40.75" PointY="22.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.ACT_ORDENES_DT" Width="1.5" PointX="39.75" PointY="43.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.ACT_TIPOS" Width="1.5" PointX="25.75" PointY="44.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.AST_ASISTENCIAS" Width="1.5" PointX="6" PointY="170" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.AST_TAREAS" Width="1.5" PointX="8.25" PointY="143" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.AST_ASISTENCIAS" Width="1.5" PointX="6" PointY="170.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.AST_TAREAS" Width="1.5" PointX="8.25" PointY="143.375" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.BAN_BANCOS" Width="1.5" PointX="11.75" PointY="27" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.BAN_BANCOS_CARDEX" Width="1.5" PointX="41.75" PointY="31.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.BAN_CHEQUES_PROTESTADOS" Width="1.5" PointX="18" PointY="204" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.BAN_CHEQUES_PROTESTADOS" Width="1.5" PointX="18" PointY="204.375" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.BAN_CHEQUES_PROTESTADOS_RUBROS" Width="1.5" PointX="32.75" PointY="44.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.BAN_CREDITOS" Width="1.5" PointX="14" PointY="13.625" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.BAN_CREDITOS_CUENTAS" Width="1.5" PointX="34.75" PointY="44.5" IsExpanded="true" />
@@ -83,39 +83,39 @@
         <EntityTypeShape EntityType="DobraModel.BGT_CODIGOS_VALORES" Width="1.5" PointX="3" PointY="1.375" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.BGT_PROVEEDORES_CATEGORIAS" Width="1.5" PointX="13.75" PointY="3.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.citas" Width="1.5" PointX="44.75" PointY="22.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.CLI_CLIENTES" Width="1.5" PointX="15.75" PointY="186.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.CLI_CLIENTES" Width="1.5" PointX="15.75" PointY="186.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.CLI_CLIENTES_ANEXOS" Width="1.5" PointX="10.75" PointY="16.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.CLI_CLIENTES_DEUDAS" Width="1.5" PointX="18" PointY="211.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.CLI_CLIENTES_DEUDAS" Width="1.5" PointX="18" PointY="212.25" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.CLI_COBRANZAS" Width="1.5" PointX="27.75" PointY="47.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.CLI_COBRANZAS_INGRESOS" Width="1.5" PointX="29.75" PointY="47.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.CLI_COTIZACIONES" Width="1.5" PointX="18" PointY="192.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.CLI_CREDITOS" Width="1.5" PointX="9" PointY="168.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.CLI_COTIZACIONES" Width="1.5" PointX="18" PointY="192.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.CLI_CREDITOS" Width="1.5" PointX="9" PointY="168.75" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.CLI_CREDITOS_DEUDAS" Width="1.5" PointX="36.75" PointY="47.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.CLI_CREDITOS_PRODUCTOS" Width="1.5" PointX="11.25" PointY="143.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.CLI_CREDITOS_PRODUCTOS" Width="1.5" PointX="11.25" PointY="143.375" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.CLI_CREDITOS_RUBROS" Width="1.5" PointX="45.75" PointY="27.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.CLI_CRUCE" Width="1.5" PointX="45.75" PointY="33.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.CLI_CRUCE_CLIENTES" Width="1.5" PointX="45.75" PointY="40.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.CLI_DEBITOS" Width="1.5" PointX="18" PointY="223.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.CLI_DEBITOS" Width="1.5" PointX="18" PointY="223.625" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.CLI_DEBITOS_RUBROS" Width="1.5" PointX="45.75" PointY="47.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.CLI_GRUPOS" Width="1.5" PointX="13.5" PointY="194.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.CLI_LETRAS" Width="1.5" PointX="18" PointY="235.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.CLI_LETRAS_DEUDAS" Width="1.5" PointX="20.25" PointY="232.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.CLI_LETRAS_DT" Width="1.5" PointX="20.25" PointY="239.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.CLI_RECIBOS" Width="1.5" PointX="18" PointY="242.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.CLI_GRUPOS" Width="1.5" PointX="13.5" PointY="195" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.CLI_LETRAS" Width="1.5" PointX="18" PointY="235.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.CLI_LETRAS_DEUDAS" Width="1.5" PointX="20.25" PointY="232.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.CLI_LETRAS_DT" Width="1.5" PointX="20.25" PointY="239.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.CLI_RECIBOS" Width="1.5" PointX="18" PointY="243.125" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.CLI_RECIBOS_DEUDAS" Width="1.5" PointX="46.75" PointY="3.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.CLI_RECIBOS_DT" Width="1.5" PointX="46.75" PointY="10.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.CLI_RETENCIONES" Width="1.5" PointX="46.75" PointY="17.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.CLI_RETENCIONES_DEUDAS" Width="1.5" PointX="18.75" PointY="49.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.CLI_RETENCIONES_DT" Width="1.5" PointX="5.75" PointY="50.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.CLI_RUBROS" Width="1.5" PointX="47.75" PointY="25.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.COM_DEVOLUCIONES" Width="1.5" PointX="18" PointY="92.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.COM_DEVOLUCIONES_DT" Width="1.5" PointX="20.25" PointY="169.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.COM_FACTURAS" Width="1.5" PointX="12" PointY="165.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.COM_FACTURAS_DT" Width="1.5" PointX="14.25" PointY="141" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.COM_DEVOLUCIONES" Width="1.5" PointX="18" PointY="92.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.COM_DEVOLUCIONES_DT" Width="1.5" PointX="20.25" PointY="169.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.COM_FACTURAS" Width="1.5" PointX="12" PointY="166" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.COM_FACTURAS_DT" Width="1.5" PointX="14.25" PointY="141.25" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.COM_FACTURAS_PAGOS" Width="1.5" PointX="23.75" PointY="50.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.COM_GUIAS_REMISION" Width="1.5" PointX="47.75" PointY="31.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.COM_LIQUIDACIONES" Width="1.5" PointX="6" PointY="114" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.COM_LIQUIDACIONES_DT" Width="1.5" PointX="8.25" PointY="134.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.COM_LIQUIDACIONES" Width="1.5" PointX="6" PointY="114.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.COM_LIQUIDACIONES_DT" Width="1.5" PointX="8.25" PointY="134.875" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.COM_ORDENES" Width="1.5" PointX="31.75" PointY="50.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.COM_ORDENES_DT" Width="1.5" PointX="33.75" PointY="50.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.CRM_WHATSAPP" Width="1.5" PointX="18.75" PointY="15.5" IsExpanded="true" />
@@ -155,11 +155,11 @@
         <EntityTypeShape EntityType="DobraModel.EMP_UTILIDADES" Width="1.5" PointX="51.75" PointY="30.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.EMP_UTILIDADES_DEUDAS" Width="1.5" PointX="35.75" PointY="54.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.EMP_UTILIDADES_DT" Width="1.5" PointX="51.75" PointY="40.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.EXP_FACTURAS" Width="1.5" PointX="6" PointY="177.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.EXP_FACTURAS_DT" Width="1.5" PointX="8.25" PointY="152.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.EXP_FACTURAS" Width="1.5" PointX="6" PointY="177.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.EXP_FACTURAS_DT" Width="1.5" PointX="8.25" PointY="152.75" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.EXP_INFORMES" Width="1.5" PointX="16.75" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.EXP_ORDENES" Width="1.5" PointX="9" PointY="114.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.EXP_ORDENES_DT" Width="1.5" PointX="11.25" PointY="134.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.EXP_ORDENES" Width="1.5" PointX="9" PointY="114.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.EXP_ORDENES_DT" Width="1.5" PointX="11.25" PointY="134.75" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.EXP_PERFILES" Width="1.5" PointX="19" PointY="9.625" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.FLW_CODIGOS" Width="1.5" PointX="51.75" PointY="48.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.FLW_CODIGOS_CUENTAS" Width="1.5" PointX="52.75" PointY="3.5" IsExpanded="true" />
@@ -167,60 +167,60 @@
         <EntityTypeShape EntityType="DobraModel.GeoTECKSoftware_CamposEtiqueta" Width="1.5" PointX="7.75" PointY="55.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.GeoTECKSoftware_LabelPrinter" Width="1.5" PointX="9.75" PointY="55.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.GeoTECKSoftware_ListPrinter" Width="1.5" PointX="52.75" PointY="14.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.IMP_LIQUIDACION" Width="1.5" PointX="5.25" PointY="92.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.IMP_LIQUIDACION_DT" Width="1.5" PointX="5.25" PointY="132.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.IMP_LIQUIDACION_PEDIDOS" Width="1.5" PointX="5.25" PointY="107.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.IMP_PEDIDOS" Width="1.5" PointX="3" PointY="108.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.IMP_LIQUIDACION" Width="1.5" PointX="5.25" PointY="92.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.IMP_LIQUIDACION_DT" Width="1.5" PointX="5.25" PointY="133" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.IMP_LIQUIDACION_PEDIDOS" Width="1.5" PointX="5.25" PointY="108" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.IMP_PEDIDOS" Width="1.5" PointX="3" PointY="108.875" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.IMP_PEDIDOS_DEUDAS" Width="1.5" PointX="22.75" PointY="55.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.IMP_PEDIDOS_DT" Width="1.5" PointX="5.25" PointY="153" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.IMP_PEDIDOS_DT" Width="1.5" PointX="5.25" PointY="153.375" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.IMP_PEDIDOS_EMPAQUES" Width="1.5" PointX="24.75" PointY="55.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.IMP_PEDIDOS_MASTER" Width="1.5" PointX="42.75" PointY="55.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.IMP_PEDIDOS_MASTER_DT" Width="1.5" PointX="44.75" PointY="55.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.IMP_PREPEDIDOS" Width="1.5" PointX="3" PointY="87.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.IMP_PREPEDIDOS_DT" Width="1.5" PointX="5.25" PointY="212.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.INV_BODEGAS" Width="1.5" PointX="6" PointY="162.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.INV_COMBOS_COMPONENTES" Width="1.5" PointX="5.25" PointY="221.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.INV_CONTEO" Width="1.5" PointX="9" PointY="181.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.INV_CONTEO_DT" Width="1.5" PointX="11.25" PointY="152.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.IMP_PREPEDIDOS" Width="1.5" PointX="3" PointY="88.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.IMP_PREPEDIDOS_DT" Width="1.5" PointX="5.25" PointY="213.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.INV_BODEGAS" Width="1.5" PointX="6" PointY="162.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.INV_COMBOS_COMPONENTES" Width="1.5" PointX="5.25" PointY="221.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.INV_CONTEO" Width="1.5" PointX="9" PointY="181.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.INV_CONTEO_DT" Width="1.5" PointX="11.25" PointY="153.125" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.INV_CONVERSIONES" Width="1.5" PointX="31.75" PointY="29.875" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.INV_CONVERSIONES_DT" Width="1.5" PointX="34" PointY="30.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.INV_EGRESOS" Width="1.5" PointX="12" PointY="108" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.INV_EGRESOS_PRODUCTOS" Width="1.5" PointX="14.25" PointY="133.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.INV_EGRESOS_RUBROS" Width="1.5" PointX="14.25" PointY="108.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.INV_EGRESOS" Width="1.5" PointX="12" PointY="108.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.INV_EGRESOS_PRODUCTOS" Width="1.5" PointX="14.25" PointY="133.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.INV_EGRESOS_RUBROS" Width="1.5" PointX="14.25" PointY="109" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.INV_EMPAQUES" Width="1.5" PointX="51.75" PointY="55.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.INV_ENSAMBLAJE" Width="1.5" PointX="11.75" PointY="56.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.INV_ENSAMBLAJE_DT" Width="1.5" PointX="13.75" PointY="56.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.INV_ESCALAS" Width="1.5" PointX="53.75" PointY="17.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.INV_ESCALAS_TALLAS" Width="1.5" PointX="53.75" PointY="22.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.INV_FACTURAS_TALLAS" Width="1.5" PointX="53.75" PointY="27.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.INV_FISICO" Width="1.5" PointX="6" PointY="192.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.INV_FISICO" Width="1.5" PointX="6" PointY="192.75" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.INV_GIFT_CARD" Width="1.5" PointX="26.75" PointY="56.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.INV_GRUPOS" Width="1.5" PointX="0.75" PointY="143" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.INV_GRUPOS" Width="1.5" PointX="0.75" PointY="143.375" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.INV_GUIAS_REMISION" Width="1.5" PointX="28.75" PointY="56.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.INV_INGRESOS" Width="1.5" PointX="26.75" PointY="25.625" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.INV_INGRESOS_PRODUCTOS" Width="1.5" PointX="29" PointY="23.125" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.INV_INGRESOS_RUBROS" Width="1.5" PointX="29" PointY="30.75" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.INV_PARTIDAS" Width="1.5" PointX="53.75" PointY="32.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.INV_PD_BODEGA_STOCK" Width="1.5" PointX="53.75" PointY="39.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.INV_PRECIOS" Width="1.5" PointX="12" PointY="180.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.INV_PRECIOS_DT" Width="1.5" PointX="14.25" PointY="154.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.INV_PRODUCTOS" Width="1.5" PointX="3" PointY="129" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.INV_PRODUCTOS_CARDEX" Width="1.5" PointX="17.25" PointY="143.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.INV_PRODUCTOS_CARDEX_DAY" Width="1.5" PointX="17.25" PointY="135.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.INV_PRECIOS" Width="1.5" PointX="12" PointY="180.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.INV_PRECIOS_DT" Width="1.5" PointX="14.25" PointY="155" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.INV_PRODUCTOS" Width="1.5" PointX="3" PointY="129.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.INV_PRODUCTOS_CARDEX" Width="1.5" PointX="17.25" PointY="144" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.INV_PRODUCTOS_CARDEX_DAY" Width="1.5" PointX="17.25" PointY="136.25" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.INV_PRODUCTOS_EMPAQUES" Width="1.5" PointX="53.75" PointY="43.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.INV_PRODUCTOS_EXHIBICION" Width="1.5" PointX="5.25" PointY="261.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.INV_PRODUCTOS_EXHIBICION" Width="1.5" PointX="5.25" PointY="261.375" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.INV_PRODUCTOS_LOTES" Width="1.5" PointX="53.75" PointY="50.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.INV_PRODUCTOS_MINIMOS" Width="1.5" PointX="5.25" PointY="267" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.INV_PRODUCTOS_PRECIOS" Width="1.5" PointX="5.25" PointY="272.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.INV_PRODUCTOS_MINIMOS" Width="1.5" PointX="5.25" PointY="267.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.INV_PRODUCTOS_PRECIOS" Width="1.5" PointX="5.25" PointY="272.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.INV_PRODUCTOS_STOCK" Width="1.5" PointX="53.75" PointY="56.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.INV_PRODUCTOS_UBICACIONES" Width="1.5" PointX="5.25" PointY="277.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.INV_PROMOCIONES" Width="1.5" PointX="15" PointY="161.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.INV_PROMOCIONES_DT" Width="1.5" PointX="17.25" PointY="152.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.INV_PROMOCIONES_DT2" Width="1.5" PointX="17.25" PointY="87.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.INV_PRODUCTOS_UBICACIONES" Width="1.5" PointX="5.25" PointY="277.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.INV_PROMOCIONES" Width="1.5" PointX="15" PointY="161.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.INV_PROMOCIONES_DT" Width="1.5" PointX="17.25" PointY="152.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.INV_PROMOCIONES_DT2" Width="1.5" PointX="17.25" PointY="87.875" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.INV_RUBROS" Width="1.5" PointX="54.75" PointY="3.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.INV_SKU" Width="1.5" PointX="6" PointY="125" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.INV_TRANSFERENCIAS" Width="1.5" PointX="15" PointY="172.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.INV_TRANSFERENCIAS_DT" Width="1.5" PointX="17.25" PointY="157.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.INV_SKU" Width="1.5" PointX="6" PointY="125.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.INV_TRANSFERENCIAS" Width="1.5" PointX="15" PointY="173.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.INV_TRANSFERENCIAS_DT" Width="1.5" PointX="17.25" PointY="157.875" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.lista_eventos" Width="1.5" PointX="54.75" PointY="9.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.NIIF_CODIGOS" Width="1.5" PointX="5.75" PointY="58.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.NIIF_CODIGOS_CUENTAS" Width="1.5" PointX="54.75" PointY="12.5" IsExpanded="true" />
@@ -283,7 +283,7 @@
         <EntityTypeShape EntityType="DobraModel.SIS_CONTADORES" Width="1.5" PointX="61.75" PointY="44.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.SIS_DEPARTAMENTOS" Width="1.5" PointX="5.75" PointY="3.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.SIS_DIVISAS" Width="1.5" PointX="41.75" PointY="64.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.SIS_DIVISIONES" Width="1.5" PointX="12.75" PointY="117.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.SIS_DIVISIONES" Width="1.5" PointX="12.75" PointY="118.125" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.SIS_DIVISIONES_PAGOS" Width="1.5" PointX="43.75" PointY="64.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.SIS_INFORMES" Width="1.5" PointX="61.75" PointY="48.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.SIS_INTERFASE_VENTAS" Width="1.5" PointX="61.75" PointY="55.5" IsExpanded="true" />
@@ -304,36 +304,36 @@
         <EntityTypeShape EntityType="DobraModel.SRI_SECUENCIAL" Width="1.5" PointX="45.75" PointY="66.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.SRI_TIPO_TRANSACCION" Width="1.5" PointX="47.75" PointY="66.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.SRI_TIPOCOMPROBANTE" Width="1.5" PointX="63.75" PointY="53.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.SRV_EGRESOS" Width="1.5" PointX="9" PointY="189.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.SRV_EGRESOS_PRODUCTOS" Width="1.5" PointX="11.25" PointY="158.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.SRV_EGRESOS" Width="1.5" PointX="9" PointY="189.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.SRV_EGRESOS_PRODUCTOS" Width="1.5" PointX="11.25" PointY="159" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.SRV_ETAPAS" Width="1.5" PointX="63.75" PointY="59.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.SRV_ORDENES" Width="1.5" PointX="24.75" PointY="4.375" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.SRV_ORDENES_DT" Width="1.5" PointX="27" PointY="4" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.SRV_ORDENES_TIPOS" Width="1.5" PointX="27" PointY="8.875" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.SRV_TIPOS" Width="1.5" PointX="58.75" PointY="66.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.sysdiagrams" Width="1.5" PointX="63.75" PointY="65.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.VEN_CONCILIACION" Width="1.5" PointX="18" PointY="164.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.VEN_CONCILIACION_DT" Width="1.5" PointX="20.25" PointY="144.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.VEN_CONCILIACION_ORDENES" Width="1.5" PointX="23.25" PointY="136.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.VEN_CONCILIACION_PRODUCTOS" Width="1.5" PointX="20.25" PointY="139.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.VEN_CONCILIACION" Width="1.5" PointX="18" PointY="164.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.VEN_CONCILIACION_DT" Width="1.5" PointX="20.25" PointY="144.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.VEN_CONCILIACION_ORDENES" Width="1.5" PointX="23.25" PointY="137" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.VEN_CONCILIACION_PRODUCTOS" Width="1.5" PointX="20.25" PointY="139.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.VEN_CROQUIS" Width="1.5" PointX="64.75" PointY="3.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.VEN_DESPACHOS" Width="1.5" PointX="24" PointY="16.125" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.VEN_DESPACHOS_DT" Width="1.5" PointX="26.25" PointY="17.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.VEN_DEVOLUCIONES" Width="1.5" PointX="21" PointY="88.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.VEN_DEVOLUCIONES_DT" Width="1.5" PointX="23.25" PointY="109.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.VEN_ENTREGA" Width="1.5" PointX="18" PointY="171.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.VEN_ENTREGA_DT" Width="1.5" PointX="20.25" PointY="151.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.VEN_DEVOLUCIONES" Width="1.5" PointX="21" PointY="88.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.VEN_DEVOLUCIONES_DT" Width="1.5" PointX="23.25" PointY="109.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.VEN_ENTREGA" Width="1.5" PointX="18" PointY="171.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.VEN_ENTREGA_DT" Width="1.5" PointX="20.25" PointY="151.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.VEN_ENTREGAS" Width="1.5" PointX="21.75" PointY="19" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.VEN_ENTREGAS_DT" Width="1.5" PointX="24" PointY="23.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.VEN_FACTURAS" Width="1.5" PointX="21" PointY="99.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.VEN_FACTURAS_DAY" Width="1.5" PointX="18" PointY="104" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.VEN_FACTURAS_DAY_DT" Width="1.5" PointX="20.25" PointY="128.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.VEN_FACTURAS_DT" Width="1.5" PointX="23.25" PointY="142.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.VEN_FACTURAS" Width="1.5" PointX="21" PointY="99.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.VEN_FACTURAS_DAY" Width="1.5" PointX="18" PointY="104.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.VEN_FACTURAS_DAY_DT" Width="1.5" PointX="20.25" PointY="129.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.VEN_FACTURAS_DT" Width="1.5" PointX="23.25" PointY="142.625" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.VEN_FACTURAS_PAGOS" Width="1.5" PointX="19.75" PointY="67.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.VEN_FACTURAS_TALLAS" Width="1.5" PointX="21.75" PointY="67.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.VEN_OPCIONES" Width="1.5" PointX="19" PointY="39.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.VEN_ORDENES" Width="1.5" PointX="15" PointY="115" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.VEN_ORDENES_DT" Width="1.5" PointX="17.25" PointY="125.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.VEN_ORDENES" Width="1.5" PointX="15" PointY="115.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.VEN_ORDENES_DT" Width="1.5" PointX="17.25" PointY="126" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.VEN_PLANACUMULATIVO" Width="1.5" PointX="27.75" PointY="67.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.VEN_PLANACUMULATIVO_DT" Width="1.5" PointX="49.75" PointY="67.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.VEN_PRODUCTOS_RESERVADOS" Width="1.5" PointX="51.75" PointY="67.5" IsExpanded="true" />
@@ -351,15 +351,15 @@
         <EntityTypeShape EntityType="DobraModel.CLI_AMORTIZACIONES_DEUDAS" Width="1.5" PointX="65.75" PointY="37.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.CLI_AMORTIZACIONES_DT" Width="1.5" PointX="65.75" PointY="44.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.CLI_CLIENTES_GARANTIAS" Width="1.5" PointX="65.75" PointY="50.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.CLI_CLIENTES_OBSERVACIONES" Width="1.5" PointX="18" PointY="251.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.CLI_CLIENTES_OBSERVACIONES" Width="1.5" PointX="18" PointY="251.75" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.CLI_COBRANZAS_DT" Width="1.5" PointX="65.75" PointY="56.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.CLI_CONTRATOS" Width="1.5" PointX="65.75" PointY="65.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.CLI_CONTRATOS_SERVICIOS" Width="1.5" PointX="66.75" PointY="3.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.CLI_COTIZACIONES_DT" Width="1.5" PointX="20.25" PointY="160.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.CLI_COTIZACIONES_DT" Width="1.5" PointX="20.25" PointY="161" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.CLI_CRUCE_CLIENTES_DEUDAS" Width="1.5" PointX="6.75" PointY="69.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.CLI_CRUCE_DT" Width="1.5" PointX="31.75" PointY="69.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.CLI_FACTURAS_KARDEX" Width="1.5" PointX="33.75" PointY="69.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.COM_FACTURAS_LOTE_UBICACIONES" Width="1.5" PointX="8.25" PointY="127.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.COM_FACTURAS_LOTE_UBICACIONES" Width="1.5" PointX="8.25" PointY="127.375" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.COM_FACTURAS_TALLAS" Width="1.5" PointX="38.75" PointY="69.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.COM_RUBROS" Width="1.5" PointX="60.75" PointY="69.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.EMP_DECLARACIONES_GASTOS" Width="1.5" PointX="3" PointY="41.375" IsExpanded="true" />
@@ -370,13 +370,13 @@
         <EntityTypeShape EntityType="DobraModel.IMP_PROJECCION_GASTOS" Width="1.5" PointX="23.75" PointY="70.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.IMP_PROJECCION_PAGOS_DT" Width="1.5" PointX="67.75" PointY="29.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.INV_COMBOS" Width="1.5" PointX="67.75" PointY="35.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.INV_FISICO_CUENTAS" Width="1.5" PointX="8.25" PointY="196.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.INV_FISICO_PRODUCTOS" Width="1.5" PointX="8.25" PointY="161.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.INV_FISICO_CUENTAS" Width="1.5" PointX="8.25" PointY="197.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.INV_FISICO_PRODUCTOS" Width="1.5" PointX="8.25" PointY="161.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.INV_GUIAS_REMISION_DT" Width="1.5" PointX="67.75" PointY="40.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.INV_INGRESOS_LOTE_UBICACIONES" Width="1.5" PointX="11.25" PointY="129" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.INV_INGRESOS_LOTE_UBICACIONES" Width="1.5" PointX="11.25" PointY="129.375" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.INV_PRODUCTOS_ENSAMBLAJE" Width="1.5" PointX="40.75" PointY="70.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.INV_PRODUCTOS_PRECIOS_HISTORICO" Width="1.5" PointX="42.75" PointY="70.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="DobraModel.INV_PRODUCTOS_PROMOCIONES" Width="1.5" PointX="5.25" PointY="380.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="DobraModel.INV_PRODUCTOS_PROMOCIONES" Width="1.5" PointX="5.25" PointY="381.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.INV_PRODUCTOS_PROVEEDORES" Width="1.5" PointX="67.75" PointY="46.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.ORG_CITAS" Width="1.5" PointX="67.75" PointY="50.5" IsExpanded="true" />
         <EntityTypeShape EntityType="DobraModel.ORG_TAREAS" Width="1.5" PointX="67.75" PointY="56.5" IsExpanded="true" />

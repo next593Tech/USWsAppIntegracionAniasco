@@ -129,12 +129,12 @@ namespace USWsApp.Controllers
             }*/
 
         // [Authorize(Roles = "QueryDocs")]
-      /*  [HttpPost]
-        public PagedList<CLI_CLIENTE> AllCustomers(GenericFilterInpCliente Filter)
-        {
-            var retorno = _objclisrv.AllCustomers(Filter);
-            return retorno;
-        }*/
+        /*  [HttpPost]
+          public PagedList<CLI_CLIENTE> AllCustomers(GenericFilterInpCliente Filter)
+          {
+              var retorno = _objclisrv.AllCustomers(Filter);
+              return retorno;
+          }*/
 
         [HttpPost]
         public ErrorSave saveCliente(USWsLibrary.Models.PagedList<CLI_CLIENTES> clients)
@@ -147,7 +147,7 @@ namespace USWsApp.Controllers
             return _objclisrv.updateClient(clients);
         }
         [HttpPost]
-        public USWsLibrary.Models.PagedList<CLI_CLIENTES> listClient(DateTime lastUpdate,DateTime lastUpdate2)
+        public USWsLibrary.Models.PagedList<CLI_CLIENTES> listClient(DateTime lastUpdate, DateTime lastUpdate2)
         {
             return _objclisrv.listClient(lastUpdate, lastUpdate2);
 
@@ -156,7 +156,7 @@ namespace USWsApp.Controllers
         [HttpPost]
         public USWsLibrary.Models.PagedList<INV_PRODUCTOS> listProducts(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listProducts(lastUpdate,lastUpdate2);
+            return _objclisrv.listProducts(lastUpdate, lastUpdate2);
 
         }
 
@@ -190,9 +190,9 @@ namespace USWsApp.Controllers
 
 
         [HttpPost]
-        public USWsLibrary.Models.PagedList<INV_PRODUCTOS_EMPAQUES> listPackagesProducts(DateTime lastUpdate,DateTime lastUpdate2)
+        public USWsLibrary.Models.PagedList<INV_PRODUCTOS_EMPAQUES> listPackagesProducts(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listPackagesProducts( lastUpdate, lastUpdate2);
+            return _objclisrv.listPackagesProducts(lastUpdate, lastUpdate2);
         }
 
 
@@ -205,9 +205,9 @@ namespace USWsApp.Controllers
         }
 
         [HttpPost]
-        public USWsLibrary.Models.PagedList<INV_PRODUCTOS_PRECIOS> listPriceProducts(DateTime lastUpdate,DateTime lastUpdate2)
+        public USWsLibrary.Models.PagedList<INV_PRODUCTOS_PRECIOS> listPriceProducts(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listPriceProducts( lastUpdate, lastUpdate2);
+            return _objclisrv.listPriceProducts(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -218,9 +218,9 @@ namespace USWsApp.Controllers
         }
 
         [HttpPost]
-        public USWsLibrary.Models.PagedList<INV_COMBOS> listComboProducts(DateTime lastUpdate,DateTime lastUpdate2)
+        public USWsLibrary.Models.PagedList<INV_COMBOS> listComboProducts(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listComboProducts( lastUpdate, lastUpdate2);
+            return _objclisrv.listComboProducts(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -230,9 +230,9 @@ namespace USWsApp.Controllers
         }
 
         [HttpPost]
-        public USWsLibrary.Models.PagedList<INV_COMBOS_COMPONENTES> listComboComponentesProducts(DateTime lastUpdate,DateTime lastUpdate2)
+        public USWsLibrary.Models.PagedList<INV_COMBOS_COMPONENTES> listComboComponentesProducts(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listComboComponentesProducts( lastUpdate, lastUpdate2);
+            return _objclisrv.listComboComponentesProducts(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -256,9 +256,9 @@ namespace USWsApp.Controllers
 
         [HttpPost]
 
-        public USWsLibrary.Models.PagedList<INV_PRECIOS> listInvPrecios(DateTime lastUpdate,DateTime lastUpdate2)
+        public USWsLibrary.Models.PagedList<INV_PRECIOS> listInvPrecios(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listInvPrecios( lastUpdate, lastUpdate2);
+            return _objclisrv.listInvPrecios(lastUpdate, lastUpdate2);
         }
 
 
@@ -270,9 +270,9 @@ namespace USWsApp.Controllers
 
         [HttpPost]
 
-        public USWsLibrary.Models.PagedList<INV_PRECIOS_DT> listInvPreciosDt(DateTime lastUpdate,DateTime lastUpdate2)
+        public USWsLibrary.Models.PagedList<INV_PRECIOS_DT> listInvPreciosDt(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listInvPreciosDt( lastUpdate, lastUpdate2);
+            return _objclisrv.listInvPreciosDt(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -282,9 +282,9 @@ namespace USWsApp.Controllers
         }
 
         [HttpPost]
-        public PagedList<INV_PRODUCTOS_STOCK> listInvProductsStock(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<INV_PRODUCTOS_STOCK> listInvProductsStock(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listInvProductsStock( lastUpdate, lastUpdate2);
+            return _objclisrv.listInvProductsStock(lastUpdate, lastUpdate2);
 
         }
 
@@ -295,9 +295,9 @@ namespace USWsApp.Controllers
         }
 
         [HttpPost]
-        public PagedList<INV_RUBROS> listInvRubros(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<INV_RUBROS> listInvRubros(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listInvRubros( lastUpdate, lastUpdate2);
+            return _objclisrv.listInvRubros(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -308,9 +308,9 @@ namespace USWsApp.Controllers
 
 
         [HttpPost]
-        public PagedList<ACC_CUENTAS> listAccCuentas(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<ACC_CUENTAS> listAccCuentas(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listAccCuentas( lastUpdate, lastUpdate2);
+            return _objclisrv.listAccCuentas(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -320,21 +320,21 @@ namespace USWsApp.Controllers
         }
 
         [HttpPost]
-        public USWsLibrary.Models.PagedList<EMP_EMPLEADOS> listEmployess(DateTime lastUpdate,DateTime lastUpdate2)
+        public USWsLibrary.Models.PagedList<EMP_EMPLEADOS> listEmployess(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listEmployess( lastUpdate, lastUpdate2);
+            return _objclisrv.listEmployess(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
         public ErrorSave saveEmployees(PagedList<EMP_EMPLEADOS> employess)
         {
-                return _objclisrv.saveEmployess(employess);
+            return _objclisrv.saveEmployess(employess);
         }
 
         [HttpPost]
-        public PagedList<BAN_BANCOS> listBancos(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<BAN_BANCOS> listBancos(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listBanks( lastUpdate, lastUpdate2);
+            return _objclisrv.listBanks(lastUpdate, lastUpdate2);
 
 
         }
@@ -348,9 +348,9 @@ namespace USWsApp.Controllers
         }
 
         [HttpPost]
-        public PagedList<CLI_RUBROS> listCliRubros(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<CLI_RUBROS> listCliRubros(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listCliRubros( lastUpdate, lastUpdate2);
+            return _objclisrv.listCliRubros(lastUpdate, lastUpdate2);
 
         }
 
@@ -363,22 +363,22 @@ namespace USWsApp.Controllers
         #endregion
         [HttpPost]
 
-        public PagedList<INV_EMPAQUES> listInvPackages(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<INV_EMPAQUES> listInvPackages(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listInvPackages( lastUpdate, lastUpdate2);
+            return _objclisrv.listInvPackages(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
 
         public ErrorSave saveInvPackages(PagedList<INV_EMPAQUES> empaques)
-		{
+        {
             return _objclisrv.saveInvPackages(empaques);
         }
 
         [HttpPost]
-        public PagedList<SEG_PERFILES> listSegProfiles(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<SEG_PERFILES> listSegProfiles(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listSegProfiles( lastUpdate, lastUpdate2);
+            return _objclisrv.listSegProfiles(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -388,9 +388,9 @@ namespace USWsApp.Controllers
         }
 
         [HttpPost]
-        public PagedList<SEG_RECURSOS> listSegRecursos(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<SEG_RECURSOS> listSegRecursos(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listSegRecursos( lastUpdate, lastUpdate2);
+            return _objclisrv.listSegRecursos(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -400,9 +400,9 @@ namespace USWsApp.Controllers
         }
 
         [HttpPost]
-        public PagedList<SEG_USUARIOS> listSegUsuarios(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<SEG_USUARIOS> listSegUsuarios(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listSegUsuarios( lastUpdate, lastUpdate2);
+            return _objclisrv.listSegUsuarios(lastUpdate, lastUpdate2);
 
         }
 
@@ -413,9 +413,9 @@ namespace USWsApp.Controllers
         }
 
         [HttpPost]
-        public PagedList<SIS_DIVISIONES> listSisDivisiones(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<SIS_DIVISIONES> listSisDivisiones(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listSisDivisiones( lastUpdate, lastUpdate2);
+            return _objclisrv.listSisDivisiones(lastUpdate, lastUpdate2);
 
         }
 
@@ -428,9 +428,9 @@ namespace USWsApp.Controllers
 
 
         [HttpPost]
-        public PagedList<SIS_PARAMETROS> listSisParametros(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<SIS_PARAMETROS> listSisParametros(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listSisParametros(lastUpdate,lastUpdate2);
+            return _objclisrv.listSisParametros(lastUpdate, lastUpdate2);
 
         }
 
@@ -443,9 +443,9 @@ namespace USWsApp.Controllers
 
 
         [HttpPost]
-        public PagedList<SIS_SUCURSALES> listSisSucursales(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<SIS_SUCURSALES> listSisSucursales(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listSisSucursales( lastUpdate, lastUpdate2);
+            return _objclisrv.listSisSucursales(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -455,10 +455,10 @@ namespace USWsApp.Controllers
         }
 
         [HttpPost]
-        public PagedList<SRI_SECUENCIAL> listSriSecuencial(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<SRI_SECUENCIAL> listSriSecuencial(DateTime lastUpdate, DateTime lastUpdate2)
         {
 
-            return _objclisrv.listSriSecuencial( lastUpdate, lastUpdate2);
+            return _objclisrv.listSriSecuencial(lastUpdate, lastUpdate2);
         }
 
 
@@ -470,9 +470,9 @@ namespace USWsApp.Controllers
 
         [HttpPost]
 
-        public PagedList<SEG_PERFILES_RECURSOS> listSegPerfilesRecursos(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<SEG_PERFILES_RECURSOS> listSegPerfilesRecursos(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listSegPerfilesRecursos( lastUpdate, lastUpdate2);
+            return _objclisrv.listSegPerfilesRecursos(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -481,9 +481,9 @@ namespace USWsApp.Controllers
             return _objclisrv.saveSegPerfilesRecursos(perfilesRecuros);
         }
         [HttpPost]
-        public PagedList<ACC_ASIENTOS> listAccAsientos(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<ACC_ASIENTOS> listAccAsientos(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listAccAsientos( lastUpdate, lastUpdate2);
+            return _objclisrv.listAccAsientos(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -493,9 +493,9 @@ namespace USWsApp.Controllers
         }
 
         [HttpPost]
-        public PagedList<ACC_ASIENTOS_DT> listAccAsientosDt(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<ACC_ASIENTOS_DT> listAccAsientosDt(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listAccAsientosDt( lastUpdate, lastUpdate2);
+            return _objclisrv.listAccAsientosDt(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -505,9 +505,9 @@ namespace USWsApp.Controllers
         }
 
         [HttpPost]
-        public PagedList<BAN_INGRESOS> listBanIngresos(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<BAN_INGRESOS> listBanIngresos(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listBanIngresos( lastUpdate, lastUpdate2);
+            return _objclisrv.listBanIngresos(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -518,9 +518,9 @@ namespace USWsApp.Controllers
 
 
         [HttpPost]
-        public PagedList<BAN_INGRESOS_DT> listBanIngresosDt(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<BAN_INGRESOS_DT> listBanIngresosDt(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listBanIngresosDt( lastUpdate, lastUpdate2);
+            return _objclisrv.listBanIngresosDt(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -530,9 +530,9 @@ namespace USWsApp.Controllers
         }
 
         [HttpPost]
-        public PagedList<CLI_CLIENTES_DEUDAS> listClientesDeduas(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<CLI_CLIENTES_DEUDAS> listClientesDeduas(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listClientesDeduas( lastUpdate, lastUpdate2);
+            return _objclisrv.listClientesDeduas(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -542,9 +542,9 @@ namespace USWsApp.Controllers
         }
 
         [HttpPost]
-        public PagedList<USWsLibrary.ModelDobraDatabase.CLI_CREDITOS> listCliCreditos(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<USWsLibrary.ModelDobraDatabase.CLI_CREDITOS> listCliCreditos(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listCliCreditos( lastUpdate, lastUpdate2);
+            return _objclisrv.listCliCreditos(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -555,9 +555,9 @@ namespace USWsApp.Controllers
 
 
         [HttpPost]
-        public PagedList<USWsLibrary.ModelDobraDatabase.CLI_CREDITOS_PRODUCTOS> listCliCreditosProductos(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<USWsLibrary.ModelDobraDatabase.CLI_CREDITOS_PRODUCTOS> listCliCreditosProductos(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listCliCreditosProductos( lastUpdate, lastUpdate2);
+            return _objclisrv.listCliCreditosProductos(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -566,10 +566,10 @@ namespace USWsApp.Controllers
             return _objclisrv.saveCliCreditosProductos(cliCreditosProductos);
         }
 
-      [HttpPost]
-        public PagedList<INV_PRODUCTOS_CARDEX> listInvProductosCardex(DateTime lastUpdate,DateTime lastUpdate2)
+        [HttpPost]
+        public PagedList<INV_PRODUCTOS_CARDEX> listInvProductosCardex(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listInvProductosCardex( lastUpdate, lastUpdate2);
+            return _objclisrv.listInvProductosCardex(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -591,9 +591,9 @@ namespace USWsApp.Controllers
         }
 
         [HttpPost]
-        public PagedList<POS_CIERRES> listPosCierre(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<POS_CIERRES> listPosCierre(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listPosCierres( lastUpdate, lastUpdate2);
+            return _objclisrv.listPosCierres(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -603,9 +603,9 @@ namespace USWsApp.Controllers
         }
 
         [HttpPost]
-        public PagedList<VEN_FACTURAS> listVenFacturas(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<VEN_FACTURAS> listVenFacturas(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listVenFacturas( lastUpdate, lastUpdate2);
+            return _objclisrv.listVenFacturas(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -615,9 +615,9 @@ namespace USWsApp.Controllers
         }
 
         [HttpPost]
-        public PagedList<VEN_FACTURAS_DT> listVenFacturasDt(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<VEN_FACTURAS_DT> listVenFacturasDt(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listVenFacturasDt( lastUpdate, lastUpdate2);
+            return _objclisrv.listVenFacturasDt(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -627,9 +627,9 @@ namespace USWsApp.Controllers
         }
 
         [HttpPost]
-        public PagedList<BAN_INGRESOS_DEUDAS> listBanIngresosDeudas(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<BAN_INGRESOS_DEUDAS> listBanIngresosDeudas(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listBanIngresoDeuda(lastUpdate,lastUpdate2);
+            return _objclisrv.listBanIngresoDeuda(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -639,9 +639,9 @@ namespace USWsApp.Controllers
         }
 
         [HttpPost]
-        public PagedList<BAN_BANCOS_CARDEX> listBanBancosCardex(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<BAN_BANCOS_CARDEX> listBanBancosCardex(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listBanBancosCardex(lastUpdate,lastUpdate2);
+            return _objclisrv.listBanBancosCardex(lastUpdate, lastUpdate2);
         }
 
 
@@ -652,9 +652,9 @@ namespace USWsApp.Controllers
         }
 
         [HttpPost]
-        public PagedList<BAN_DEPOSITOS> listBanDepositos(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<BAN_DEPOSITOS> listBanDepositos(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listBanDepositos(lastUpdate,lastUpdate2);
+            return _objclisrv.listBanDepositos(lastUpdate, lastUpdate2);
         }
 
 
@@ -666,9 +666,9 @@ namespace USWsApp.Controllers
 
 
         [HttpPost]
-        public PagedList<BAN_DEPOSITOS_DT> listBanDepositosDt(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<BAN_DEPOSITOS_DT> listBanDepositosDt(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listBanDepositosDt(lastUpdate,lastUpdate2);
+            return _objclisrv.listBanDepositosDt(lastUpdate, lastUpdate2);
         }
 
 
@@ -692,9 +692,9 @@ namespace USWsApp.Controllers
         }
 
         [HttpPost]
-        public PagedList<COM_FACTURAS> listComFacturas(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<COM_FACTURAS> listComFacturas(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listComFacturas(lastUpdate,lastUpdate2);
+            return _objclisrv.listComFacturas(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -705,9 +705,9 @@ namespace USWsApp.Controllers
 
 
         [HttpPost]
-        public PagedList<COM_FACTURAS_DT> listComFacturasDt(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<COM_FACTURAS_DT> listComFacturasDt(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listComFacturasDt(lastUpdate,lastUpdate2);
+            return _objclisrv.listComFacturasDt(lastUpdate, lastUpdate2);
         }
 
 
@@ -719,9 +719,9 @@ namespace USWsApp.Controllers
 
 
         [HttpPost]
-        public PagedList<COM_FACTURAS_PAGOS> listComFacturasPagos(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<COM_FACTURAS_PAGOS> listComFacturasPagos(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listComFacturasPagos(lastUpdate,lastUpdate2);
+            return _objclisrv.listComFacturasPagos(lastUpdate, lastUpdate2);
         }
 
 
@@ -733,9 +733,9 @@ namespace USWsApp.Controllers
 
 
         [HttpPost]
-        public PagedList<ACR_RETENCIONES> listAcrRetenciones(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<ACR_RETENCIONES> listAcrRetenciones(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listAcrRetenciones(lastUpdate,lastUpdate2);
+            return _objclisrv.listAcrRetenciones(lastUpdate, lastUpdate2);
         }
 
 
@@ -746,9 +746,9 @@ namespace USWsApp.Controllers
         }
 
         [HttpPost]
-        public PagedList<ACR_RETENCIONES_DEUDAS> listAcrRetencionesDeudas(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<ACR_RETENCIONES_DEUDAS> listAcrRetencionesDeudas(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listAcrRetencionesDeudas(lastUpdate,lastUpdate2);
+            return _objclisrv.listAcrRetencionesDeudas(lastUpdate, lastUpdate2);
         }
 
 
@@ -760,9 +760,9 @@ namespace USWsApp.Controllers
 
 
         [HttpPost]
-        public PagedList<ACR_RETENCIONES_DT> listAcrRetencionesDt(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<ACR_RETENCIONES_DT> listAcrRetencionesDt(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listAcrRetencionesDt(lastUpdate,lastUpdate2);
+            return _objclisrv.listAcrRetencionesDt(lastUpdate, lastUpdate2);
         }
 
 
@@ -774,9 +774,9 @@ namespace USWsApp.Controllers
 
 
         [HttpPost]
-        public PagedList<ACR_ACREEDORES_DEUDAS> listAcrAcreedoresDeudas(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<ACR_ACREEDORES_DEUDAS> listAcrAcreedoresDeudas(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listAcrAcreedoresDeudas(lastUpdate,lastUpdate2);
+            return _objclisrv.listAcrAcreedoresDeudas(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -787,9 +787,9 @@ namespace USWsApp.Controllers
 
 
         [HttpPost]
-        public PagedList<PRV_FACTURAS> listPrvFacturas(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<PRV_FACTURAS> listPrvFacturas(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listPvrFacturas(lastUpdate,lastUpdate2);
+            return _objclisrv.listPvrFacturas(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -800,9 +800,9 @@ namespace USWsApp.Controllers
 
 
         [HttpPost]
-        public PagedList<PRV_FACTURAS_DT> listPrvFacturasDt(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<PRV_FACTURAS_DT> listPrvFacturasDt(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listPvrFacturasDt(lastUpdate,lastUpdate2);
+            return _objclisrv.listPvrFacturasDt(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -813,9 +813,9 @@ namespace USWsApp.Controllers
 
 
         [HttpPost]
-        public PagedList<PRV_FACTURASCTA_DT> listPrvFacturasCtaDt(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<PRV_FACTURASCTA_DT> listPrvFacturasCtaDt(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listPvrFacturasCtaDt(lastUpdate,lastUpdate2);
+            return _objclisrv.listPvrFacturasCtaDt(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -826,9 +826,9 @@ namespace USWsApp.Controllers
 
 
         [HttpPost]
-        public PagedList<EMP_ROLES> listEmpRoles(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<EMP_ROLES> listEmpRoles(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listEmpRoles(lastUpdate,lastUpdate2);
+            return _objclisrv.listEmpRoles(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -839,9 +839,9 @@ namespace USWsApp.Controllers
 
 
         [HttpPost]
-        public PagedList<EMP_ROLES_EMPLEADOS> listEmpRolesEmpleados(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<EMP_ROLES_EMPLEADOS> listEmpRolesEmpleados(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listEmpRolesEmpleados(lastUpdate,lastUpdate2);
+            return _objclisrv.listEmpRolesEmpleados(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -853,9 +853,9 @@ namespace USWsApp.Controllers
 
 
         [HttpPost]
-        public PagedList<EMP_ROLES_RUBROS> listEmpRolesRubros(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<EMP_ROLES_RUBROS> listEmpRolesRubros(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listEmpRolesRubros(lastUpdate,lastUpdate2);
+            return _objclisrv.listEmpRolesRubros(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -867,9 +867,9 @@ namespace USWsApp.Controllers
 
 
         [HttpPost]
-        public PagedList<EMP_EMPLEADOS_DEUDAS> listEmpEmpleadosDeudas(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<EMP_EMPLEADOS_DEUDAS> listEmpEmpleadosDeudas(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listEmpEmpleadosDeudas(lastUpdate,lastUpdate2);
+            return _objclisrv.listEmpEmpleadosDeudas(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -881,9 +881,9 @@ namespace USWsApp.Controllers
 
 
         [HttpPost]
-        public PagedList<EMP_EMPLEADOS_HORAS> listEmpEmpleadoHoras(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<EMP_EMPLEADOS_HORAS> listEmpEmpleadoHoras(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listEmpEmpleadosHoras(lastUpdate,lastUpdate2);
+            return _objclisrv.listEmpEmpleadosHoras(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -894,9 +894,9 @@ namespace USWsApp.Controllers
 
 
         [HttpPost]
-        public PagedList<EMP_DEBITOS> listEmpDebitos(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<EMP_DEBITOS> listEmpDebitos(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listEmpDebitos(lastUpdate,lastUpdate2);
+            return _objclisrv.listEmpDebitos(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -908,9 +908,9 @@ namespace USWsApp.Controllers
 
 
         [HttpPost]
-        public PagedList<EMP_DEBITOS_RUBROS> listEmpDebitosRubros(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<EMP_DEBITOS_RUBROS> listEmpDebitosRubros(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listEmpDebitosRubros(lastUpdate,lastUpdate2);
+            return _objclisrv.listEmpDebitosRubros(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -922,9 +922,9 @@ namespace USWsApp.Controllers
 
 
         [HttpPost]
-        public PagedList<CLI_GRUPOS> listCliGrupos(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<CLI_GRUPOS> listCliGrupos(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listCliGrupos(lastUpdate,lastUpdate2);
+            return _objclisrv.listCliGrupos(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -934,9 +934,9 @@ namespace USWsApp.Controllers
         }
 
         [HttpPost]
-        public PagedList<INV_BODEGAS> listInvBodegas(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<INV_BODEGAS> listInvBodegas(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listInvBodegas(lastUpdate,lastUpdate2);
+            return _objclisrv.listInvBodegas(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -945,22 +945,22 @@ namespace USWsApp.Controllers
             return _objclisrv.saveInvBodegas(invBodegas);
         }
 
-      /*  [HttpPost]
-        public PagedList<INV_PRODUCTOS_EXHIBICION> listInvProductosExhibicion(DateTime lastUpdate,DateTime lastUpdate2)
-        {
-            return _objclisrv.listInvProductosExhibicion(lastUpdate,lastUpdate2);
-        }
+        /*  [HttpPost]
+          public PagedList<INV_PRODUCTOS_EXHIBICION> listInvProductosExhibicion(DateTime lastUpdate,DateTime lastUpdate2)
+          {
+              return _objclisrv.listInvProductosExhibicion(lastUpdate,lastUpdate2);
+          }
+
+          [HttpPost]
+          public ErrorSave saveInvProductosExhibicion(PagedList<INV_PRODUCTOS_EXHIBICION> invProductoExhibicion)
+          {
+              return _objclisrv.saveInvProductosExhibicion(invProductoExhibicion);
+          }*/
 
         [HttpPost]
-        public ErrorSave saveInvProductosExhibicion(PagedList<INV_PRODUCTOS_EXHIBICION> invProductoExhibicion)
+        public PagedList<ACR_CREDITOS> listAcrCreditos(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.saveInvProductosExhibicion(invProductoExhibicion);
-        }*/
-
-        [HttpPost]
-        public PagedList<ACR_CREDITOS> listAcrCreditos(DateTime lastUpdate,DateTime lastUpdate2)
-        {
-            return _objclisrv.listAcrCreditos(lastUpdate,lastUpdate2);
+            return _objclisrv.listAcrCreditos(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -970,9 +970,9 @@ namespace USWsApp.Controllers
         }
 
         [HttpPost]
-        public PagedList<ACR_CREDITOS_DEUDAS> listAcrCreditosDeudas(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<ACR_CREDITOS_DEUDAS> listAcrCreditosDeudas(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listAcrCreditosDeudas(lastUpdate,lastUpdate2);
+            return _objclisrv.listAcrCreditosDeudas(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -982,9 +982,9 @@ namespace USWsApp.Controllers
         }
 
         [HttpPost]
-        public PagedList<ACR_CREDITOS_RUBROS> listAcrCreditosRubros(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<ACR_CREDITOS_RUBROS> listAcrCreditosRubros(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listAcrCreditosRubros(lastUpdate,lastUpdate2);
+            return _objclisrv.listAcrCreditosRubros(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -994,9 +994,9 @@ namespace USWsApp.Controllers
         }
 
         [HttpPost]
-        public PagedList<ACR_DEBITOS> listAcrDebitos(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<ACR_DEBITOS> listAcrDebitos(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listAcrDebitos(lastUpdate,lastUpdate2);
+            return _objclisrv.listAcrDebitos(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -1006,9 +1006,9 @@ namespace USWsApp.Controllers
         }
 
         [HttpPost]
-        public PagedList<ACR_DEBITOS_DEUDAS> listAcrDebitosDeudas(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<ACR_DEBITOS_DEUDAS> listAcrDebitosDeudas(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listAcrDebitosDeudas(lastUpdate,lastUpdate2);
+            return _objclisrv.listAcrDebitosDeudas(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -1019,9 +1019,9 @@ namespace USWsApp.Controllers
 
 
         [HttpPost]
-        public PagedList<ACR_DEBITOS_RUBROS> listAcrDebitosRubros(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<ACR_DEBITOS_RUBROS> listAcrDebitosRubros(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listAcrDebitoRubros(lastUpdate,lastUpdate2);
+            return _objclisrv.listAcrDebitoRubros(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -1032,9 +1032,9 @@ namespace USWsApp.Controllers
 
 
         [HttpPost]
-        public PagedList<ACR_DEBITOS_PRODUCTOS> listAcrDebitosProductos(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<ACR_DEBITOS_PRODUCTOS> listAcrDebitosProductos(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listAcrDebitosProductos(lastUpdate,lastUpdate2);
+            return _objclisrv.listAcrDebitosProductos(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -1045,9 +1045,9 @@ namespace USWsApp.Controllers
 
 
         [HttpPost]
-        public PagedList<ACR_RECIBOS> listAcrRecibos(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<ACR_RECIBOS> listAcrRecibos(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listAcrRecibos(lastUpdate,lastUpdate2);
+            return _objclisrv.listAcrRecibos(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -1058,9 +1058,9 @@ namespace USWsApp.Controllers
 
 
         [HttpPost]
-        public PagedList<ACR_RECIBOS_DT> listAcrRecibosDt(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<ACR_RECIBOS_DT> listAcrRecibosDt(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listAcrRecibosDt(lastUpdate,lastUpdate2);
+            return _objclisrv.listAcrRecibosDt(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -1071,9 +1071,9 @@ namespace USWsApp.Controllers
 
 
         [HttpPost]
-        public PagedList<ACR_RECIBOS_DEUDAS> listAcrRecbiosDeudas(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<ACR_RECIBOS_DEUDAS> listAcrRecbiosDeudas(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listAcrReciboDeudas(lastUpdate,lastUpdate2);
+            return _objclisrv.listAcrReciboDeudas(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -1084,9 +1084,9 @@ namespace USWsApp.Controllers
 
 
         [HttpPost]
-        public PagedList<BAN_DEBITOS> listBanDebitos(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<BAN_DEBITOS> listBanDebitos(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listBanDebitos(lastUpdate,lastUpdate2);
+            return _objclisrv.listBanDebitos(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -1097,9 +1097,9 @@ namespace USWsApp.Controllers
 
 
         [HttpPost]
-        public PagedList<BAN_DEBITOS_CUENTAS> listBanDebitosCuentas(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<BAN_DEBITOS_CUENTAS> listBanDebitosCuentas(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listBanDebitosCuentas(lastUpdate,lastUpdate2);
+            return _objclisrv.listBanDebitosCuentas(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -1111,9 +1111,9 @@ namespace USWsApp.Controllers
 
 
         [HttpPost]
-        public PagedList<BAN_EGRESOS> listBanEgresos(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<BAN_EGRESOS> listBanEgresos(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listbanEgresos(lastUpdate,lastUpdate2);
+            return _objclisrv.listbanEgresos(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -1123,9 +1123,9 @@ namespace USWsApp.Controllers
         }
 
         [HttpPost]
-        public PagedList<BAN_EGRESOS_ANEXOS> listBanEgresosAnexos(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<BAN_EGRESOS_ANEXOS> listBanEgresosAnexos(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listbanEgresosAnexos(lastUpdate,lastUpdate2);
+            return _objclisrv.listbanEgresosAnexos(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -1136,9 +1136,9 @@ namespace USWsApp.Controllers
 
 
         [HttpPost]
-        public PagedList<BAN_EGRESOS_ANTICIPOS> listBanEgresosAnticipos(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<BAN_EGRESOS_ANTICIPOS> listBanEgresosAnticipos(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listbanEgresosAnticipos(lastUpdate,lastUpdate2);
+            return _objclisrv.listbanEgresosAnticipos(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -1150,9 +1150,9 @@ namespace USWsApp.Controllers
 
 
         [HttpPost]
-        public PagedList<BAN_EGRESOS_CUENTAS> listBanEgresosCuentas(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<BAN_EGRESOS_CUENTAS> listBanEgresosCuentas(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listbanEgresosCuentas(lastUpdate,lastUpdate2);
+            return _objclisrv.listbanEgresosCuentas(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -1164,9 +1164,9 @@ namespace USWsApp.Controllers
 
 
         [HttpPost]
-        public PagedList<BAN_EGRESOS_DEUDAS> listBanEgresosDeudas(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<BAN_EGRESOS_DEUDAS> listBanEgresosDeudas(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listbanEgresosDeudas(lastUpdate,lastUpdate2);
+            return _objclisrv.listbanEgresosDeudas(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -1177,9 +1177,9 @@ namespace USWsApp.Controllers
 
 
         [HttpPost]
-        public PagedList<BAN_EGRESOS_DT> listbanEgresosDt(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<BAN_EGRESOS_DT> listbanEgresosDt(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listbanEgresosDt(lastUpdate,lastUpdate2);
+            return _objclisrv.listbanEgresosDt(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -1189,9 +1189,9 @@ namespace USWsApp.Controllers
         }
 
         [HttpPost]
-        public PagedList<BAN_EGRESOS_PAGOS> listbanEgresosPagos(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<BAN_EGRESOS_PAGOS> listbanEgresosPagos(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listbanEgresosPagos(lastUpdate,lastUpdate2);
+            return _objclisrv.listbanEgresosPagos(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -1203,9 +1203,9 @@ namespace USWsApp.Controllers
 
 
         [HttpPost]
-        public PagedList<BAN_INGRESOS_CUENTAS> listbanIngresosCuentas(DateTime lastUpdate,DateTime lastUpdate2)
+        public PagedList<BAN_INGRESOS_CUENTAS> listbanIngresosCuentas(DateTime lastUpdate, DateTime lastUpdate2)
         {
-            return _objclisrv.listbanIngresosCuentas(lastUpdate,lastUpdate2);
+            return _objclisrv.listbanIngresosCuentas(lastUpdate, lastUpdate2);
         }
 
         [HttpPost]
@@ -1213,6 +1213,19 @@ namespace USWsApp.Controllers
         {
             return _objclisrv.savebanIngresosCuentas(banIngresosCuentas);
         }
+
+        [HttpPost]
+        public PagedList<BAN_INGRESOS_PINPAD> listBanIngresosPinPad (DateTime lastUpdate, DateTime lastUpdate2)
+		{
+			return _objclisrv.listBanIngresoPinpad(lastUpdate, lastUpdate2);
+		}
+
+		[HttpPost]
+		public ErrorSave saveBanIngresoPinpad(PagedList<BAN_INGRESOS_PINPAD> banIngresosCuentas)
+		{
+			return _objclisrv.saveBanIngresoPinpad(banIngresosCuentas);
+		}
+
 
 		[HttpPost]
 		public PagedList<BAN_INGRESOS_TARJETAS> listbanIngresosTarjetas(DateTime lastUpdate, DateTime lastUpdate2)

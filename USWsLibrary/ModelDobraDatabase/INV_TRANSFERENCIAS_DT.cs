@@ -34,11 +34,10 @@ namespace USWsLibrary.ModelDobraDatabase
         public Nullable<decimal> Recibido { get; set; }
         public Nullable<decimal> TotalRecibido { get; set; }
         public Nullable<decimal> UnidadesReservar { get; set; }
-		public Nullable<System.DateTime> CreadoDate { get; set; }
-		public Nullable<System.DateTime> EditadoDate { get; set; }
-
-		
-		public virtual INV_PRODUCTOS INV_PRODUCTOS { get; set; }
+        public Nullable<System.DateTime> CreadoDate { get; set; }
+        public Nullable<System.DateTime> EditadoDate { get; set; }
+    
+        public virtual INV_PRODUCTOS INV_PRODUCTOS { get; set; }
         public virtual INV_TRANSFERENCIAS INV_TRANSFERENCIAS { get; set; }
     }
 }

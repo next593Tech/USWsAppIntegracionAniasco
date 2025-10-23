@@ -22,9 +22,7 @@ namespace USWsLibrary.ModelDobraDatabase
         public Nullable<decimal> Exportado { get; set; }
         public Nullable<decimal> ExportadoUpdate { get; set; }
         public Nullable<decimal> ExportadoCandidate { get; set; }
-
-		public Nullable<System.DateTime> CreadoDate { get; set; }
-
-		public string id { get; set; }
+        public string id { get; set; }
+        public Nullable<System.DateTime> CreadoDate { get; set; }
     }
 }

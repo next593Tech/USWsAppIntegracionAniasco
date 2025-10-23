@@ -4780,6 +4780,64 @@ namespace USWsLibrary.Services
 			return errorSave;
 		}
 
+		public PagedList<BAN_INGRESOS_PINPAD> listBanIngresoPinpad(DateTime lastUpdate, DateTime lastUpdate2)
+		{
+			PagedList<BAN_INGRESOS_PINPAD> banIngresoPinPad = new PagedList<BAN_INGRESOS_PINPAD>();
+			using (DobraConnection db = new DobraConnection())
+			{
+				banIngresoPinPad.Results = db.BAN_INGRESOS_PINPAD.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+
+				banIngresoPinPad.Total = banIngresoPinPad.Results.Count;
+				banIngresoPinPad.Count = banIngresoPinPad.Results.Count;
+			}
+			return banIngresoPinPad;
+		}
+
+		public ErrorSave saveBanIngresoPinpad(PagedList<BAN_INGRESOS_PINPAD> banIngresosPinpad)
+		{
+			ErrorSave errorSave = new ErrorSave();
+
+			errorSave.errorMessage = "ID:  ";
+
+			using (DobraConnection db = new DobraConnection())
+			{
+				try
+				{
+					foreach (var item in banIngresosPinpad.Results)
+					{
+						errorSave.errorMessage = errorSave.errorMessage + "\n" + "ID:  " + item.ID;
+
+						try
+						{
+							if (db.BAN_INGRESOS_PINPAD.Any(banIngresoPinpad => banIngresoPinpad.ID == item.ID))
+							{
+								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
+								db.SaveChanges();
+							}
+							else
+							{
+								db.BAN_INGRESOS_PINPAD.Add(item);
+								db.SaveChanges();
+							}
+						}
+						catch (Exception e)
+						{
+							encontrarError(e, errorSave);
+						}
+					}
+				}
+				catch (Exception e)
+				{
+					encontrarError(e, errorSave);
+				}
+			}
+			return errorSave;
+		}
+
+
+
+
+
 		public PagedList<BAN_INGRESOS_TARJETAS> listbanIngresosTarjetas(DateTime lastUpdate, DateTime lastUpdate2)
 		{
 			PagedList<BAN_INGRESOS_TARJETAS> banIngresosTarjetas = new PagedList<BAN_INGRESOS_TARJETAS>();

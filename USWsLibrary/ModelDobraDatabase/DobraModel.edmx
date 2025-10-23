@@ -8273,6 +8273,7 @@ advertencia 6002: La tabla o vista 'DBANAZCO.dbo.INV_INGRESOS_LOTE_UBICACIONES' 
           <Property Name="ID" Type="char" MaxLength="10" Nullable="false" />
           <Property Name="Anulado" Type="bit" />
           <Property Name="MayorEmpaque" Type="bit" />
+          <Property Name="EditadoDate" Type="datetime" />
         </EntityType>
         <!--Errores durante la generación:
 advertencia 6002: La tabla o vista 'DBANAZCO.dbo.INV_PRODUCTOS_ENSAMBLAJE' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
@@ -8396,6 +8397,7 @@ advertencia 6002: La tabla o vista 'DBANAZCO.dbo.INV_PRODUCTOS_ENSAMBLAJE' no ti
           <Property Name="Anulado" Type="bit" />
           <Property Name="tasaUtilidad" Type="numeric" Precision="8" Scale="2" Nullable="false" />
           <Property Name="placa" Type="bit" Nullable="false" />
+          <Property Name="EditadoDate" Type="datetime" />
         </EntityType>
         <!--Errores durante la generación:
 advertencia 6002: La tabla o vista 'DBANAZCO.dbo.INV_PRODUCTOS_PRECIOS_HISTORICO' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
@@ -8514,6 +8516,7 @@ advertencia 6002: La tabla o vista 'DBANAZCO.dbo.INV_PRODUCTOS_PROVEEDORES' no t
           <Property Name="ExportadoUpdate" Type="numeric" Precision="1" Scale="0" />
           <Property Name="ExportadoCandidate" Type="numeric" Precision="1" Scale="0" />
           <Property Name="id" Type="varchar" MaxLength="10" Nullable="false" />
+          <Property Name="CreadoDate" Type="datetime" />
         </EntityType>
         <EntityType Name="INV_PRODUCTOS_UBICACIONES">
           <Key>
@@ -8754,6 +8757,8 @@ advertencia 6002: La tabla o vista 'DBANAZCO.dbo.INV_PRODUCTOS_PROVEEDORES' no t
           <Property Name="Recibido" Type="numeric" Precision="12" Scale="2" />
           <Property Name="TotalRecibido" Type="money" />
           <Property Name="UnidadesReservar" Type="numeric" Precision="12" Scale="2" />
+          <Property Name="CreadoDate" Type="datetime" />
+          <Property Name="EditadoDate" Type="datetime" />
         </EntityType>
         <!--Errores durante la generación:
 advertencia 6013: La tabla o vista 'DBANAZCO.dbo.lcxpcheque' no tiene definida una clave principal y no es posible inferir ninguna clave principal válida. Esta tabla o vista se ha excluido. Para usar la entidad, necesitará revisar el esquema, agregar las claves correctas y quitar sus comentarios.
@@ -25432,6 +25437,7 @@ advertencia 6002: La tabla o vista 'DBANAZCO.dbo.VEN_FACTURASREM_DT' no tiene de
           <Property Name="ID" Type="String" MaxLength="10" FixedLength="true" Unicode="false" Nullable="false" />
           <Property Name="Anulado" Type="Boolean" />
           <Property Name="MayorEmpaque" Type="Boolean" />
+          <Property Name="EditadoDate" Type="DateTime" Precision="3" />
         </EntityType>
         <EntityType Name="INV_PRODUCTOS_EXHIBICION">
           <Key>
@@ -25528,6 +25534,7 @@ advertencia 6002: La tabla o vista 'DBANAZCO.dbo.VEN_FACTURASREM_DT' no tiene de
           <Property Name="Anulado" Type="Boolean" />
           <Property Name="tasaUtilidad" Type="Decimal" Precision="8" Scale="2" Nullable="false" />
           <Property Name="placa" Type="Boolean" Nullable="false" />
+          <Property Name="EditadoDate" Type="DateTime" Precision="3" />
           <NavigationProperty Name="INV_PRODUCTOS" Relationship="Self.FK_INV_PRODUCTOS_PRECIOS_INV_PRODUCTOS" FromRole="INV_PRODUCTOS_PRECIOS" ToRole="INV_PRODUCTOS" />
         </EntityType>
         <EntityType Name="INV_PRODUCTOS_STOCK">
@@ -25543,6 +25550,7 @@ advertencia 6002: La tabla o vista 'DBANAZCO.dbo.VEN_FACTURASREM_DT' no tiene de
           <Property Name="ExportadoUpdate" Type="Decimal" Precision="1" Scale="0" />
           <Property Name="ExportadoCandidate" Type="Decimal" Precision="1" Scale="0" />
           <Property Name="id" Type="String" MaxLength="10" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="CreadoDate" Type="DateTime" Precision="3" />
         </EntityType>
         <EntityType Name="INV_PRODUCTOS_UBICACIONES">
           <Key>
@@ -25792,6 +25800,8 @@ advertencia 6002: La tabla o vista 'DBANAZCO.dbo.VEN_FACTURASREM_DT' no tiene de
           <Property Name="Recibido" Type="Decimal" Precision="12" Scale="2" />
           <Property Name="TotalRecibido" Type="Decimal" Precision="19" Scale="4" />
           <Property Name="UnidadesReservar" Type="Decimal" Precision="12" Scale="2" />
+          <Property Name="CreadoDate" Type="DateTime" Precision="3" />
+          <Property Name="EditadoDate" Type="DateTime" Precision="3" />
           <NavigationProperty Name="INV_PRODUCTOS" Relationship="Self.FK_INV_TRANSFERENCIAS_DT_INV_PRODUCTOS" FromRole="INV_TRANSFERENCIAS_DT" ToRole="INV_PRODUCTOS" />
           <NavigationProperty Name="INV_TRANSFERENCIAS" Relationship="Self.FK_INV_TRANSFERENCIAS_DT_INV_TRANSFERENCIAS" FromRole="INV_TRANSFERENCIAS_DT" ToRole="INV_TRANSFERENCIAS" />
         </EntityType>
@@ -42012,6 +42022,7 @@ advertencia 6002: La tabla o vista 'DBANAZCO.dbo.VEN_FACTURASREM_DT' no tiene de
                 <ScalarProperty Name="ID" ColumnName="ID" />
                 <ScalarProperty Name="Anulado" ColumnName="Anulado" />
                 <ScalarProperty Name="MayorEmpaque" ColumnName="MayorEmpaque" />
+                <ScalarProperty Name="EditadoDate" ColumnName="EditadoDate" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -42108,6 +42119,7 @@ advertencia 6002: La tabla o vista 'DBANAZCO.dbo.VEN_FACTURASREM_DT' no tiene de
                 <ScalarProperty Name="Anulado" ColumnName="Anulado" />
                 <ScalarProperty Name="tasaUtilidad" ColumnName="tasaUtilidad" />
                 <ScalarProperty Name="placa" ColumnName="placa" />
+                <ScalarProperty Name="EditadoDate" ColumnName="EditadoDate" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -42123,6 +42135,7 @@ advertencia 6002: La tabla o vista 'DBANAZCO.dbo.VEN_FACTURASREM_DT' no tiene de
                 <ScalarProperty Name="ExportadoUpdate" ColumnName="ExportadoUpdate" />
                 <ScalarProperty Name="ExportadoCandidate" ColumnName="ExportadoCandidate" />
                 <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="CreadoDate" ColumnName="CreadoDate" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -42370,6 +42383,8 @@ advertencia 6002: La tabla o vista 'DBANAZCO.dbo.VEN_FACTURASREM_DT' no tiene de
                 <ScalarProperty Name="Recibido" ColumnName="Recibido" />
                 <ScalarProperty Name="TotalRecibido" ColumnName="TotalRecibido" />
                 <ScalarProperty Name="UnidadesReservar" ColumnName="UnidadesReservar" />
+                <ScalarProperty Name="CreadoDate" ColumnName="CreadoDate" />
+                <ScalarProperty Name="EditadoDate" ColumnName="EditadoDate" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

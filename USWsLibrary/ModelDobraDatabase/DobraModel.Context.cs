@@ -25,10 +25,10 @@ namespace USWsLibrary.ModelDobraDatabase
     
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-			base.OnModelCreating(modelBuilder);
-		}
-
-		public virtual DbSet<ACC_ASIENTOS> ACC_ASIENTOS { get; set; }
+            throw new UnintentionalCodeFirstException();
+        }
+    
+        public virtual DbSet<ACC_ASIENTOS> ACC_ASIENTOS { get; set; }
         public virtual DbSet<ACC_ASIENTOS_DAY> ACC_ASIENTOS_DAY { get; set; }
         public virtual DbSet<ACC_ASIENTOS_DT> ACC_ASIENTOS_DT { get; set; }
         public virtual DbSet<ACC_ASIENTOS_PLANTILLAS> ACC_ASIENTOS_PLANTILLAS { get; set; }
