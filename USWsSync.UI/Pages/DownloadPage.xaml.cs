@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -45,8 +47,10 @@ namespace USWsSync_UI.Pages
             BtnStart.IsEnabled = false;
             BtnCancel.IsEnabled = true;
             PbSync.Value = 0;
+            PbSync.ShowError = false;
             TxtProgressPct.Text = "0%";
-            TxtCurrentTable.Text = "Iniciando verificación de conexión...";
+            TxtStatus.Text = "Verificando conectividad...";
+
             _logBuilder.Clear();
             TxtLogs.Text = "";
 
@@ -56,15 +60,21 @@ namespace USWsSync_UI.Pages
             AppendLog($"[{DateTime.Now:HH:mm:ss}] Iniciando descarga de datos desde {config.IpPublica} hacia {config.IpLocal}");
             AppendLog($"[{DateTime.Now:HH:mm:ss}] Rango seleccionado: {f1:yyyy-MM-dd HH:mm:ss} - {f2:yyyy-MM-dd HH:mm:ss}");
 
+            var errorCount = 0;
+            var successCount = 0;
+            var failedTables = new List<string>();
+
             try
             {
                 var connOk = await _syncEngine.CheckConnectionAsync(config.IpPublica, ct);
                 if (!connOk)
                 {
+                    PbSync.ShowError = true;
                     AppendLog($"[{DateTime.Now:HH:mm:ss}] ERROR: No hay conexión con el servidor público ({config.IpPublica}). Verifique red.");
-                    TxtStatus.Text = "Fallo de conexión.";
+                    TxtStatus.Text = "Fallo de conexión con el servidor remoto.";
                     BtnStart.IsEnabled = true;
                     BtnCancel.IsEnabled = false;
+                    SaveSessionLog("Descarga", _logBuilder.ToString());
                     return;
                 }
 
@@ -77,6 +87,20 @@ namespace USWsSync_UI.Pages
                         PbSync.Value = pctValue;
                         TxtProgressPct.Text = $"{pctValue}%";
                         TxtStatus.Text = info.Message;
+
+                        if (!info.IsSuccess)
+                        {
+                            if (!failedTables.Contains(info.TableName))
+                            {
+                                failedTables.Add(info.TableName);
+                                errorCount++;
+                            }
+                            PbSync.ShowError = true;
+                        }
+                        else if (info.Message.StartsWith("[OK"))
+                        {
+                            successCount++;
+                        }
 
                         AppendLog($"[{DateTime.Now:HH:mm:ss}] {info.Message}");
                     });
@@ -91,28 +115,35 @@ namespace USWsSync_UI.Pages
                     ct
                 ), ct);
 
-                if (success)
+                if (success && errorCount == 0)
                 {
-                    config.LastDateDownload = f2;
-                    ConfigManager.SaveConfig(config);
-                    TxtLastDate.Text = config.LastDateDownload.ToString("yyyy-MM-dd HH:mm:ss");
+                    PbSync.ShowError = false;
+                    PbSync.Value = 100;
+                    TxtProgressPct.Text = "100%";
+                    TxtStatus.Text = $"Descarga exitosa al 100% ({successCount} tablas procesadas sin errores).";
 
-                    AppendLog($"[{DateTime.Now:HH:mm:ss}] DESCARGA FINALIZADA CON ÉXITO AL 100%.");
-                    TxtStatus.Text = "Proceso completado exitosamente.";
+                    AppendLog($"[{DateTime.Now:HH:mm:ss}] DESCARGA FINALIZADA CON ÉXITO AL 100% ({successCount} tablas).");
+                    AppendLog($"[{DateTime.Now:HH:mm:ss}] NOTA: La fecha de corte se mantiene intacta para la tarea programada.");
                 }
                 else
                 {
-                    AppendLog($"[{DateTime.Now:HH:mm:ss}] DESCARGA FINALIZADA CON ADVERTENCIAS/ERRORES. Revise el registro.");
-                    TxtStatus.Text = "Proceso completado con errores en algunas tablas.";
+                    PbSync.ShowError = true;
+                    TxtStatus.Text = $"Descarga con errores en {failedTables.Count} tabla(s): {string.Join(", ", failedTables)}. (Exitosas: {successCount})";
+
+                    AppendLog($"[{DateTime.Now:HH:mm:ss}] DESCARGA FINALIZADA CON ERRORES: {failedTables.Count} tablas fallaron ({string.Join(", ", failedTables)}).");
+                    AppendLog($"[{DateTime.Now:HH:mm:ss}] Tablas exitosas: {successCount}.");
+                    AppendLog($"[{DateTime.Now:HH:mm:ss}] REGLA DE ORO: La fecha de corte NO se actualiza.");
                 }
             }
             catch (OperationCanceledException)
             {
+                PbSync.ShowError = true;
                 AppendLog($"[{DateTime.Now:HH:mm:ss}] Operación cancelada por el usuario.");
-                TxtStatus.Text = "Cancelado.";
+                TxtStatus.Text = "Cancelado por el usuario.";
             }
             catch (Exception ex)
             {
+                PbSync.ShowError = true;
                 AppendLog($"[{DateTime.Now:HH:mm:ss}] ERROR INESPERADO: {ex.Message}");
                 TxtStatus.Text = "Error crítico durante la sincronización.";
             }
@@ -120,6 +151,7 @@ namespace USWsSync_UI.Pages
             {
                 BtnStart.IsEnabled = true;
                 BtnCancel.IsEnabled = false;
+                SaveSessionLog("Descarga", _logBuilder.ToString());
                 _cts?.Dispose();
                 _cts = null;
             }
@@ -137,6 +169,27 @@ namespace USWsSync_UI.Pages
             _logBuilder.AppendLine(message);
             TxtLogs.Text = _logBuilder.ToString();
             LogScrollViewer.ChangeView(null, LogScrollViewer.ScrollableHeight, null);
+        }
+
+        private void SaveSessionLog(string operation, string fullLog)
+        {
+            try
+            {
+                var logsDir = @"C:\logs";
+                if (!Directory.Exists(logsDir))
+                {
+                    Directory.CreateDirectory(logsDir);
+                }
+                var now = DateTime.Now;
+                var fileName = $"Sync_Manual_{operation}_{now:yyyyMMdd_HHmmss}.log";
+                var generalFile = $"Sync_General_{now:yyyyMMdd}.log";
+
+                File.WriteAllText(Path.Combine(logsDir, fileName), fullLog, Encoding.UTF8);
+
+                var separator = $"\n========================================================================\n=== REGISTRO MANUAL {operation.ToUpper()} - {now:yyyy-MM-dd HH:mm:ss} ===\n========================================================================\n";
+                File.AppendAllText(Path.Combine(logsDir, generalFile), separator + fullLog + "\n", Encoding.UTF8);
+            }
+            catch { }
         }
     }
 }

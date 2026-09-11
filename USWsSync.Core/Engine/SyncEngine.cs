@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using USWsLibrary.Models;
 using USWsSync.Core.Configuration;
 using USWsSync.Core.Registry;
+using USWsSync.Core.Serialization;
 
 namespace USWsSync.Core.Engine
 {
@@ -40,6 +41,10 @@ namespace USWsSync.Core.Engine
                 Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
                 WriteIndented = false
             };
+            _jsonOptions.Converters.Add(new CustomDecimalConverter());
+            _jsonOptions.Converters.Add(new NullableDecimalConverter());
+            _jsonOptions.Converters.Add(new CustomDoubleConverter());
+            _jsonOptions.Converters.Add(new NullableDoubleConverter());
         }
 
         private SyncConfig GetConfig() => _configProvider?.Invoke() ?? ConfigManager.LoadConfig();
@@ -55,15 +60,19 @@ namespace USWsSync.Core.Engine
         {
             try
             {
-                var cleanBase = SyncConfig.CleanIp(ipOrUrl);
-                var testUrl = $"{cleanBase}/Clientes/listSisParametros?lastUpdate={DateTime.Today:yyyy-MM-ddTHH:mm:ss}&lastUpdate2={DateTime.Now:yyyy-MM-ddTHH:mm:ss}";
+                var host = SyncConfig.CleanHost(ipOrUrl);
+                if (string.IsNullOrWhiteSpace(host)) return false;
+
+                string url = ipOrUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase) 
+                    ? $"https://{host}/" 
+                    : $"http://{host}/";
 
                 using var client = CreateClient(timeoutSeconds: 8);
-                using var request = new HttpRequestMessage(HttpMethod.Post, testUrl);
+                using var request = new HttpRequestMessage(HttpMethod.Get, url);
                 using var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
 
-                _logger.LogInformation("Verificando conexión con {Url}: Status {StatusCode}", testUrl, response.StatusCode);
-                return response.IsSuccessStatusCode;
+                _logger.LogInformation("Verificación de conexión con {Url} -> Respuesta HTTP {StatusCode}", url, (int)response.StatusCode);
+                return true;
             }
             catch (Exception ex)
             {
