@@ -129,6 +129,8 @@ namespace USWsLibrary.ModelDobraDatabase
         public Nullable<decimal> Puntos { get; set; }
         public string JefeID { get; set; }
         public string Gerarquia { get; set; }
+        public decimal DiasVencidos { get; set; }
+        public decimal PagosVencidos { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<BAN_CHEQUES_PROTESTADOS> BAN_CHEQUES_PROTESTADOS { get; set; }

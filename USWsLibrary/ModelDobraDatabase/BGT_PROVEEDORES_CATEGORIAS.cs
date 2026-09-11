@@ -20,5 +20,8 @@ namespace USWsLibrary.ModelDobraDatabase
         public string Mes { get; set; }
         public Nullable<decimal> Valor { get; set; }
         public string CategoriaID { get; set; }
+        public System.DateTime CreadoDate { get; set; }
+        public bool Exportado { get; set; }
+        public bool ExportadoUpdate { get; set; }
     }
 }

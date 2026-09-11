@@ -69,6 +69,9 @@ namespace USWsLibrary.ModelDobraDatabase
         public string SRI_ACK { get; set; }
         public string SRI_DHA { get; set; }
         public Nullable<System.DateTime> Editadodate { get; set; }
+        public bool Asumir { get; set; }
+        public bool isDividendo { get; set; }
+        public decimal Periodo { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ACR_RETENCIONES_DEUDAS> ACR_RETENCIONES_DEUDAS { get; set; }

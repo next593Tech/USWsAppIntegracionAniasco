@@ -65,6 +65,8 @@ namespace USWsLibrary.ModelDobraDatabase
         public bool IsDebito { get; set; }
         public bool IsDébito { get; set; }
         public Nullable<bool> PagarEnRol { get; set; }
+        public string AprobadoPor { get; set; }
+        public string Estado { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<EMP_DECIMOS_DT> EMP_DECIMOS_DT { get; set; }

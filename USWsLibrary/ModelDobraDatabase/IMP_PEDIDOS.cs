@@ -115,6 +115,7 @@ namespace USWsLibrary.ModelDobraDatabase
         public string departamentoid { get; set; }
         public string OrdenID { get; set; }
         public string XMLDocumentos { get; set; }
+        public decimal GOrigen { get; set; }
     
         public virtual ACR_ACREEDORES ACR_ACREEDORES { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

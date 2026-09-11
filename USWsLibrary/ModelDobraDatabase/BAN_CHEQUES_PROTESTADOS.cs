@@ -45,6 +45,7 @@ namespace USWsLibrary.ModelDobraDatabase
         public Nullable<bool> Remunerar { get; set; }
         public Nullable<decimal> Comisión { get; set; }
         public Nullable<bool> Remunerada { get; set; }
+        public string VendedorID { get; set; }
     
         public virtual CLI_CLIENTES CLI_CLIENTES { get; set; }
     }

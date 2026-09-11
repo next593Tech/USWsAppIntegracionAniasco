@@ -57,5 +57,8 @@ namespace USWsLibrary.ModelDobraDatabase
         public decimal VDistribuir { get; set; }
         public string FacturaID { get; set; }
         public System.DateTime Fecha_Entrega { get; set; }
+        public string Contacto { get; set; }
+        public string Direccion { get; set; }
+        public string Telefono { get; set; }
     }
 }

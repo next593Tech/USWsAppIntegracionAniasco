@@ -157,6 +157,7 @@ namespace USWsLibrary.ModelDobraDatabase
         public decimal PuntosGanados { get; set; }
         public Nullable<bool> NCgit { get; set; }
         public decimal TarjetaDB { get; set; }
+        public decimal Incremento { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<VEN_DEVOLUCIONES_DT> VEN_DEVOLUCIONES_DT { get; set; }

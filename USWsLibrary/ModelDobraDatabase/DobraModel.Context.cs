@@ -35,6 +35,7 @@ namespace USWsLibrary.ModelDobraDatabase
         public virtual DbSet<ACC_ASIENTOS_PLANTILLAS_DT> ACC_ASIENTOS_PLANTILLAS_DT { get; set; }
         public virtual DbSet<ACC_CUENTAS> ACC_CUENTAS { get; set; }
         public virtual DbSet<ACC_CUENTAS_BACKUP> ACC_CUENTAS_BACKUP { get; set; }
+        public virtual DbSet<ACC_CUENTAS_PRESUPUESTO> ACC_CUENTAS_PRESUPUESTO { get; set; }
         public virtual DbSet<ACR_ACREEDORES> ACR_ACREEDORES { get; set; }
         public virtual DbSet<ACR_ACREEDORES_ANEXOS> ACR_ACREEDORES_ANEXOS { get; set; }
         public virtual DbSet<ACR_ACREEDORES_DEUDAS> ACR_ACREEDORES_DEUDAS { get; set; }
@@ -77,6 +78,7 @@ namespace USWsLibrary.ModelDobraDatabase
         public virtual DbSet<BAN_BANCOS_CARDEX> BAN_BANCOS_CARDEX { get; set; }
         public virtual DbSet<BAN_CHEQUES_PROTESTADOS> BAN_CHEQUES_PROTESTADOS { get; set; }
         public virtual DbSet<BAN_CHEQUES_PROTESTADOS_RUBROS> BAN_CHEQUES_PROTESTADOS_RUBROS { get; set; }
+        public virtual DbSet<BAN_CONCILIACION> BAN_CONCILIACION { get; set; }
         public virtual DbSet<BAN_CREDITOS> BAN_CREDITOS { get; set; }
         public virtual DbSet<BAN_CREDITOS_CUENTAS> BAN_CREDITOS_CUENTAS { get; set; }
         public virtual DbSet<BAN_DEBITOS> BAN_DEBITOS { get; set; }
@@ -87,6 +89,7 @@ namespace USWsLibrary.ModelDobraDatabase
         public virtual DbSet<BAN_EGRESOS> BAN_EGRESOS { get; set; }
         public virtual DbSet<BAN_EGRESOS_ANEXOS> BAN_EGRESOS_ANEXOS { get; set; }
         public virtual DbSet<BAN_EGRESOS_ANTICIPOS> BAN_EGRESOS_ANTICIPOS { get; set; }
+        public virtual DbSet<BAN_EGRESOS_ANTICIPOS_Q> BAN_EGRESOS_ANTICIPOS_Q { get; set; }
         public virtual DbSet<BAN_EGRESOS_CUENTAS> BAN_EGRESOS_CUENTAS { get; set; }
         public virtual DbSet<BAN_EGRESOS_DEUDAS> BAN_EGRESOS_DEUDAS { get; set; }
         public virtual DbSet<BAN_EGRESOS_DT> BAN_EGRESOS_DT { get; set; }
@@ -301,6 +304,7 @@ namespace USWsLibrary.ModelDobraDatabase
         public virtual DbSet<SEG_GRUPOS> SEG_GRUPOS { get; set; }
         public virtual DbSet<SEG_RECURSOS> SEG_RECURSOS { get; set; }
         public virtual DbSet<SEG_USUARIOS> SEG_USUARIOS { get; set; }
+        public virtual DbSet<SEG_USUARIOS_BITACORA> SEG_USUARIOS_BITACORA { get; set; }
         public virtual DbSet<SIS_BINARY_FILES> SIS_BINARY_FILES { get; set; }
         public virtual DbSet<SIS_CENTROS> SIS_CENTROS { get; set; }
         public virtual DbSet<SIS_CONTADORES> SIS_CONTADORES { get; set; }
@@ -308,6 +312,8 @@ namespace USWsLibrary.ModelDobraDatabase
         public virtual DbSet<SIS_DIVISAS> SIS_DIVISAS { get; set; }
         public virtual DbSet<SIS_DIVISIONES> SIS_DIVISIONES { get; set; }
         public virtual DbSet<SIS_DIVISIONES_PAGOS> SIS_DIVISIONES_PAGOS { get; set; }
+        public virtual DbSet<SIS_DIVISIONES_PORCENTAJES> SIS_DIVISIONES_PORCENTAJES { get; set; }
+        public virtual DbSet<SIS_ERRORLOG_FE> SIS_ERRORLOG_FE { get; set; }
         public virtual DbSet<SIS_INFORMES> SIS_INFORMES { get; set; }
         public virtual DbSet<SIS_INTERFASE_VENTAS> SIS_INTERFASE_VENTAS { get; set; }
         public virtual DbSet<SIS_PARAMETROS> SIS_PARAMETROS { get; set; }
@@ -367,6 +373,8 @@ namespace USWsLibrary.ModelDobraDatabase
         public virtual DbSet<ACT_ASIGNACIONES> ACT_ASIGNACIONES { get; set; }
         public virtual DbSet<ACT_ASIGNACIONES_DT> ACT_ASIGNACIONES_DT { get; set; }
         public virtual DbSet<ACT_EGRESOS> ACT_EGRESOS { get; set; }
+        public virtual DbSet<BAN_CONCILIACION_DT> BAN_CONCILIACION_DT { get; set; }
+        public virtual DbSet<BAN_EGRESOS_ANTICIPOS_RUBROS> BAN_EGRESOS_ANTICIPOS_RUBROS { get; set; }
         public virtual DbSet<BAN_EGRESOS_DATOS_CASH> BAN_EGRESOS_DATOS_CASH { get; set; }
         public virtual DbSet<BAN_EGRESOS_RETENCIONES> BAN_EGRESOS_RETENCIONES { get; set; }
         public virtual DbSet<CLI_AMORTIZACIONES> CLI_AMORTIZACIONES { get; set; }
@@ -405,6 +413,7 @@ namespace USWsLibrary.ModelDobraDatabase
         public virtual DbSet<ORG_TAREAS> ORG_TAREAS { get; set; }
         public virtual DbSet<ORG_TASK> ORG_TASK { get; set; }
         public virtual DbSet<ORG_TASK_SOLUCIONES> ORG_TASK_SOLUCIONES { get; set; }
+        public virtual DbSet<POS_CIERRES_DT> POS_CIERRES_DT { get; set; }
         public virtual DbSet<POS_FACTURAS> POS_FACTURAS { get; set; }
         public virtual DbSet<POS_FACTURAS_DT> POS_FACTURAS_DT { get; set; }
         public virtual DbSet<PRD_EGRESOS> PRD_EGRESOS { get; set; }
@@ -422,7 +431,6 @@ namespace USWsLibrary.ModelDobraDatabase
         public virtual DbSet<PRV_TRANSFERENCIAS_DT> PRV_TRANSFERENCIAS_DT { get; set; }
         public virtual DbSet<SEG_PERFILES> SEG_PERFILES { get; set; }
         public virtual DbSet<SEG_PERFILES_RECURSOS> SEG_PERFILES_RECURSOS { get; set; }
-        public virtual DbSet<SEG_USUARIOS_BITACORA> SEG_USUARIOS_BITACORA { get; set; }
         public virtual DbSet<SIS_RANGOS> SIS_RANGOS { get; set; }
         public virtual DbSet<SRI_RANGOS> SRI_RANGOS { get; set; }
         public virtual DbSet<SRI_RANGOS_SECUENCIAS> SRI_RANGOS_SECUENCIAS { get; set; }

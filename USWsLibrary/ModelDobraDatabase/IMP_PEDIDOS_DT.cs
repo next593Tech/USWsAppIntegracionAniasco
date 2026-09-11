@@ -57,6 +57,7 @@ namespace USWsLibrary.ModelDobraDatabase
         public string Nombre { get; set; }
         public Nullable<decimal> Ordenado { get; set; }
         public decimal TasaDescuento { get; set; }
+        public decimal GOrigen { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<IMP_LIQUIDACION_DT> IMP_LIQUIDACION_DT { get; set; }

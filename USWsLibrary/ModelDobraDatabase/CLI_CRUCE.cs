@@ -41,5 +41,9 @@ namespace USWsLibrary.ModelDobraDatabase
         public Nullable<decimal> Exportado { get; set; }
         public Nullable<decimal> ExportadoUpdate { get; set; }
         public Nullable<decimal> ExportadoCandidate { get; set; }
+        public bool Aprobado { get; set; }
+        public System.DateTime AprobadoDate { get; set; }
+        public string AprobadoPor { get; set; }
+        public string Estado { get; set; }
     }
 }

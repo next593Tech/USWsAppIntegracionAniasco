@@ -22,5 +22,8 @@ namespace USWsLibrary.ModelDobraDatabase
         public bool Procesado { get; set; }
         public string Estado { get; set; }
         public bool DeleteFile { get; set; }
+        public System.DateTime CreadoDate { get; set; }
+        public bool Exportado { get; set; }
+        public bool ExportadoUpdate { get; set; }
     }
 }

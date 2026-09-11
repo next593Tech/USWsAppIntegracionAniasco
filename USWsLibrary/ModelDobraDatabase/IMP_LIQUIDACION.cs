@@ -79,6 +79,9 @@ namespace USWsLibrary.ModelDobraDatabase
         public Nullable<decimal> ValorTransformacion { get; set; }
         public decimal TipoImport { get; set; }
         public decimal TipoFlete { get; set; }
+        public decimal GLocal { get; set; }
+        public decimal GOrigen { get; set; }
+        public decimal Origen_CIF { get; set; }
     
         public virtual IMP_PEDIDOS IMP_PEDIDOS { get; set; }
     }

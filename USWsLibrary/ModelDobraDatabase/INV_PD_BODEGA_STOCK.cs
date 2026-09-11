@@ -25,5 +25,6 @@ namespace USWsLibrary.ModelDobraDatabase
         public Nullable<decimal> ExportadoCandidate { get; set; }
         public string TallaID { get; set; }
         public Nullable<System.DateTime> F_UltimoIng { get; set; }
+        public System.DateTime CreadoDate { get; set; }
     }
 }

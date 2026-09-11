@@ -134,6 +134,9 @@
     <Compile Include="ModelDobraDatabase\ACC_CUENTAS_BACKUP.cs">
       <DependentUpon>DobraModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="ModelDobraDatabase\ACC_CUENTAS_PRESUPUESTO.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="ModelDobraDatabase\ACR_ACREEDORES.cs">
       <DependentUpon>DobraModel.tt</DependentUpon>
     </Compile>
@@ -275,6 +278,12 @@
     <Compile Include="ModelDobraDatabase\BAN_CHEQUES_PROTESTADOS_RUBROS.cs">
       <DependentUpon>DobraModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="ModelDobraDatabase\BAN_CONCILIACION.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\BAN_CONCILIACION_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="ModelDobraDatabase\BAN_CREDITOS.cs">
       <DependentUpon>DobraModel.tt</DependentUpon>
     </Compile>
@@ -303,6 +312,12 @@
       <DependentUpon>DobraModel.tt</DependentUpon>
     </Compile>
     <Compile Include="ModelDobraDatabase\BAN_EGRESOS_ANTICIPOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\BAN_EGRESOS_ANTICIPOS_Q.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\BAN_EGRESOS_ANTICIPOS_RUBROS.cs">
       <DependentUpon>DobraModel.tt</DependentUpon>
     </Compile>
     <Compile Include="ModelDobraDatabase\BAN_EGRESOS_CUENTAS.cs">
@@ -935,6 +950,9 @@
     <Compile Include="ModelDobraDatabase\POS_CIERRES_CAJA.cs">
       <DependentUpon>DobraModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="ModelDobraDatabase\POS_CIERRES_DT.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="ModelDobraDatabase\POS_FACTURAS.cs">
       <DependentUpon>DobraModel.tt</DependentUpon>
     </Compile>
@@ -1149,6 +1167,12 @@
       <DependentUpon>DobraModel.tt</DependentUpon>
     </Compile>
     <Compile Include="ModelDobraDatabase\SIS_DIVISIONES_PAGOS.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SIS_DIVISIONES_PORCENTAJES.cs">
+      <DependentUpon>DobraModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelDobraDatabase\SIS_ERRORLOG_FE.cs">
       <DependentUpon>DobraModel.tt</DependentUpon>
     </Compile>
     <Compile Include="ModelDobraDatabase\SIS_INFORMES.cs">

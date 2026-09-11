@@ -58,6 +58,7 @@ namespace USWsLibrary.ModelDobraDatabase
         public decimal MontoMáximo { get; set; }
         public string foto { get; set; }
         public byte[] FotoB { get; set; }
+        public bool DepositosPOS { get; set; }
     
         public virtual BAN_GRUPOS BAN_GRUPOS { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

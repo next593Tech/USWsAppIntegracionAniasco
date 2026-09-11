@@ -39,5 +39,11 @@ namespace USWsLibrary.ModelDobraDatabase
         public string Observación { get; set; }
         public Nullable<decimal> ExportadoUpdate { get; set; }
         public decimal Exportadocandidate { get; set; }
+        public bool Aprobado { get; set; }
+        public string Detalle { get; set; }
+        public System.DateTime Fecha { get; set; }
+        public System.DateTime FechaPeriodo { get; set; }
+        public string Número { get; set; }
+        public bool Tomada { get; set; }
     }
 }

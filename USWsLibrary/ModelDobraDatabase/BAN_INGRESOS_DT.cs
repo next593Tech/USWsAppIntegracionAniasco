@@ -42,6 +42,8 @@ namespace USWsLibrary.ModelDobraDatabase
         public string FormaPago { get; set; }
         public Nullable<System.DateTime> Editadodate { get; set; }
         public string DocumentoPA { get; set; }
+        public string BancoID { get; set; }
+        public string Estado { get; set; }
     
         public virtual BAN_INGRESOS BAN_INGRESOS { get; set; }
     }

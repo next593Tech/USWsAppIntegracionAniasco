@@ -21,7 +21,7 @@ namespace USWsLibrary.ModelDobraDatabase
         public string BodegaID { get; set; }
         public decimal Cantidad { get; set; }
         public Nullable<decimal> Facturado { get; set; }
-        public decimal Precio { get; set; }
+        public Nullable<decimal> Precio { get; set; }
         public decimal Costo { get; set; }
         public decimal Subtotal { get; set; }
         public Nullable<decimal> TasaDescuento { get; set; }

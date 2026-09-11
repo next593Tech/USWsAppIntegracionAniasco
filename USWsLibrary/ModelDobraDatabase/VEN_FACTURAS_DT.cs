@@ -23,7 +23,7 @@ namespace USWsLibrary.ModelDobraDatabase
         public Nullable<decimal> Devuelto { get; set; }
         public Nullable<decimal> Facturado { get; set; }
         public Nullable<decimal> Entregado { get; set; }
-        public decimal Precio { get; set; }
+        public Nullable<decimal> Precio { get; set; }
         public decimal Costo { get; set; }
         public decimal Subtotal { get; set; }
         public Nullable<decimal> TasaDescuento { get; set; }

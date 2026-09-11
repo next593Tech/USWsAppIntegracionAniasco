@@ -31,6 +31,6 @@ namespace USWsLibrary.ModelDobraDatabase
         public Nullable<decimal> ExportadoUpdate { get; set; }
         public Nullable<decimal> ExportadoCandidate { get; set; }
         public Nullable<bool> SRI { get; set; }
-        public string id { get; set; }
+        public long ID { get; set; }
     }
 }

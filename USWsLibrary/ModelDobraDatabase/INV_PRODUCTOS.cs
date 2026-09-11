@@ -204,6 +204,20 @@ namespace USWsLibrary.ModelDobraDatabase
         public decimal CanjeSP { get; set; }
         public decimal PrecioSP { get; set; }
         public bool Publicidad { get; set; }
+        public string Año { get; set; }
+        public string CAE { get; set; }
+        public string Capacidad { get; set; }
+        public string Chasis { get; set; }
+        public decimal cilindraje { get; set; }
+        public string Código_Original2 { get; set; }
+        public decimal CostoFOB { get; set; }
+        public decimal CostoImp { get; set; }
+        public string ModeloBUS { get; set; }
+        public string Motor { get; set; }
+        public string NombreExt { get; set; }
+        public string TAGs { get; set; }
+        public string TipoCarroceria { get; set; }
+        public decimal Tonelaje { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ACR_DEBITOS_PRODUCTOS> ACR_DEBITOS_PRODUCTOS { get; set; }

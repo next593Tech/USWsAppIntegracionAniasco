@@ -19,7 +19,7 @@ namespace USWsLibrary.ModelDobraDatabase
         public string ProductoID { get; set; }
         public string Nombre { get; set; }
         public decimal Cantidad { get; set; }
-        public decimal Precio { get; set; }
+        public Nullable<decimal> Precio { get; set; }
         public decimal Subtotal { get; set; }
         public Nullable<decimal> TasaDescuento { get; set; }
         public Nullable<decimal> Descuento { get; set; }

@@ -26,6 +26,7 @@ namespace USWsLibrary.ModelDobraDatabase
         public string SucursalID { get; set; }
         public string PcID { get; set; }
         public long id { get; set; }
+        public bool ExportadoUpdate { get; set; }
     
         public virtual INV_PROMOCIONES INV_PROMOCIONES { get; set; }
     }

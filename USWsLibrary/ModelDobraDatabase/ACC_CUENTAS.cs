@@ -52,6 +52,7 @@ namespace USWsLibrary.ModelDobraDatabase
         public string F101 { get; set; }
         public bool IsEnlace { get; set; }
         public string Código_Alterno { get; set; }
+        public bool ConPresupuesto { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ACC_ASIENTOS_DT> ACC_ASIENTOS_DT { get; set; }

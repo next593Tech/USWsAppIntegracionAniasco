@@ -45,6 +45,7 @@ namespace USWsLibrary.ModelDobraDatabase
         public string DerivadoID { get; set; }
         public string Lote { get; set; }
         public long ID { get; set; }
+        public string UbicacionID { get; set; }
     
         public virtual INV_BODEGAS INV_BODEGAS { get; set; }
         public virtual INV_PRODUCTOS INV_PRODUCTOS { get; set; }

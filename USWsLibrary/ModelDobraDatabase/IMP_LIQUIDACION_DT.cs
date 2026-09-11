@@ -54,6 +54,11 @@ namespace USWsLibrary.ModelDobraDatabase
         public decimal Exportadocandidate { get; set; }
         public string Lote { get; set; }
         public decimal Valor_Liberado { get; set; }
+        public decimal AdValorem { get; set; }
+        public decimal CostoOld { get; set; }
+        public decimal FodinFA { get; set; }
+        public decimal GOrigen { get; set; }
+        public decimal TShare { get; set; }
     
         public virtual IMP_PEDIDOS IMP_PEDIDOS { get; set; }
         public virtual IMP_PEDIDOS_DT IMP_PEDIDOS_DT { get; set; }

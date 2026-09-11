@@ -52,6 +52,7 @@ namespace USWsLibrary.ModelDobraDatabase
         public string Alias { get; set; }
         public decimal Orden { get; set; }
         public bool Vacaciones { get; set; }
+        public bool Anticipo { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<EMP_DEBITOS_RUBROS> EMP_DEBITOS_RUBROS { get; set; }
