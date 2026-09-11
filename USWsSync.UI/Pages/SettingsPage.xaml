@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="USWsSync_UI.Pages.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="24">
+        <StackPanel Spacing="20" MaxWidth="800" HorizontalAlignment="Stretch">
+            <!-- Encabezado -->
+            <StackPanel Spacing="4">
+                <TextBlock Text="Configuración del Sistema" Style="{StaticResource TitleTextBlockStyle}" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
+                <TextBlock Text="Administra los parámetros de conexión y corte compartidos con la tarea programada (appsettings.json)." Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            </StackPanel>
+
+            <InfoBar x:Name="SettingsInfoBar" IsOpen="False" Severity="Informational" />
+
+            <!-- Card Conexión -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="20">
+                <StackPanel Spacing="16">
+                    <TextBlock Text="Servidores y Conexión" Style="{StaticResource SubtitleTextBlockStyle}" />
+
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="IP / Host Servidor Local (ERP):" FontWeight="SemiBold" />
+                        <TextBox x:Name="TxtIpLocal" PlaceholderText="Ej: 192.168.10.39:8484" HorizontalAlignment="Stretch" />
+                    </StackPanel>
+
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="IP / Host Servidor Nube (Público):" FontWeight="SemiBold" />
+                        <TextBox x:Name="TxtIpPublica" PlaceholderText="Ej: 190.15.140.20:8484 o miempresa.com" HorizontalAlignment="Stretch" />
+                    </StackPanel>
+
+                    <Button x:Name="BtnTestConnection" Click="BtnTestConnection_Click" Padding="16,8">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon Glyph="&#xE8B9;" />
+                            <TextBlock Text="Probar Conexiones" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Border>
+
+            <!-- Card Parámetros de Sincronización -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="20">
+                <StackPanel Spacing="16">
+                    <TextBlock Text="Parámetros de Corte y Diagnóstico" Style="{StaticResource SubtitleTextBlockStyle}" />
+
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="Última Fecha de Corte Registrada:" FontWeight="SemiBold" />
+                        <TextBox x:Name="TxtLastDateUpdate" PlaceholderText="yyyy-MM-ddTHH:mm:ss" HorizontalAlignment="Stretch" />
+                        <TextBlock Text="Formato ISO: YYYY-MM-DDTHH:MM:SS. Modificar solo si necesita forzar un reenvío total desde una fecha anterior." Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    </StackPanel>
+
+                    <ToggleSwitch x:Name="TsLogsJson" Header="Guardar respaldo JSON crudo en disco" OffContent="Desactivado" OnContent="Activado (C:\logsJSON)" />
+
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="Directorio de Logs JSON:" FontWeight="SemiBold" />
+                        <TextBox x:Name="TxtDirectorioLogs" HorizontalAlignment="Stretch" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Botón Guardar -->
+            <Button x:Name="BtnSave" Click="BtnSave_Click" Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Left" Padding="24,10">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <FontIcon Glyph="&#xE74E;" />
+                    <TextBlock Text="Guardar Configuración" />
+                </StackPanel>
+            </Button>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

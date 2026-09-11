@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
@@ -34,9 +34,11 @@ namespace USWsLibrary.Services
 			errorSave.errorMessage="ID:  ";
 
 			using (DobraConnection db = new DobraConnection())
+			using (var tx = db.Database.BeginTransaction())
 			{
 				try
 				{
+					int count = 0;
 					foreach (var item in clients.Results)
 					{
 						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  ";
@@ -47,7 +49,6 @@ namespace USWsLibrary.Services
 							{
 								
 								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
 							}
 							else
 							{
@@ -56,22 +57,23 @@ namespace USWsLibrary.Services
 									ErrorClienteCedula errorClienteCedula= new  ErrorClienteCedula();
 									errorSave.errorExit = true;
 									errorSave.errorMessage = errorSave.errorMessage + "id diferente y cedula igual:"+item.ID;
-									//errorSave.ID.Add(item.ID);
 								}
 								else if(db.CLI_CLIENTES.Any(cl => cl.ID == item.ID && cl.Código != item.Código))
 								{
-
-
 									errorSave.errorExit = true;
 									errorSave.errorMessage = errorSave.errorMessage + "id igual y cedula diferente:" + item.ID;
-									//errorSave.ID.Add(item.ID);
 								}
 								else
 								{
 									db.CLI_CLIENTES.Add(item);
-									db.SaveChanges();
 								}
 							
+							}
+
+							count++;
+							if (count % 100 == 0)
+							{
+								db.SaveChanges();
 							}
 						}
 						catch (Exception e)
@@ -79,9 +81,12 @@ namespace USWsLibrary.Services
 							encontrarError(e, errorSave);
 						}
 					}
+					db.SaveChanges();
+					tx.Commit();
 				}
 				catch (Exception e)
 				{
+					try { tx.Rollback(); } catch { }
 					encontrarError(e, errorSave);
 				}
 			}
@@ -137,13 +142,14 @@ namespace USWsLibrary.Services
 			errorSave.errorMessage="ID:  ";
 
 			using (DobraConnection db = new DobraConnection())
+			using (var tx = db.Database.BeginTransaction())
 			{
 				try
 				{
+					int count = 0;
 					foreach (var item in products.Results)
 					{
 						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
 
 						Console.WriteLine(item.Código);
 						try
@@ -151,11 +157,15 @@ namespace USWsLibrary.Services
 							if (db.INV_PRODUCTOS.Any(pro => pro.ID == item.ID))
 							{
 								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
 							}
 							else
 							{
 								db.INV_PRODUCTOS.Add(item);
+							}
+
+							count++;
+							if (count % 100 == 0)
+							{
 								db.SaveChanges();
 							}
 						}
@@ -164,10 +174,12 @@ namespace USWsLibrary.Services
 							encontrarError(e, errorSave);
 						}
 					}
+					db.SaveChanges();
+					tx.Commit();
 				}
 				catch (Exception e)
 				{
-
+					try { tx.Rollback(); } catch { }
 					encontrarError(e, errorSave);
 				}
 			}
@@ -2128,48 +2140,44 @@ namespace USWsLibrary.Services
 			errorSave.errorMessage="ID:  ";
 
 			using (DobraConnection db = new DobraConnection())
+			using (var tx = db.Database.BeginTransaction())
 			{
-
-				//venFacturas.Results.ForEach(n => db.VEN_FACTURAS.Add(n));
 				try
 				{
+					int count = 0;
 					foreach (var item in venFacturas.Results)
 					{
 						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
 
-
-						
 						try
 						{
-
-
-							var clientes   =db.CLI_CLIENTES.Where(cliente => cliente.Cédula.Trim() == item.Ruc.Trim()  ||
-							cliente.Ruc.Trim() == item.Ruc.Trim()
+							var clientes = db.CLI_CLIENTES.Where(cliente => cliente.Cédula.Trim() == item.Ruc.Trim() ||
+								cliente.Ruc.Trim() == item.Ruc.Trim()
 							);
 
 							if (db.VEN_FACTURAS.Any(venFactura => venFactura.ID == item.ID))
 							{
-
-
 								if (clientes.Count() > 0)
 								{
 									item.ClienteID = clientes.First<CLI_CLIENTES>().ID;
 								}
 
 								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								//db.SaveChanges();
 							}
 							else
 							{
-
 								if (clientes.Count() > 0)
 								{
 									item.ClienteID = clientes.First<CLI_CLIENTES>().ID;
 								}
 
 								db.VEN_FACTURAS.Add(item);
-								
+							}
 
+							count++;
+							if (count % 100 == 0)
+							{
+								db.SaveChanges();
 							}
 						}
 						catch (Exception e)
@@ -2178,9 +2186,11 @@ namespace USWsLibrary.Services
 						}
 					}
 					db.SaveChanges();
+					tx.Commit();
 				}
 				catch (Exception e)
 				{
+					try { tx.Rollback(); } catch { }
 					encontrarError(e, errorSave);
 				}
 			}
@@ -2208,13 +2218,14 @@ namespace USWsLibrary.Services
 			errorSave.errorMessage="ID:  ";
 
 			using (DobraConnection db = new DobraConnection())
+			using (var tx = db.Database.BeginTransaction())
 			{
 				try
 				{
+					int count = 0;
 					foreach (var item in venFacturas.Results)
 					{
 						errorSave.errorMessage = item.ID;
-
 
 						try
 						{
@@ -2225,7 +2236,12 @@ namespace USWsLibrary.Services
 							else
 							{
 								db.VEN_FACTURAS_DT.Add(item);
-								
+							}
+
+							count++;
+							if (count % 100 == 0)
+							{
+								db.SaveChanges();
 							}
 						}
 						catch (Exception e)
@@ -2234,10 +2250,11 @@ namespace USWsLibrary.Services
 						}
 					}
 					db.SaveChanges();
-
+					tx.Commit();
 				}
 				catch (Exception e)
 				{
+					try { tx.Rollback(); } catch { }
 					encontrarError(e, errorSave);
 				}
 			}
