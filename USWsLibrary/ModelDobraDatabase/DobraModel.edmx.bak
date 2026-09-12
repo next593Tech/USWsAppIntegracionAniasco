@@ -981,7 +981,18 @@ advertencia 6002: La tabla o vista 'DBANAZCO.dbo.ACR_ACREEDORES_AUTORIZACIONES' 
 advertencia 6002: La tabla o vista 'DBANAZCO.dbo.ACR_RETENCIONES_DT' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
         <EntityType Name="ACR_RETENCIONES_DT">
           <Key>
-            <PropertyRef Name="ID" />
+            <PropertyRef Name="RetenciónID" />
+            <PropertyRef Name="Factura" />
+            <PropertyRef Name="BaseFuente" />
+            <PropertyRef Name="Tipo_RFIR" />
+            <PropertyRef Name="Tasa_RFIR" />
+            <PropertyRef Name="Total_RFIR" />
+            <PropertyRef Name="BaseIVA" />
+            <PropertyRef Name="Tipo_RFIVA" />
+            <PropertyRef Name="Tasa_RFIVA" />
+            <PropertyRef Name="Total_RFIVA" />
+            <PropertyRef Name="DivisaID" />
+            <PropertyRef Name="Cambio" />
           </Key>
           <Property Name="RetenciónID" Type="char" MaxLength="10" Nullable="false" />
           <Property Name="Factura" Type="varchar" MaxLength="20" Nullable="false" />
@@ -1019,7 +1030,7 @@ advertencia 6002: La tabla o vista 'DBANAZCO.dbo.ACR_RETENCIONES_DT' no tiene de
           <Property Name="Exportado" Type="numeric" Precision="1" Scale="0" />
           <Property Name="ExportadoUpdate" Type="numeric" Precision="1" Scale="0" />
           <Property Name="ExportadoCandidate" Type="numeric" Precision="1" Scale="0" />
-          <Property Name="ID" Type="char" MaxLength="10" Nullable="false" />
+          <Property Name="ID" Type="char" MaxLength="10" />
         </EntityType>
         <EntityType Name="ACR_RUBROS">
           <Key>
@@ -3630,7 +3641,7 @@ advertencia 6002: La tabla o vista 'DBANAZCO.dbo.CLI_COTIZACIONES_DT' no tiene d
             <PropertyRef Name="TasaFinanciero" />
             <PropertyRef Name="Financiero" />
           </Key>
-          <Property Name="ID" Type="char" MaxLength="10" Nullable="false" />
+          <Property Name="ID" Type="char" MaxLength="10" />
           <Property Name="CotizaciónID" Type="char" MaxLength="10" Nullable="false" />
           <Property Name="ProductoID" Type="char" MaxLength="10" Nullable="false" />
           <Property Name="Nombre" Type="varchar" MaxLength="50" />
@@ -6729,7 +6740,7 @@ advertencia 6002: La tabla o vista 'DBANAZCO.dbo.IMP_ANALISIS_COSTOS_DT' no tien
           <Property Name="Exportado" Type="numeric" Precision="1" Scale="0" />
           <Property Name="ExportadoUpdate" Type="numeric" Precision="1" Scale="0" />
           <Property Name="ExportadoCandidate" Type="numeric" Precision="1" Scale="0" />
-          <Property Name="ID" Type="char" MaxLength="10" Nullable="false" />
+          <Property Name="ID" Type="char" MaxLength="10" />
           <Property Name="IsPV1" Type="bit" Nullable="false" />
           <Property Name="IsPV2" Type="bit" Nullable="false" />
           <Property Name="IsPV3" Type="bit" Nullable="false" />
@@ -7393,6 +7404,10 @@ advertencia 6002: La tabla o vista 'DBANAZCO.dbo.INV_COMBOS' no tiene definida n
         <EntityType Name="INV_COMBOS">
           <Key>
             <PropertyRef Name="ID" />
+            <PropertyRef Name="Código" />
+            <PropertyRef Name="Nombre" />
+            <PropertyRef Name="Anulado" />
+            <PropertyRef Name="CodigoBarra" />
           </Key>
           <Property Name="ID" Type="char" MaxLength="10" Nullable="false" />
           <Property Name="Código" Type="varchar" MaxLength="20" Nullable="false" />
@@ -8556,7 +8571,7 @@ advertencia 6002: La tabla o vista 'DBANAZCO.dbo.INV_PRODUCTOS_ENSAMBLAJE' no ti
           <Property Name="Exportado" Type="numeric" Precision="1" Scale="0" />
           <Property Name="ExportadoUpdate" Type="numeric" Precision="1" Scale="0" />
           <Property Name="ExportadoCandidate" Type="numeric" Precision="1" Scale="0" />
-          <Property Name="ID" Type="char" MaxLength="10" Nullable="false" />
+          <Property Name="ID" Type="char" MaxLength="10" />
           <Property Name="Anulado" Type="bit" />
         </EntityType>
         <EntityType Name="INV_PRODUCTOS_EXHIBICION">
@@ -8674,7 +8689,7 @@ advertencia 6002: La tabla o vista 'DBANAZCO.dbo.INV_PRODUCTOS_PRECIOS_HISTORICO
           <Property Name="CreadoDate" Type="datetime" />
           <Property Name="SucursalID" Type="char" MaxLength="2" />
           <Property Name="PcID" Type="varchar" MaxLength="50" />
-          <Property Name="ID" Type="char" MaxLength="10" Nullable="false" />
+          <Property Name="ID" Type="char" MaxLength="10" />
           <Property Name="Anulado" Type="bit" />
           <Property Name="ExportadoUpdate" Type="numeric" Precision="1" Scale="0" />
           <Property Name="DocumentoID" Type="char" MaxLength="10" />
@@ -9056,7 +9071,7 @@ advertencia 6013: La tabla o vista 'DBANAZCO.dbo.LINV' no tiene definida una cla
         <!--Errores durante la generación:
 advertencia 6013: La tabla o vista 'DBANAZCO.dbo.LNEWCLI' no tiene definida una clave principal y no es posible inferir ninguna clave principal válida. Esta tabla o vista se ha excluido. Para usar la entidad, necesitará revisar el esquema, agregar las claves correctas y quitar sus comentarios.
         <EntityType Name="LNEWCLI">
-          <Property Name="id" Type="char" MaxLength="10" Nullable="false" />
+          <Property Name="id" Type="char" MaxLength="10" />
           <Property Name="COLEGIO" Type="nvarchar" MaxLength="255" />
           <Property Name="nombre" Type="nvarchar" MaxLength="255" />
           <Property Name="CEDULA" Type="varchar" MaxLength="10" />
@@ -9408,6 +9423,8 @@ advertencia 6002: La tabla o vista 'DBANAZCO.dbo.ORG_TAREAS' no tiene definida n
         <EntityType Name="ORG_TAREAS">
           <Key>
             <PropertyRef Name="ID" />
+            <PropertyRef Name="Completado" />
+            <PropertyRef Name="Asignado" />
           </Key>
           <Property Name="ID" Type="char" MaxLength="10" Nullable="false" />
           <Property Name="Tipo" Type="varchar" MaxLength="10" />
@@ -11641,7 +11658,10 @@ advertencia 6002: La tabla o vista 'DBANAZCO.dbo.PRV_TRANSFERENCIAS_DT' no tiene
 advertencia 6002: La tabla o vista 'DBANAZCO.dbo.SEG_PERFILES' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
         <EntityType Name="SEG_PERFILES">
           <Key>
-            <PropertyRef Name="id" />
+            <PropertyRef Name="Anulado" />
+            <PropertyRef Name="Código" />
+            <PropertyRef Name="Nombre" />
+            <PropertyRef Name="Nota" />
           </Key>
           <Property Name="UsuarioID" Type="char" MaxLength="10" />
           <Property Name="SucursalID" Type="char" MaxLength="2" />
@@ -11657,7 +11677,7 @@ advertencia 6002: La tabla o vista 'DBANAZCO.dbo.SEG_PERFILES' no tiene definida
           <Property Name="Exportado" Type="numeric" Precision="1" Scale="0" />
           <Property Name="ExportadoUpdate" Type="numeric" Precision="1" Scale="0" />
           <Property Name="ExportadoCandidate" Type="numeric" Precision="1" Scale="0" />
-          <Property Name="id" Type="char" MaxLength="10" Nullable="false" />
+          <Property Name="id" Type="char" MaxLength="10" />
           <Property Name="Anulado" Type="bit" Nullable="false" />
           <Property Name="Código" Type="varchar" MaxLength="15" Nullable="false" />
           <Property Name="Nombre" Type="varchar" MaxLength="50" Nullable="false" />
@@ -11668,6 +11688,8 @@ advertencia 6002: La tabla o vista 'DBANAZCO.dbo.SEG_PERFILES_RECURSOS' no tiene
         <EntityType Name="SEG_PERFILES_RECURSOS">
           <Key>
             <PropertyRef Name="id" />
+            <PropertyRef Name="PerfilID" />
+            <PropertyRef Name="RecursoID" />
           </Key>
           <Property Name="id" Type="varchar" MaxLength="10" Nullable="false" />
           <Property Name="PerfilID" Type="char" MaxLength="10" Nullable="false" />
@@ -12469,7 +12491,7 @@ advertencia 6002: La tabla o vista 'DBANAZCO.dbo.SRI_RANGOS_SECUENCIAS' no tiene
           <Property Name="CreadoDate" Type="datetime" />
           <Property Name="HostNameID" Type="char" MaxLength="10" />
           <Property Name="anulado" Type="bit" />
-          <Property Name="id" Type="char" MaxLength="10" Nullable="false" />
+          <Property Name="id" Type="char" MaxLength="10" />
           <Property Name="punto" Type="varchar" MaxLength="3" />
           <Property Name="editadopor" Type="varchar" MaxLength="30" />
           <Property Name="editadodate" Type="datetime" />
@@ -16260,7 +16282,47 @@ advertencia 6002: La tabla o vista 'DBANAZCO.dbo.VEN_FACTURASREM_DT' no tiene de
     [ACR_ACREEDORES_AUTORIZACIONES].[ExportadoCandidate] AS [ExportadoCandidate]
     FROM [dbo].[ACR_ACREEDORES_AUTORIZACIONES] AS [ACR_ACREEDORES_AUTORIZACIONES]</DefiningQuery>
           </EntitySet>
-          <EntitySet Name="ACR_RETENCIONES_DT" EntityType="Self.ACR_RETENCIONES_DT" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ACR_RETENCIONES_DT" EntityType="Self.ACR_RETENCIONES_DT" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [ACR_RETENCIONES_DT].[RetenciónID] AS [RetenciónID], 
+    [ACR_RETENCIONES_DT].[Factura] AS [Factura], 
+    [ACR_RETENCIONES_DT].[BaseFuente] AS [BaseFuente], 
+    [ACR_RETENCIONES_DT].[Base] AS [Base], 
+    [ACR_RETENCIONES_DT].[Tipo_RFIR] AS [Tipo_RFIR], 
+    [ACR_RETENCIONES_DT].[Tasa_RFIR] AS [Tasa_RFIR], 
+    [ACR_RETENCIONES_DT].[Total_RFIR] AS [Total_RFIR], 
+    [ACR_RETENCIONES_DT].[CuentaID_RFIR] AS [CuentaID_RFIR], 
+    [ACR_RETENCIONES_DT].[BaseIVA] AS [BaseIVA], 
+    [ACR_RETENCIONES_DT].[Tipo_RFIVA] AS [Tipo_RFIVA], 
+    [ACR_RETENCIONES_DT].[Tasa_RFIVA] AS [Tasa_RFIVA], 
+    [ACR_RETENCIONES_DT].[Total_RFIVA] AS [Total_RFIVA], 
+    [ACR_RETENCIONES_DT].[CuentaID_RFIVA] AS [CuentaID_RFIVA], 
+    [ACR_RETENCIONES_DT].[DivisaID] AS [DivisaID], 
+    [ACR_RETENCIONES_DT].[Cambio] AS [Cambio], 
+    [ACR_RETENCIONES_DT].[SucursalID] AS [SucursalID], 
+    [ACR_RETENCIONES_DT].[PcID] AS [PcID], 
+    [ACR_RETENCIONES_DT].[CreadoPor] AS [CreadoPor], 
+    [ACR_RETENCIONES_DT].[CreadoDate] AS [CreadoDate], 
+    [ACR_RETENCIONES_DT].[ExportadoDate] AS [ExportadoDate], 
+    [ACR_RETENCIONES_DT].[RetencionIVAID] AS [RetencionIVAID], 
+    [ACR_RETENCIONES_DT].[RetencionFuenteID] AS [RetencionFuenteID], 
+    [ACR_RETENCIONES_DT].[TipoComprobante] AS [TipoComprobante], 
+    [ACR_RETENCIONES_DT].[TipoDocumento] AS [TipoDocumento], 
+    [ACR_RETENCIONES_DT].[FacturaID] AS [FacturaID], 
+    [ACR_RETENCIONES_DT].[Preimpresa] AS [Preimpresa], 
+    [ACR_RETENCIONES_DT].[Tipofactura] AS [Tipofactura], 
+    [ACR_RETENCIONES_DT].[Fecha] AS [Fecha], 
+    [ACR_RETENCIONES_DT].[CódigoRFIR] AS [CódigoRFIR], 
+    [ACR_RETENCIONES_DT].[CódigoRFIVA] AS [CódigoRFIVA], 
+    [ACR_RETENCIONES_DT].[RetenciónIVAID] AS [RetenciónIVAID], 
+    [ACR_RETENCIONES_DT].[RetenciónFuenteID] AS [RetenciónFuenteID], 
+    [ACR_RETENCIONES_DT].[ExportadoPor] AS [ExportadoPor], 
+    [ACR_RETENCIONES_DT].[Exportado] AS [Exportado], 
+    [ACR_RETENCIONES_DT].[ExportadoUpdate] AS [ExportadoUpdate], 
+    [ACR_RETENCIONES_DT].[ExportadoCandidate] AS [ExportadoCandidate], 
+    [ACR_RETENCIONES_DT].[ID] AS [ID]
+    FROM [dbo].[ACR_RETENCIONES_DT] AS [ACR_RETENCIONES_DT]</DefiningQuery>
+          </EntitySet>
           <EntitySet Name="ACT_ASIGNACIONES" EntityType="Self.ACT_ASIGNACIONES" store:Type="Tables" store:Schema="dbo">
             <DefiningQuery>SELECT 
     [ACT_ASIGNACIONES].[ID] AS [ID], 
@@ -17126,7 +17188,26 @@ advertencia 6002: La tabla o vista 'DBANAZCO.dbo.VEN_FACTURASREM_DT' no tiene de
     [IMP_PROJECCION_PAGOS_DT].[ExportadoCandidate] AS [ExportadoCandidate]
     FROM [dbo].[IMP_PROJECCION_PAGOS_DT] AS [IMP_PROJECCION_PAGOS_DT]</DefiningQuery>
           </EntitySet>
-          <EntitySet Name="INV_COMBOS" EntityType="Self.INV_COMBOS" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="INV_COMBOS" EntityType="Self.INV_COMBOS" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [INV_COMBOS].[ID] AS [ID], 
+    [INV_COMBOS].[Código] AS [Código], 
+    [INV_COMBOS].[Nombre] AS [Nombre], 
+    [INV_COMBOS].[Anulado] AS [Anulado], 
+    [INV_COMBOS].[Exportado] AS [Exportado], 
+    [INV_COMBOS].[ExportadoPor] AS [ExportadoPor], 
+    [INV_COMBOS].[ExportadoDate] AS [ExportadoDate], 
+    [INV_COMBOS].[CreadoPor] AS [CreadoPor], 
+    [INV_COMBOS].[CreadoDate] AS [CreadoDate], 
+    [INV_COMBOS].[EditadoPor] AS [EditadoPor], 
+    [INV_COMBOS].[EditadoDate] AS [EditadoDate], 
+    [INV_COMBOS].[SucursalID] AS [SucursalID], 
+    [INV_COMBOS].[PcID] AS [PcID], 
+    [INV_COMBOS].[ExportadoUpdate] AS [ExportadoUpdate], 
+    [INV_COMBOS].[ExportadoCandidate] AS [ExportadoCandidate], 
+    [INV_COMBOS].[CodigoBarra] AS [CodigoBarra]
+    FROM [dbo].[INV_COMBOS] AS [INV_COMBOS]</DefiningQuery>
+          </EntitySet>
           <EntitySet Name="INV_FISICO_CUENTAS" EntityType="Self.INV_FISICO_CUENTAS" store:Type="Tables" store:Schema="dbo">
             <DefiningQuery>SELECT 
     [INV_FISICO_CUENTAS].[FísicoID] AS [FísicoID], 
@@ -17347,7 +17428,37 @@ advertencia 6002: La tabla o vista 'DBANAZCO.dbo.VEN_FACTURASREM_DT' no tiene de
     [ORG_CITAS].[ExportadoCandidate] AS [ExportadoCandidate]
     FROM [dbo].[ORG_CITAS] AS [ORG_CITAS]</DefiningQuery>
           </EntitySet>
-          <EntitySet Name="ORG_TAREAS" EntityType="Self.ORG_TAREAS" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ORG_TAREAS" EntityType="Self.ORG_TAREAS" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [ORG_TAREAS].[ID] AS [ID], 
+    [ORG_TAREAS].[Tipo] AS [Tipo], 
+    [ORG_TAREAS].[DeID] AS [DeID], 
+    [ORG_TAREAS].[BuzónID] AS [BuzónID], 
+    [ORG_TAREAS].[UsuarioID] AS [UsuarioID], 
+    [ORG_TAREAS].[Inicio] AS [Inicio], 
+    [ORG_TAREAS].[Vencimiento] AS [Vencimiento], 
+    [ORG_TAREAS].[Fin] AS [Fin], 
+    [ORG_TAREAS].[Asunto] AS [Asunto], 
+    [ORG_TAREAS].[Completado] AS [Completado], 
+    [ORG_TAREAS].[Prioridad] AS [Prioridad], 
+    [ORG_TAREAS].[Asignado] AS [Asignado], 
+    [ORG_TAREAS].[AsignadoPor] AS [AsignadoPor], 
+    [ORG_TAREAS].[AsignadoDate] AS [AsignadoDate], 
+    [ORG_TAREAS].[Ruta] AS [Ruta], 
+    [ORG_TAREAS].[CreadoPor] AS [CreadoPor], 
+    [ORG_TAREAS].[CreadoDate] AS [CreadoDate], 
+    [ORG_TAREAS].[EditadoPor] AS [EditadoPor], 
+    [ORG_TAREAS].[EditadoDate] AS [EditadoDate], 
+    [ORG_TAREAS].[ExportadoDate] AS [ExportadoDate], 
+    [ORG_TAREAS].[SucursalID] AS [SucursalID], 
+    [ORG_TAREAS].[PCID] AS [PCID], 
+    [ORG_TAREAS].[Nota] AS [Nota], 
+    [ORG_TAREAS].[ExportadoPor] AS [ExportadoPor], 
+    [ORG_TAREAS].[Exportado] AS [Exportado], 
+    [ORG_TAREAS].[ExportadoUpdate] AS [ExportadoUpdate], 
+    [ORG_TAREAS].[ExportadoCandidate] AS [ExportadoCandidate]
+    FROM [dbo].[ORG_TAREAS] AS [ORG_TAREAS]</DefiningQuery>
+          </EntitySet>
           <EntitySet Name="ORG_TASK" EntityType="Self.ORG_TASK" store:Type="Tables" store:Schema="dbo">
             <DefiningQuery>SELECT 
     [ORG_TASK].[ID] AS [ID], 
@@ -17899,8 +18010,49 @@ advertencia 6002: La tabla o vista 'DBANAZCO.dbo.VEN_FACTURASREM_DT' no tiene de
     [PRV_TRANSFERENCIAS_DT].[CreadoDate] AS [CreadoDate]
     FROM [dbo].[PRV_TRANSFERENCIAS_DT] AS [PRV_TRANSFERENCIAS_DT]</DefiningQuery>
           </EntitySet>
-          <EntitySet Name="SEG_PERFILES" EntityType="Self.SEG_PERFILES" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="SEG_PERFILES_RECURSOS" EntityType="Self.SEG_PERFILES_RECURSOS" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="SEG_PERFILES" EntityType="Self.SEG_PERFILES" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [SEG_PERFILES].[UsuarioID] AS [UsuarioID], 
+    [SEG_PERFILES].[SucursalID] AS [SucursalID], 
+    [SEG_PERFILES].[PCID] AS [PCID], 
+    [SEG_PERFILES].[Tipo] AS [Tipo], 
+    [SEG_PERFILES].[CreadoPor] AS [CreadoPor], 
+    [SEG_PERFILES].[CreadoDate] AS [CreadoDate], 
+    [SEG_PERFILES].[EditadoPor] AS [EditadoPor], 
+    [SEG_PERFILES].[EditadoDate] AS [EditadoDate], 
+    [SEG_PERFILES].[NTUserID] AS [NTUserID], 
+    [SEG_PERFILES].[ExportadoDate] AS [ExportadoDate], 
+    [SEG_PERFILES].[ExportadoPor] AS [ExportadoPor], 
+    [SEG_PERFILES].[Exportado] AS [Exportado], 
+    [SEG_PERFILES].[ExportadoUpdate] AS [ExportadoUpdate], 
+    [SEG_PERFILES].[ExportadoCandidate] AS [ExportadoCandidate], 
+    [SEG_PERFILES].[id] AS [id], 
+    [SEG_PERFILES].[Anulado] AS [Anulado], 
+    [SEG_PERFILES].[Código] AS [Código], 
+    [SEG_PERFILES].[Nombre] AS [Nombre], 
+    [SEG_PERFILES].[Nota] AS [Nota]
+    FROM [dbo].[SEG_PERFILES] AS [SEG_PERFILES]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="SEG_PERFILES_RECURSOS" EntityType="Self.SEG_PERFILES_RECURSOS" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [SEG_PERFILES_RECURSOS].[id] AS [id], 
+    [SEG_PERFILES_RECURSOS].[PerfilID] AS [PerfilID], 
+    [SEG_PERFILES_RECURSOS].[RecursoID] AS [RecursoID], 
+    [SEG_PERFILES_RECURSOS].[SucursalID] AS [SucursalID], 
+    [SEG_PERFILES_RECURSOS].[PCID] AS [PCID], 
+    [SEG_PERFILES_RECURSOS].[Tipo] AS [Tipo], 
+    [SEG_PERFILES_RECURSOS].[CreadoPor] AS [CreadoPor], 
+    [SEG_PERFILES_RECURSOS].[CreadoDate] AS [CreadoDate], 
+    [SEG_PERFILES_RECURSOS].[EditadoPor] AS [EditadoPor], 
+    [SEG_PERFILES_RECURSOS].[EditadoDate] AS [EditadoDate], 
+    [SEG_PERFILES_RECURSOS].[NTUserID] AS [NTUserID], 
+    [SEG_PERFILES_RECURSOS].[ExportadoDate] AS [ExportadoDate], 
+    [SEG_PERFILES_RECURSOS].[ExportadoPor] AS [ExportadoPor], 
+    [SEG_PERFILES_RECURSOS].[Exportado] AS [Exportado], 
+    [SEG_PERFILES_RECURSOS].[ExportadoUpdate] AS [ExportadoUpdate], 
+    [SEG_PERFILES_RECURSOS].[ExportadoCandidate] AS [ExportadoCandidate]
+    FROM [dbo].[SEG_PERFILES_RECURSOS] AS [SEG_PERFILES_RECURSOS]</DefiningQuery>
+          </EntitySet>
           <EntitySet Name="SIS_RANGOS" EntityType="Self.SIS_RANGOS" store:Type="Tables" store:Schema="dbo">
             <DefiningQuery>SELECT 
     [SIS_RANGOS].[ID] AS [ID], 
@@ -30191,7 +30343,7 @@ advertencia 6002: La tabla o vista 'DBANAZCO.dbo.VEN_FACTURASREM_DT' no tiene de
             <PropertyRef Name="Valor" />
             <PropertyRef Name="Cambio" />
           </Key>
-          <Property Name="ID" Type="String" MaxLength="10" FixedLength="true" Unicode="false" Nullable="false" />
+          <Property Name="ID" Type="String" MaxLength="10" FixedLength="true" Unicode="false" />
           <Property Name="AsientoID" Type="String" MaxLength="10" FixedLength="true" Unicode="false" />
           <Property Name="CuentaID" Type="String" MaxLength="10" FixedLength="true" Unicode="false" />
           <Property Name="SucursalID" Type="String" MaxLength="2" FixedLength="true" Unicode="false" />
@@ -30239,7 +30391,18 @@ advertencia 6002: La tabla o vista 'DBANAZCO.dbo.VEN_FACTURASREM_DT' no tiene de
         </EntityType>
         <EntityType Name="ACR_RETENCIONES_DT">
           <Key>
-            <PropertyRef Name="ID" />
+            <PropertyRef Name="RetenciónID" />
+            <PropertyRef Name="Factura" />
+            <PropertyRef Name="BaseFuente" />
+            <PropertyRef Name="Tipo_RFIR" />
+            <PropertyRef Name="Tasa_RFIR" />
+            <PropertyRef Name="Total_RFIR" />
+            <PropertyRef Name="BaseIVA" />
+            <PropertyRef Name="Tipo_RFIVA" />
+            <PropertyRef Name="Tasa_RFIVA" />
+            <PropertyRef Name="Total_RFIVA" />
+            <PropertyRef Name="DivisaID" />
+            <PropertyRef Name="Cambio" />
           </Key>
           <Property Name="RetenciónID" Type="String" MaxLength="10" FixedLength="true" Unicode="false" Nullable="false" />
           <Property Name="Factura" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
@@ -30277,7 +30440,7 @@ advertencia 6002: La tabla o vista 'DBANAZCO.dbo.VEN_FACTURASREM_DT' no tiene de
           <Property Name="Exportado" Type="Decimal" Precision="1" Scale="0" />
           <Property Name="ExportadoUpdate" Type="Decimal" Precision="1" Scale="0" />
           <Property Name="ExportadoCandidate" Type="Decimal" Precision="1" Scale="0" />
-          <Property Name="ID" Type="String" MaxLength="10" FixedLength="true" Unicode="false" Nullable="false" />
+          <Property Name="ID" Type="String" MaxLength="10" FixedLength="true" Unicode="false" />
           <NavigationProperty Name="ACR_RETENCIONES" Relationship="Self.FK_ACR_RETENCIONES_DT_ACR_RETENCIONES" FromRole="ACR_RETENCIONES_DT" ToRole="ACR_RETENCIONES" />
         </EntityType>
         <EntityType Name="ACT_ASIGNACIONES">
@@ -30850,7 +31013,7 @@ advertencia 6002: La tabla o vista 'DBANAZCO.dbo.VEN_FACTURASREM_DT' no tiene de
             <PropertyRef Name="TasaFinanciero" />
             <PropertyRef Name="Financiero" />
           </Key>
-          <Property Name="ID" Type="String" MaxLength="10" FixedLength="true" Unicode="false" Nullable="false" />
+          <Property Name="ID" Type="String" MaxLength="10" FixedLength="true" Unicode="false" />
           <Property Name="CotizaciónID" Type="String" MaxLength="10" FixedLength="true" Unicode="false" Nullable="false" />
           <Property Name="ProductoID" Type="String" MaxLength="10" FixedLength="true" Unicode="false" Nullable="false" />
           <Property Name="Nombre" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
@@ -31244,7 +31407,7 @@ advertencia 6002: La tabla o vista 'DBANAZCO.dbo.VEN_FACTURASREM_DT' no tiene de
           <Property Name="Exportado" Type="Decimal" Precision="1" Scale="0" />
           <Property Name="ExportadoUpdate" Type="Decimal" Precision="1" Scale="0" />
           <Property Name="ExportadoCandidate" Type="Decimal" Precision="1" Scale="0" />
-          <Property Name="ID" Type="String" MaxLength="10" FixedLength="true" Unicode="false" Nullable="false" />
+          <Property Name="ID" Type="String" MaxLength="10" FixedLength="true" Unicode="false" />
           <Property Name="IsPV1" Type="Boolean" Nullable="false" />
           <Property Name="IsPV2" Type="Boolean" Nullable="false" />
           <Property Name="IsPV3" Type="Boolean" Nullable="false" />
@@ -31393,6 +31556,10 @@ advertencia 6002: La tabla o vista 'DBANAZCO.dbo.VEN_FACTURASREM_DT' no tiene de
         <EntityType Name="INV_COMBOS">
           <Key>
             <PropertyRef Name="ID" />
+            <PropertyRef Name="Código" />
+            <PropertyRef Name="Nombre" />
+            <PropertyRef Name="Anulado" />
+            <PropertyRef Name="CodigoBarra" />
           </Key>
           <Property Name="ID" Type="String" MaxLength="10" FixedLength="true" Unicode="false" Nullable="false" />
           <Property Name="Código" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
@@ -31564,7 +31731,7 @@ advertencia 6002: La tabla o vista 'DBANAZCO.dbo.VEN_FACTURASREM_DT' no tiene de
           <Property Name="Exportado" Type="Decimal" Precision="1" Scale="0" />
           <Property Name="ExportadoUpdate" Type="Decimal" Precision="1" Scale="0" />
           <Property Name="ExportadoCandidate" Type="Decimal" Precision="1" Scale="0" />
-          <Property Name="ID" Type="String" MaxLength="10" FixedLength="true" Unicode="false" Nullable="false" />
+          <Property Name="ID" Type="String" MaxLength="10" FixedLength="true" Unicode="false" />
           <Property Name="Anulado" Type="Boolean" />
         </EntityType>
         <EntityType Name="INV_PRODUCTOS_PRECIOS_HISTORICO">
@@ -31585,7 +31752,7 @@ advertencia 6002: La tabla o vista 'DBANAZCO.dbo.VEN_FACTURASREM_DT' no tiene de
           <Property Name="CreadoDate" Type="DateTime" Precision="3" />
           <Property Name="SucursalID" Type="String" MaxLength="2" FixedLength="true" Unicode="false" />
           <Property Name="PcID" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="ID" Type="String" MaxLength="10" FixedLength="true" Unicode="false" Nullable="false" />
+          <Property Name="ID" Type="String" MaxLength="10" FixedLength="true" Unicode="false" />
           <Property Name="Anulado" Type="Boolean" />
           <Property Name="ExportadoUpdate" Type="Decimal" Precision="1" Scale="0" />
           <Property Name="DocumentoID" Type="String" MaxLength="10" FixedLength="true" Unicode="false" />
@@ -31698,6 +31865,8 @@ advertencia 6002: La tabla o vista 'DBANAZCO.dbo.VEN_FACTURASREM_DT' no tiene de
         <EntityType Name="ORG_TAREAS">
           <Key>
             <PropertyRef Name="ID" />
+            <PropertyRef Name="Completado" />
+            <PropertyRef Name="Asignado" />
           </Key>
           <Property Name="ID" Type="String" MaxLength="10" FixedLength="true" Unicode="false" Nullable="false" />
           <Property Name="Tipo" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
@@ -32438,7 +32607,10 @@ advertencia 6002: La tabla o vista 'DBANAZCO.dbo.VEN_FACTURASREM_DT' no tiene de
         </EntityType>
         <EntityType Name="SEG_PERFILES">
           <Key>
-            <PropertyRef Name="id" />
+            <PropertyRef Name="Anulado" />
+            <PropertyRef Name="Código" />
+            <PropertyRef Name="Nombre" />
+            <PropertyRef Name="Nota" />
           </Key>
           <Property Name="UsuarioID" Type="String" MaxLength="10" FixedLength="true" Unicode="false" />
           <Property Name="SucursalID" Type="String" MaxLength="2" FixedLength="true" Unicode="false" />
@@ -32454,7 +32626,7 @@ advertencia 6002: La tabla o vista 'DBANAZCO.dbo.VEN_FACTURASREM_DT' no tiene de
           <Property Name="Exportado" Type="Decimal" Precision="1" Scale="0" />
           <Property Name="ExportadoUpdate" Type="Decimal" Precision="1" Scale="0" />
           <Property Name="ExportadoCandidate" Type="Decimal" Precision="1" Scale="0" />
-          <Property Name="id" Type="String" MaxLength="10" FixedLength="true" Unicode="false" Nullable="false" />
+          <Property Name="id" Type="String" MaxLength="10" FixedLength="true" Unicode="false" />
           <Property Name="Anulado" Type="Boolean" Nullable="false" />
           <Property Name="Código" Type="String" MaxLength="15" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="Nombre" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
@@ -32464,6 +32636,8 @@ advertencia 6002: La tabla o vista 'DBANAZCO.dbo.VEN_FACTURASREM_DT' no tiene de
         <EntityType Name="SEG_PERFILES_RECURSOS">
           <Key>
             <PropertyRef Name="id" />
+            <PropertyRef Name="PerfilID" />
+            <PropertyRef Name="RecursoID" />
           </Key>
           <Property Name="id" Type="String" MaxLength="10" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="PerfilID" Type="String" MaxLength="10" FixedLength="true" Unicode="false" Nullable="false" />
@@ -32566,7 +32740,7 @@ advertencia 6002: La tabla o vista 'DBANAZCO.dbo.VEN_FACTURASREM_DT' no tiene de
           <Property Name="CreadoDate" Type="DateTime" Precision="3" />
           <Property Name="HostNameID" Type="String" MaxLength="10" FixedLength="true" Unicode="false" />
           <Property Name="anulado" Type="Boolean" />
-          <Property Name="id" Type="String" MaxLength="10" FixedLength="true" Unicode="false" Nullable="false" />
+          <Property Name="id" Type="String" MaxLength="10" FixedLength="true" Unicode="false" />
           <Property Name="punto" Type="String" MaxLength="3" FixedLength="false" Unicode="false" />
           <Property Name="editadopor" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
           <Property Name="editadodate" Type="DateTime" Precision="3" />
