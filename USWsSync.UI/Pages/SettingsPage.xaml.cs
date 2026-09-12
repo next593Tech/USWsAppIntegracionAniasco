@@ -29,8 +29,6 @@ namespace USWsSync_UI.Pages
             TxtIpLocal.Text = config.IpLocal;
             TxtIpPublica.Text = config.IpPublica;
             TxtLastDateUpdate.Text = config.LastDateUpdate.ToString("yyyy-MM-ddTHH:mm:ss");
-            TsLogsJson.IsOn = config.GuardarLogsJson;
-            TxtDirectorioLogs.Text = config.DirectorioLogs;
         }
 
         private async void BtnTestConnection_Click(object sender, RoutedEventArgs e)
@@ -82,8 +80,6 @@ namespace USWsSync_UI.Pages
 
                 config.IpLocal = TxtIpLocal.Text.Trim();
                 config.IpPublica = TxtIpPublica.Text.Trim();
-                config.GuardarLogsJson = TsLogsJson.IsOn;
-                config.DirectorioLogs = TxtDirectorioLogs.Text.Trim();
 
                 if (DateTime.TryParse(TxtLastDateUpdate.Text.Trim(), out var parsedDate))
                 {

@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using USWsSync.Core.Configuration;
 using USWsSync.Core.Engine;
+using USWsSync.Core.Logging;
 
 namespace USWsSync.Console
 {
@@ -13,20 +14,19 @@ namespace USWsSync.Console
     {
         private static async Task<int> Main(string[] args)
         {
-            // Asegurar directorio de logs
-            var logsDir = @"C:\logs";
-            if (!Directory.Exists(logsDir))
+            var now = DateTime.Now;
+            var consoleLogFile = LogPathHelper.GetLogFilePath(LogComponents.Consola, now);
+            var consoleLogDir = Path.GetDirectoryName(consoleLogFile);
+            if (!string.IsNullOrEmpty(consoleLogDir) && !Directory.Exists(consoleLogDir))
             {
-                try { Directory.CreateDirectory(logsDir); } catch { }
+                try { Directory.CreateDirectory(consoleLogDir); } catch { }
             }
 
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Information()
                 .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
-                .WriteTo.File(Path.Combine(logsDir, "Sync_Console_.log"), rollingInterval: RollingInterval.Day,
+                .WriteTo.File(consoleLogFile,
                     outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
-                .WriteTo.File(Path.Combine(logsDir, "Sync_General_.log"), rollingInterval: RollingInterval.Day,
-                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [CONSOLA] [{Level:u3}] {Message:lj}{NewLine}{Exception}")
                 .CreateLogger();
 
             try

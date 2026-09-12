@@ -8,8 +8,6 @@ namespace USWsSync.Core.Configuration
         public string IpPublica { get; set; } = "192.168.10.39:8484";
         public DateTime LastDateUpdate { get; set; } = DateTime.Today.AddDays(-1);
         public DateTime LastDateDownload { get; set; } = DateTime.Today.AddDays(-1);
-        public bool GuardarLogsJson { get; set; } = true;
-        public string DirectorioLogs { get; set; } = @"C:\logsJSON";
         public int TimeoutSegundos { get; set; } = 300;
 
         public string CleanIpLocal => CleanHost(IpLocal);

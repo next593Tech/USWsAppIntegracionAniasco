@@ -93,11 +93,7 @@ namespace USWsSync.Core.Engine
             var f2Str = f2.ToString("yyyy-MM-ddTHH:mm:ss");
             var url = $"{cleanBase}/Clientes/{methodName}?lastUpdate={f1Str}&lastUpdate2={f2Str}";
 
-            var config = GetConfig();
             var tableName = typeof(T).Name;
-            var isLocalSource = cleanBase.Contains(config.CleanIpLocal, StringComparison.OrdinalIgnoreCase);
-            var opFolder = isLocalSource ? "Upload_DesdeLocal" : "Download_DesdeNube";
-            var timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
 
             try
             {
@@ -112,8 +108,6 @@ namespace USWsSync.Core.Engine
                 {
                     _logger.LogError("Error HTTP al descargar {Table} desde {Url}: {StatusCode} - {Body}",
                         tableName, url, response.StatusCode, rawBody);
-                    SaveErrorLog(opFolder, "Errores_Red", $"ErrorHTTP_{tableName}_{timestamp}.txt",
-                        $"URL: {url}\nStatusCode: {response.StatusCode}\nBody: {rawBody}");
                     return null;
                 }
 
@@ -125,16 +119,12 @@ namespace USWsSync.Core.Engine
                 catch (Exception parseEx)
                 {
                     _logger.LogError(parseEx, "Error al deserializar JSON de {Table} desde {Url}", tableName, url);
-                    SaveErrorLog(opFolder, "Errores_Parseo", $"ErrorParseo_{tableName}_{timestamp}.txt",
-                        $"URL: {url}\nException: {parseEx}\nRawResponse:\n{rawBody}");
                     return null;
                 }
             }
             catch (Exception netEx)
             {
                 _logger.LogError(netEx, "Excepción de red al descargar {Table} desde {Url}", tableName, url);
-                SaveErrorLog(opFolder, "Errores_Red", $"ErrorRed_{tableName}_{timestamp}.txt",
-                    $"URL: {url}\nException: {netEx}");
                 return null;
             }
         }
@@ -148,26 +138,16 @@ namespace USWsSync.Core.Engine
             var cleanBase = SyncConfig.CleanIp(baseUrl);
             var url = $"{cleanBase}/Clientes/{methodName}";
 
-            var config = GetConfig();
             var tableName = typeof(T).Name;
-            var isLocalTarget = cleanBase.Contains(config.CleanIpLocal, StringComparison.OrdinalIgnoreCase);
-            var opFolder = isLocalTarget ? "Download_HaciaLocal" : "Upload_HaciaNube";
-            var timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
 
             string jsonPayload;
             try
             {
                 jsonPayload = JsonSerializer.Serialize(payload, _jsonOptions);
-                if (config.GuardarLogsJson)
-                {
-                    SaveDebugJson(opFolder, timestamp, tableName, jsonPayload);
-                }
             }
             catch (Exception encEx)
             {
                 _logger.LogError(encEx, "Error al serializar JSON para {Table}", tableName);
-                SaveErrorLog(opFolder, "Errores_Parseo", $"ErrorEncode_{tableName}_{timestamp}.txt",
-                    $"URL: {url}\nException: {encEx}");
                 return new ErrorSave
                 {
                     Tabla = tableName,
@@ -190,8 +170,6 @@ namespace USWsSync.Core.Engine
                 {
                     _logger.LogError("Error HTTP al subir {Table} hacia {Url}: {StatusCode} - {Body}",
                         tableName, url, response.StatusCode, rawBody);
-                    SaveErrorLog(opFolder, "Errores_Red", $"ErrorHTTP_{tableName}_{timestamp}.txt",
-                        $"URL: {url}\nStatusCode: {response.StatusCode}\nBody: {rawBody}");
                     return new ErrorSave
                     {
                         Tabla = tableName,
@@ -217,8 +195,6 @@ namespace USWsSync.Core.Engine
                 catch (Exception decEx)
                 {
                     _logger.LogError(decEx, "Error al deserializar ErrorSave de {Table}", tableName);
-                    SaveErrorLog(opFolder, "Errores_Parseo", $"ErrorDecode_{tableName}_{timestamp}.txt",
-                        $"URL: {url}\nException: {decEx}\nRawResponse:\n{rawBody}");
                     return new ErrorSave
                     {
                         Tabla = tableName,
@@ -230,8 +206,6 @@ namespace USWsSync.Core.Engine
             catch (Exception netEx)
             {
                 _logger.LogError(netEx, "Excepción de red al subir {Table} hacia {Url}", tableName, url);
-                SaveErrorLog(opFolder, "Errores_Red", $"ErrorRed_{tableName}_{timestamp}.txt",
-                    $"URL: {url}\nException: {netEx}");
                 return new ErrorSave
                 {
                     Tabla = tableName,
@@ -400,42 +374,6 @@ namespace USWsSync.Core.Engine
 
             _logger.LogInformation("Fin del lote de Subida. Resultado global: {Result}", allSuccess ? "EXITOSO" : "CON ERRORES");
             return allSuccess;
-        }
-
-        private void SaveDebugJson(string opFolder, string timestamp, string tableName, string content)
-        {
-            try
-            {
-                var dir = Path.Combine(@"C:\logsJSON", opFolder, timestamp);
-                if (!Directory.Exists(dir))
-                {
-                    Directory.CreateDirectory(dir);
-                }
-                var filePath = Path.Combine(dir, $"{tableName}.json");
-                File.WriteAllText(filePath, content, Encoding.UTF8);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "No se pudo escribir JSON de depuración para {Table}", tableName);
-            }
-        }
-
-        private void SaveErrorLog(string opFolder, string subFolder, string fileName, string content)
-        {
-            try
-            {
-                var dir = Path.Combine(@"C:\logsJSON", opFolder, subFolder);
-                if (!Directory.Exists(dir))
-                {
-                    Directory.CreateDirectory(dir);
-                }
-                var filePath = Path.Combine(dir, fileName);
-                File.WriteAllText(filePath, content, Encoding.UTF8);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "No se pudo escribir log de error {FileName}", fileName);
-            }
         }
     }
 }

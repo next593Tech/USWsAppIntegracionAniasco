@@ -52,11 +52,10 @@
                         <TextBlock Text="Formato ISO: YYYY-MM-DDTHH:MM:SS. Modificar solo si necesita forzar un reenvío total desde una fecha anterior." Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                     </StackPanel>
 
-                    <ToggleSwitch x:Name="TsLogsJson" Header="Guardar respaldo JSON crudo en disco" OffContent="Desactivado" OnContent="Activado (C:\logsJSON)" />
-
                     <StackPanel Spacing="6">
-                        <TextBlock Text="Directorio de Logs JSON:" FontWeight="SemiBold" />
-                        <TextBox x:Name="TxtDirectorioLogs" HorizontalAlignment="Stretch" />
+                        <TextBlock Text="Ruta Base de Registros y Trazabilidad:" FontWeight="SemiBold" />
+                        <TextBox Text="C:\logs\{Componente}\{Año}\{Mes}\{Día}\" IsReadOnly="True" HorizontalAlignment="Stretch" />
+                        <TextBlock Text="Los logs se organizan automáticamente por componente (Consola, UI_Descarga, UI_Subida) y fecha/hora." Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                     </StackPanel>
                 </StackPanel>
             </Border>

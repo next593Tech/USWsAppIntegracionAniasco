@@ -10,6 +10,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using USWsSync.Core.Configuration;
 using USWsSync.Core.Engine;
+using USWsSync.Core.Logging;
 
 namespace USWsSync_UI.Pages
 {
@@ -72,9 +73,6 @@ namespace USWsSync_UI.Pages
                     PbSync.ShowError = true;
                     AppendLog($"[{DateTime.Now:HH:mm:ss}] ERROR: No hay conexión con el servidor público ({config.IpPublica}). Verifique red.");
                     TxtStatus.Text = "Fallo de conexión con el servidor remoto.";
-                    BtnStart.IsEnabled = true;
-                    BtnCancel.IsEnabled = false;
-                    SaveSessionLog("Descarga", _logBuilder.ToString());
                     return;
                 }
 
@@ -151,7 +149,11 @@ namespace USWsSync_UI.Pages
             {
                 BtnStart.IsEnabled = true;
                 BtnCancel.IsEnabled = false;
-                SaveSessionLog("Descarga", _logBuilder.ToString());
+                var savedPath = TraceLogger.WriteTraceLog(LogComponents.UiDescarga, _logBuilder.ToString());
+                if (!string.IsNullOrEmpty(savedPath))
+                {
+                    AppendLog($"[{DateTime.Now:HH:mm:ss}] Archivo de log generado en: {savedPath}");
+                }
                 _cts?.Dispose();
                 _cts = null;
             }
@@ -169,27 +171,6 @@ namespace USWsSync_UI.Pages
             _logBuilder.AppendLine(message);
             TxtLogs.Text = _logBuilder.ToString();
             LogScrollViewer.ChangeView(null, LogScrollViewer.ScrollableHeight, null);
-        }
-
-        private void SaveSessionLog(string operation, string fullLog)
-        {
-            try
-            {
-                var logsDir = @"C:\logs";
-                if (!Directory.Exists(logsDir))
-                {
-                    Directory.CreateDirectory(logsDir);
-                }
-                var now = DateTime.Now;
-                var fileName = $"Sync_Manual_{operation}_{now:yyyyMMdd_HHmmss}.log";
-                var generalFile = $"Sync_General_{now:yyyyMMdd}.log";
-
-                File.WriteAllText(Path.Combine(logsDir, fileName), fullLog, Encoding.UTF8);
-
-                var separator = $"\n========================================================================\n=== REGISTRO MANUAL {operation.ToUpper()} - {now:yyyy-MM-dd HH:mm:ss} ===\n========================================================================\n";
-                File.AppendAllText(Path.Combine(logsDir, generalFile), separator + fullLog + "\n", Encoding.UTF8);
-            }
-            catch { }
         }
     }
 }
