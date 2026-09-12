@@ -8,7 +8,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid Padding="28,20,28,24" RowSpacing="16">
+    <Grid Padding="24,14,24,16" RowSpacing="12">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -22,20 +22,20 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <StackPanel Grid.Column="0" Spacing="4">
-                <TextBlock Text="Monitor de Sincronización" Style="{StaticResource TitleTextBlockStyle}" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
-                <TextBlock Text="Supervisión en tiempo real del estado, corte temporal e incidencias por tabla." Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            <StackPanel Grid.Column="0" Spacing="2">
+                <TextBlock Text="Monitor de Sincronización" FontSize="22" FontWeight="SemiBold" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
+                <TextBlock Text="Supervisión en tiempo real del estado, corte temporal e incidencias por tabla." FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
             </StackPanel>
-            <Button Grid.Column="1" Click="BtnRefresh_Click" VerticalAlignment="Center" Padding="14,8">
+            <Button Grid.Column="1" Click="BtnRefresh_Click" VerticalAlignment="Center" Padding="12,6">
                 <StackPanel Orientation="Horizontal" Spacing="8">
-                    <FontIcon Glyph="&#xE72C;" FontSize="14" />
-                    <TextBlock Text="Actualizar Datos" FontWeight="SemiBold" />
+                    <FontIcon Glyph="&#xE72C;" FontSize="13" />
+                    <TextBlock Text="Actualizar Datos" FontSize="12" FontWeight="SemiBold" />
                 </StackPanel>
             </Button>
         </Grid>
 
         <!-- Fila 1: Tarjetas de Métricas Ejecutivas (KPIs) -->
-        <Grid Grid.Row="1" ColumnSpacing="12">
+        <Grid Grid.Row="1" ColumnSpacing="10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
@@ -44,72 +44,72 @@
             </Grid.ColumnDefinitions>
 
             <!-- KPI 1: Total Tablas -->
-            <Border Grid.Column="0" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="16,12">
-                <StackPanel Spacing="4">
+            <Border Grid.Column="0" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="14,8">
+                <StackPanel Spacing="2">
                     <TextBlock Text="Tablas Registradas" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                    <TextBlock x:Name="TxtTotalTables" Text="--" Style="{StaticResource SubtitleTextBlockStyle}" FontWeight="SemiBold" />
-                    <TextBlock x:Name="TxtTotalTablesSub" Text="En catálogo de dependencias" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                    <TextBlock x:Name="TxtTotalTables" Text="--" FontSize="18" FontWeight="SemiBold" />
+                    <TextBlock x:Name="TxtTotalTablesSub" Text="En catálogo Dobra" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
                 </StackPanel>
             </Border>
 
             <!-- KPI 2: Salud Operativa -->
-            <Border Grid.Column="1" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="16,12">
-                <StackPanel Spacing="4">
+            <Border Grid.Column="1" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="14,8">
+                <StackPanel Spacing="2">
                     <TextBlock Text="Estado Operativo" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                    <TextBlock x:Name="TxtHealthStatus" Text="--" Style="{StaticResource SubtitleTextBlockStyle}" FontWeight="SemiBold" />
-                    <TextBlock x:Name="TxtHealthStatusSub" Text="-- al día" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                    <TextBlock x:Name="TxtHealthStatus" Text="--" FontSize="18" FontWeight="SemiBold" />
+                    <TextBlock x:Name="TxtHealthStatusSub" Text="-- al día" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
                 </StackPanel>
             </Border>
 
             <!-- KPI 3: Última Corrida -->
-            <Border Grid.Column="2" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="16,12">
-                <StackPanel Spacing="4">
+            <Border Grid.Column="2" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="14,8">
+                <StackPanel Spacing="2">
                     <TextBlock Text="Última Sincronización" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                    <TextBlock x:Name="TxtLastRun" Text="--" Style="{StaticResource SubtitleTextBlockStyle}" FontWeight="SemiBold" />
-                    <TextBlock x:Name="TxtLastRunSub" Text="Último corte confirmado" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                    <TextBlock x:Name="TxtLastRun" Text="--" FontSize="18" FontWeight="SemiBold" />
+                    <TextBlock x:Name="TxtLastRunSub" Text="Último corte confirmado" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
                 </StackPanel>
             </Border>
 
             <!-- KPI 4: Registros Procesados -->
-            <Border Grid.Column="3" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="16,12">
-                <StackPanel Spacing="4">
+            <Border Grid.Column="3" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="14,8">
+                <StackPanel Spacing="2">
                     <TextBlock Text="Registros Transferidos" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                    <TextBlock x:Name="TxtTotalRecords" Text="--" Style="{StaticResource SubtitleTextBlockStyle}" FontWeight="SemiBold" />
-                    <TextBlock x:Name="TxtTotalRecordsSub" Text="Filas en última corrida" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                    <TextBlock x:Name="TxtTotalRecords" Text="--" FontSize="18" FontWeight="SemiBold" />
+                    <TextBlock x:Name="TxtTotalRecordsSub" Text="Filas en última corrida" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
                 </StackPanel>
             </Border>
         </Grid>
 
         <!-- Fila 2: Barra de Filtros y Segmentación de Flujo -->
-        <Border Grid.Row="2" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="14,10">
-            <Grid ColumnSpacing="16">
+        <Border Grid.Row="2" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="12,8">
+            <Grid ColumnSpacing="12">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="190" />
-                    <ColumnDefinition Width="170" />
+                    <ColumnDefinition Width="180" />
+                    <ColumnDefinition Width="160" />
                 </Grid.ColumnDefinitions>
 
-                <!-- Selector de Dirección: Descarga vs Subida -->
-                <RadioButtons x:Name="RbDirection" Grid.Column="0" SelectedIndex="0" SelectionChanged="RbDirection_SelectionChanged">
-                    <RadioButton Content="Descargas (Nube a Local)" Tag="download" />
-                    <RadioButton Content="Subidas (Local a Nube)" Tag="upload" />
+                <!-- Selector de Dirección: Descarga vs Subida en 2 columnas -->
+                <RadioButtons x:Name="RbDirection" Grid.Column="0" MaxColumns="2" SelectedIndex="0" SelectionChanged="RbDirection_SelectionChanged" VerticalAlignment="Center">
+                    <RadioButton Content="Descargas (Nube a Local)" Tag="download" FontSize="12" Margin="0,0,10,0" />
+                    <RadioButton Content="Subidas (Local a Nube)" Tag="upload" FontSize="12" />
                 </RadioButtons>
 
                 <!-- Buscador de texto -->
-                <TextBox x:Name="TxtSearch" Grid.Column="1" PlaceholderText="Buscar tabla (ej. VEN_FACTURAS)..." TextChanged="TxtSearch_TextChanged" VerticalAlignment="Center">
+                <TextBox x:Name="TxtSearch" Grid.Column="1" PlaceholderText="Buscar tabla (ej. VEN_FACTURAS)..." TextChanged="TxtSearch_TextChanged" VerticalAlignment="Center" FontSize="12">
                     <TextBox.Header>
-                        <StackPanel Orientation="Horizontal" Spacing="6">
-                            <FontIcon Glyph="&#xE721;" FontSize="11" />
-                            <TextBlock Text="Búsqueda rápida:" FontSize="11" />
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <FontIcon Glyph="&#xE721;" FontSize="10" />
+                            <TextBlock Text="Búsqueda rápida:" FontSize="10" />
                         </StackPanel>
                     </TextBox.Header>
                 </TextBox>
 
                 <!-- Filtro de Módulo -->
-                <ComboBox x:Name="CmbFilterModule" Grid.Column="2" HorizontalAlignment="Stretch" SelectedIndex="0" SelectionChanged="CmbFilterModule_SelectionChanged" VerticalAlignment="Center">
+                <ComboBox x:Name="CmbFilterModule" Grid.Column="2" HorizontalAlignment="Stretch" SelectedIndex="0" SelectionChanged="CmbFilterModule_SelectionChanged" VerticalAlignment="Center" FontSize="12">
                     <ComboBox.Header>
-                        <TextBlock Text="Módulo:" FontSize="11" />
+                        <TextBlock Text="Módulo:" FontSize="10" />
                     </ComboBox.Header>
                     <ComboBoxItem Content="Todos los módulos" Tag="Todos" />
                     <ComboBoxItem Content="Sistema" Tag="Sistema" />
@@ -123,9 +123,9 @@
                 </ComboBox>
 
                 <!-- Filtro de Estado -->
-                <ComboBox x:Name="CmbFilterStatus" Grid.Column="3" HorizontalAlignment="Stretch" SelectedIndex="0" SelectionChanged="CmbFilterStatus_SelectionChanged" VerticalAlignment="Center">
+                <ComboBox x:Name="CmbFilterStatus" Grid.Column="3" HorizontalAlignment="Stretch" SelectedIndex="0" SelectionChanged="CmbFilterStatus_SelectionChanged" VerticalAlignment="Center" FontSize="12">
                     <ComboBox.Header>
-                        <TextBlock Text="Estado:" FontSize="11" />
+                        <TextBlock Text="Estado:" FontSize="10" />
                     </ComboBox.Header>
                     <ComboBoxItem Content="Todos los estados" Tag="Todos" />
                     <ComboBoxItem Content="Correctas" Tag="Success" />
@@ -135,113 +135,123 @@
             </Grid>
         </Border>
 
-        <!-- Fila 3: Tabla de Trazabilidad por Tabla -->
-        <Border Grid.Row="3" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="0">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
+        <!-- Fila 3: Tabla de Trazabilidad por Tabla con Scroll Horizontal sincronizado -->
+        <Border Grid.Row="3" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="0" MinHeight="180">
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" 
+                          HorizontalScrollMode="Enabled" 
+                          VerticalScrollBarVisibility="Disabled" 
+                          VerticalScrollMode="Disabled">
+                <Grid MinWidth="1080">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
 
-                <!-- Encabezado de Columnas -->
-                <Border Grid.Row="0" Background="{ThemeResource LayerFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="0,0,0,1" CornerRadius="8,8,0,0" Padding="16,10">
-                    <Grid ColumnSpacing="12">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="110" />
-                            <ColumnDefinition Width="220" />
-                            <ColumnDefinition Width="130" />
-                            <ColumnDefinition Width="170" />
-                            <ColumnDefinition Width="170" />
-                            <ColumnDefinition Width="90" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="Estado" FontWeight="SemiBold" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                        <TextBlock Grid.Column="1" Text="Nombre de Tabla" FontWeight="SemiBold" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                        <TextBlock Grid.Column="2" Text="Módulo" FontWeight="SemiBold" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                        <TextBlock Grid.Column="3" Text="Último Corte Exitoso" FontWeight="SemiBold" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                        <TextBlock Grid.Column="4" Text="Último Intento" FontWeight="SemiBold" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                        <TextBlock Grid.Column="5" Text="Registros" FontWeight="SemiBold" HorizontalAlignment="Right" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                        <TextBlock Grid.Column="6" Text="Diagnóstico / Acciones" FontWeight="SemiBold" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Margin="12,0,0,0" />
-                    </Grid>
-                </Border>
+                    <!-- Encabezado de Columnas -->
+                    <Border Grid.Row="0" Background="{ThemeResource LayerFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="0,0,0,1" CornerRadius="8,8,0,0" Padding="16,8">
+                        <Grid ColumnSpacing="12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="105" />
+                                <ColumnDefinition Width="220" />
+                                <ColumnDefinition Width="125" />
+                                <ColumnDefinition Width="160" />
+                                <ColumnDefinition Width="160" />
+                                <ColumnDefinition Width="90" />
+                                <ColumnDefinition Width="150" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Estado" FontWeight="SemiBold" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <TextBlock Grid.Column="1" Text="Nombre de Tabla" FontWeight="SemiBold" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <TextBlock Grid.Column="2" Text="Módulo" FontWeight="SemiBold" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <TextBlock Grid.Column="3" Text="Último Corte Exitoso" FontWeight="SemiBold" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <TextBlock Grid.Column="4" Text="Último Intento" FontWeight="SemiBold" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <TextBlock Grid.Column="5" Text="Registros" FontWeight="SemiBold" HorizontalAlignment="Right" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <TextBlock Grid.Column="6" Text="Diagnóstico / Acciones" FontWeight="SemiBold" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Margin="8,0,0,0" />
+                        </Grid>
+                    </Border>
 
-                <!-- Lista de Registros -->
-                <ListView x:Name="LvTables" Grid.Row="1" SelectionMode="None" Padding="0">
-                    <ListView.ItemContainerStyle>
-                        <Style TargetType="ListViewItem">
-                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                            <Setter Property="Padding" Value="16,8" />
-                            <Setter Property="MinHeight" Value="42" />
-                            <Setter Property="BorderThickness" Value="0,0,0,1" />
-                            <Setter Property="BorderBrush" Value="{ThemeResource DividerStrokeColorDefaultBrush}" />
-                        </Style>
-                    </ListView.ItemContainerStyle>
-                    <ListView.ItemTemplate>
-                        <DataTemplate x:DataType="local:TableMonitorItem">
-                            <Grid ColumnSpacing="12">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="110" />
-                                    <ColumnDefinition Width="220" />
-                                    <ColumnDefinition Width="130" />
-                                    <ColumnDefinition Width="170" />
-                                    <ColumnDefinition Width="170" />
-                                    <ColumnDefinition Width="90" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
+                    <!-- Lista de Registros con StackPanel no virtualizado para renderizado inmediato -->
+                    <ListView x:Name="LvTables" Grid.Row="1" SelectionMode="None" Padding="0">
+                        <ListView.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Vertical" />
+                            </ItemsPanelTemplate>
+                        </ListView.ItemsPanel>
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                <Setter Property="Padding" Value="16,6" />
+                                <Setter Property="MinHeight" Value="38" />
+                                <Setter Property="BorderThickness" Value="0,0,0,1" />
+                                <Setter Property="BorderBrush" Value="{ThemeResource DividerStrokeColorDefaultBrush}" />
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="local:TableMonitorItem">
+                                <Grid ColumnSpacing="12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="105" />
+                                        <ColumnDefinition Width="220" />
+                                        <ColumnDefinition Width="125" />
+                                        <ColumnDefinition Width="160" />
+                                        <ColumnDefinition Width="160" />
+                                        <ColumnDefinition Width="90" />
+                                        <ColumnDefinition Width="150" />
+                                    </Grid.ColumnDefinitions>
 
-                                <!-- Columna 0: Badge de Estado -->
-                                <Border Grid.Column="0" 
-                                        Background="{x:Bind StatusBackground}" 
-                                        BorderBrush="{x:Bind StatusBorderBrush}" 
-                                        BorderThickness="1" 
-                                        CornerRadius="4" 
-                                        Padding="6,3" 
-                                        HorizontalAlignment="Left" 
-                                        VerticalAlignment="Center">
-                                    <StackPanel Orientation="Horizontal" Spacing="5">
-                                        <FontIcon Glyph="{x:Bind StatusGlyph}" FontSize="10" Foreground="{x:Bind StatusForeground}" />
-                                        <TextBlock Text="{x:Bind StatusText}" FontSize="11" FontWeight="SemiBold" Foreground="{x:Bind StatusForeground}" />
-                                    </StackPanel>
-                                </Border>
-
-                                <!-- Columna 1: Nombre de Tabla -->
-                                <TextBlock Grid.Column="1" Text="{x:Bind TableName}" FontWeight="SemiBold" FontFamily="Consolas, Segoe UI" FontSize="13" VerticalAlignment="Center" />
-
-                                <!-- Columna 2: Módulo -->
-                                <TextBlock Grid.Column="2" Text="{x:Bind ModuleName}" Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Center" />
-
-                                <!-- Columna 3: Último Corte Exitoso -->
-                                <TextBlock Grid.Column="3" Text="{x:Bind LastSuccessText}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorPrimaryBrush}" VerticalAlignment="Center" />
-
-                                <!-- Columna 4: Último Intento -->
-                                <TextBlock Grid.Column="4" Text="{x:Bind LastAttemptText}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Center" />
-
-                                <!-- Columna 5: Registros -->
-                                <TextBlock Grid.Column="5" Text="{x:Bind RecordsCountText}" HorizontalAlignment="Right" FontFamily="Consolas, Segoe UI" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center" />
-
-                                <!-- Columna 6: Diagnóstico / Acciones -->
-                                <StackPanel Grid.Column="6" Orientation="Horizontal" Spacing="8" Margin="12,0,0,0" VerticalAlignment="Center">
-                                    <Button Click="BtnViewDetail_Click" 
-                                            Tag="{x:Bind}" 
-                                            Visibility="{x:Bind ErrorButtonVisibility}" 
-                                            Padding="10,4" 
-                                            Style="{StaticResource DefaultButtonStyle}">
-                                        <StackPanel Orientation="Horizontal" Spacing="6">
-                                            <FontIcon Glyph="&#xE946;" FontSize="11" Foreground="{ThemeResource SystemFillColorCriticalBrush}" />
-                                            <TextBlock Text="Ver Incidencia" FontSize="11" FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorCriticalBrush}" />
+                                    <!-- Columna 0: Badge de Estado -->
+                                    <Border Grid.Column="0" 
+                                            Background="{x:Bind StatusBackground}" 
+                                            BorderBrush="{x:Bind StatusBorderBrush}" 
+                                            BorderThickness="1" 
+                                            CornerRadius="4" 
+                                            Padding="6,2" 
+                                            HorizontalAlignment="Left" 
+                                            VerticalAlignment="Center">
+                                        <StackPanel Orientation="Horizontal" Spacing="5">
+                                            <FontIcon Glyph="{x:Bind StatusGlyph}" FontSize="10" Foreground="{x:Bind StatusForeground}" />
+                                            <TextBlock Text="{x:Bind StatusText}" FontSize="11" FontWeight="SemiBold" Foreground="{x:Bind StatusForeground}" />
                                         </StackPanel>
-                                    </Button>
-                                    <TextBlock Text="Sin incidencias" 
-                                               Visibility="{x:Bind OkTextVisibility}" 
-                                               Style="{StaticResource CaptionTextBlockStyle}" 
-                                               Foreground="{ThemeResource TextFillColorTertiaryBrush}" 
-                                               VerticalAlignment="Center" />
-                                </StackPanel>
-                            </Grid>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
-            </Grid>
+                                    </Border>
+
+                                    <!-- Columna 1: Nombre de Tabla -->
+                                    <TextBlock Grid.Column="1" Text="{x:Bind TableName}" FontWeight="SemiBold" FontFamily="Consolas, Segoe UI" FontSize="12" VerticalAlignment="Center" />
+
+                                    <!-- Columna 2: Módulo -->
+                                    <TextBlock Grid.Column="2" Text="{x:Bind ModuleName}" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Center" />
+
+                                    <!-- Columna 3: Último Corte Exitoso -->
+                                    <TextBlock Grid.Column="3" Text="{x:Bind LastSuccessText}" FontSize="11" Foreground="{ThemeResource TextFillColorPrimaryBrush}" VerticalAlignment="Center" />
+
+                                    <!-- Columna 4: Último Intento -->
+                                    <TextBlock Grid.Column="4" Text="{x:Bind LastAttemptText}" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Center" />
+
+                                    <!-- Columna 5: Registros -->
+                                    <TextBlock Grid.Column="5" Text="{x:Bind RecordsCountText}" HorizontalAlignment="Right" FontFamily="Consolas, Segoe UI" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center" />
+
+                                    <!-- Columna 6: Diagnóstico / Acciones -->
+                                    <StackPanel Grid.Column="6" Orientation="Horizontal" Spacing="6" Margin="8,0,0,0" VerticalAlignment="Center">
+                                        <Button Click="BtnViewDetail_Click" 
+                                                Tag="{x:Bind}" 
+                                                Visibility="{x:Bind ErrorButtonVisibility}" 
+                                                Padding="8,3" 
+                                                Style="{StaticResource DefaultButtonStyle}">
+                                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                                <FontIcon Glyph="&#xE946;" FontSize="11" Foreground="{ThemeResource SystemFillColorCriticalBrush}" />
+                                                <TextBlock Text="Ver Incidencia" FontSize="11" FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorCriticalBrush}" />
+                                            </StackPanel>
+                                        </Button>
+                                        <TextBlock Text="Sin incidencias" 
+                                                   Visibility="{x:Bind OkTextVisibility}" 
+                                                   FontSize="11" 
+                                                   Foreground="{ThemeResource TextFillColorTertiaryBrush}" 
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Grid>
+            </ScrollViewer>
         </Border>
     </Grid>
 </Page>

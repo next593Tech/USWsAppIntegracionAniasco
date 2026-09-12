@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
@@ -36,6 +38,7 @@ namespace USWsSync_UI.Pages
     public sealed partial class MonitorPage : Page
     {
         private readonly List<TableMonitorItem> _allItems = new();
+        public ObservableCollection<TableMonitorItem> FilteredItems { get; } = new();
         private bool _isInitialized;
 
         private static readonly SolidColorBrush SuccessForegroundBrush = new(Windows.UI.Color.FromArgb(255, 16, 124, 65));
@@ -53,16 +56,20 @@ namespace USWsSync_UI.Pages
         public MonitorPage()
         {
             InitializeComponent();
+            LvTables.ItemsSource = FilteredItems;
             Loaded += MonitorPage_Loaded;
         }
 
         private void MonitorPage_Loaded(object sender, RoutedEventArgs e)
         {
-            if (!_isInitialized)
+            DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
             {
-                _isInitialized = true;
-                LoadData();
-            }
+                if (!_isInitialized)
+                {
+                    _isInitialized = true;
+                    LoadData();
+                }
+            });
         }
 
         private void BtnRefresh_Click(object sender, RoutedEventArgs e)
@@ -175,7 +182,7 @@ namespace USWsSync_UI.Pages
                 _allItems.Add(item);
             }
 
-            // KPIs
+            // Actualización de Métricas KPIs
             int total = _allItems.Count;
             int successCount = _allItems.Count(x => x.StatusKey == "Success");
             int errorCount = _allItems.Count(x => x.StatusKey == "Error");
@@ -225,7 +232,11 @@ namespace USWsSync_UI.Pages
                 filtered = filtered.Where(x => string.Equals(x.StatusKey, statusTag, StringComparison.OrdinalIgnoreCase));
             }
 
-            LvTables.ItemsSource = filtered.ToList();
+            FilteredItems.Clear();
+            foreach (var item in filtered)
+            {
+                FilteredItems.Add(item);
+            }
         }
 
         private async void BtnViewDetail_Click(object sender, RoutedEventArgs e)
