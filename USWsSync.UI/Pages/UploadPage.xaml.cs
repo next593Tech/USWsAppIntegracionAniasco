@@ -19,20 +19,26 @@ namespace USWsSync_UI.Pages
         private readonly ISyncEngine _syncEngine;
         private CancellationTokenSource? _cts;
         private readonly StringBuilder _logBuilder = new();
+        private bool _isInitialized;
 
         public UploadPage()
         {
             InitializeComponent();
+            NavigationCacheMode = Microsoft.UI.Xaml.Navigation.NavigationCacheMode.Required;
             _syncEngine = App.Services.GetRequiredService<ISyncEngine>();
             Loaded += UploadPage_Loaded;
         }
 
         private void UploadPage_Loaded(object sender, RoutedEventArgs e)
         {
-            var config = ConfigManager.LoadConfig();
-            DpFechaInicio.Date = DateTimeOffset.Now.Date;
-            DpFechaFinal.Date = DateTimeOffset.Now.Date;
-            TxtLastDate.Text = config.LastDateUpdate.ToString("yyyy-MM-dd HH:mm:ss");
+            if (!_isInitialized)
+            {
+                var config = ConfigManager.LoadConfig();
+                DpFechaInicio.Date = DateTimeOffset.Now.Date;
+                DpFechaFinal.Date = DateTimeOffset.Now.Date;
+                TxtLastDate.Text = config.LastDateUpdate.ToString("yyyy-MM-dd HH:mm:ss");
+                _isInitialized = true;
+            }
         }
 
         private async void BtnStart_Click(object sender, RoutedEventArgs e)

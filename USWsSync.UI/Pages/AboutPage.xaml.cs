@@ -10,5 +10,6 @@ public sealed partial class AboutPage : Page
     public AboutPage()
     {
         InitializeComponent();
+        NavigationCacheMode = Microsoft.UI.Xaml.Navigation.NavigationCacheMode.Required;
     }
 }

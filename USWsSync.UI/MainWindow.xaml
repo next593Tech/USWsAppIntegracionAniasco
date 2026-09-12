@@ -21,8 +21,7 @@
         <TitleBar
             x:Name="AppTitleBar"
             Title="Bizor Sync - Integración Dobra ERP"
-            BackRequested="TitleBar_BackRequested"
-            IsBackButtonVisible="{x:Bind NavFrame.CanGoBack, Mode=OneWay}"
+            IsBackButtonVisible="False"
             IsPaneToggleButtonVisible="True"
             PaneToggleRequested="TitleBar_PaneToggleRequested">
             <TitleBar.IconSource>
@@ -33,6 +32,9 @@
         <NavigationView
             x:Name="NavView"
             Grid.Row="1"
+            PaneDisplayMode="LeftCompact"
+            OpenPaneLength="260"
+            CompactPaneLength="48"
             IsBackButtonVisible="Collapsed"
             IsPaneToggleButtonVisible="False"
             IsSettingsVisible="True"

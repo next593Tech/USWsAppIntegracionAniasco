@@ -8,12 +8,22 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid Padding="24,16,24,16" RowSpacing="24">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-        <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="About" />
-        <TextBlock Grid.Row="1" Text="This is the About page" />
-    </Grid>
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="24">
+        <StackPanel Spacing="20" HorizontalAlignment="Stretch">
+            <!-- Encabezado -->
+            <StackPanel Spacing="4">
+                <TextBlock Text="Acerca del Sistema" Style="{StaticResource TitleTextBlockStyle}" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
+                <TextBlock Text="Información general de la arquitectura y sincronización con Dobra ERP." Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            </StackPanel>
+
+            <!-- Card Información -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="20">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="Bizor Sync - Integración Dobra ERP" Style="{StaticResource SubtitleTextBlockStyle}" />
+                    <TextBlock Text="Versión 1.0 (.NET 8 Nativo)" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <TextBlock Text="Módulo empresarial para la descarga y subida de información transaccional y catálogos entre servidores locales de Dobra ERP y la plataforma cloud." TextWrapping="Wrap" Style="{StaticResource BodyTextBlockStyle}" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
 </Page>

@@ -11,16 +11,23 @@ namespace USWsSync_UI.Pages
     {
         private readonly ISyncEngine _syncEngine;
 
+        private bool _isInitialized;
+
         public SettingsPage()
         {
             InitializeComponent();
+            NavigationCacheMode = Microsoft.UI.Xaml.Navigation.NavigationCacheMode.Required;
             _syncEngine = App.Services.GetRequiredService<ISyncEngine>();
             Loaded += SettingsPage_Loaded;
         }
 
         private void SettingsPage_Loaded(object sender, RoutedEventArgs e)
         {
-            LoadSettings();
+            if (!_isInitialized)
+            {
+                LoadSettings();
+                _isInitialized = true;
+            }
         }
 
         private void LoadSettings()

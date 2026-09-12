@@ -17,6 +17,7 @@ public sealed partial class MainWindow : Window
         AppWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Tall;
         AppWindow.SetIcon("Assets/AppIcon.ico");
 
+        NavView.IsPaneOpen = true;
         NavFrame.Navigate(typeof(DownloadPage));
     }
 
@@ -25,34 +26,28 @@ public sealed partial class MainWindow : Window
         NavView.IsPaneOpen = !NavView.IsPaneOpen;
     }
 
-    private void TitleBar_BackRequested(TitleBar sender, object args)
-    {
-        NavFrame.GoBack();
-    }
-
     private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
     {
+        Type? targetType = null;
         if (args.IsSettingsSelected)
         {
-            NavFrame.Navigate(typeof(SettingsPage));
+            targetType = typeof(SettingsPage);
         }
         else if (args.SelectedItem is NavigationViewItem item)
         {
-            switch (item.Tag?.ToString())
+            targetType = item.Tag?.ToString() switch
             {
-                case "download":
-                    NavFrame.Navigate(typeof(DownloadPage));
-                    break;
-                case "upload":
-                    NavFrame.Navigate(typeof(UploadPage));
-                    break;
-                case "about":
-                    NavFrame.Navigate(typeof(AboutPage));
-                    break;
-                default:
-                    NavFrame.Navigate(typeof(DownloadPage));
-                    break;
-            }
+                "download" => typeof(DownloadPage),
+                "upload" => typeof(UploadPage),
+                "about" => typeof(AboutPage),
+                _ => typeof(DownloadPage)
+            };
+        }
+
+        if (targetType != null && NavFrame.CurrentSourcePageType != targetType)
+        {
+            NavFrame.Navigate(targetType);
+            NavFrame.BackStack.Clear();
         }
     }
 }
