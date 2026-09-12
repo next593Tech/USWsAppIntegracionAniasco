@@ -3,11 +3,31 @@
   "WorkspaceRootPath": "E:\\Next\\USWsAppIntegracionAniasco\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{E9092B92-5939-4996-9208-DF5DE8D46C33}|USWsApp\\USWsApp.csproj|E:\\Next\\USWsAppIntegracionAniasco\\uswsapp\\controllers\\clientescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E9092B92-5939-4996-9208-DF5DE8D46C33}|USWsApp\\USWsApp.csproj|solutionrelative:uswsapp\\controllers\\clientescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{434150A1-5B79-4B89-8D7B-BBEEAC967DA6}|USWsSync.Core\\USWsSync.Core.csproj|e:\\next\\uswsappintegracionaniasco\\uswssync.core\\registry\\tableregistry.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{434150A1-5B79-4B89-8D7B-BBEEAC967DA6}|USWsSync.Core\\USWsSync.Core.csproj|solutionrelative:uswssync.core\\registry\\tableregistry.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{434150A1-5B79-4B89-8D7B-BBEEAC967DA6}|USWsSync.Core\\USWsSync.Core.csproj|e:\\next\\uswsappintegracionaniasco\\uswssync.core\\registry\\tablesyncdefinition.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{434150A1-5B79-4B89-8D7B-BBEEAC967DA6}|USWsSync.Core\\USWsSync.Core.csproj|solutionrelative:uswssync.core\\registry\\tablesyncdefinition.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{434150A1-5B79-4B89-8D7B-BBEEAC967DA6}|USWsSync.Core\\USWsSync.Core.csproj|e:\\next\\uswsappintegracionaniasco\\uswssync.core\\engine\\isyncengine.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{434150A1-5B79-4B89-8D7B-BBEEAC967DA6}|USWsSync.Core\\USWsSync.Core.csproj|solutionrelative:uswssync.core\\engine\\isyncengine.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{434150A1-5B79-4B89-8D7B-BBEEAC967DA6}|USWsSync.Core\\USWsSync.Core.csproj|e:\\next\\uswsappintegracionaniasco\\uswssync.core\\engine\\syncengine.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{434150A1-5B79-4B89-8D7B-BBEEAC967DA6}|USWsSync.Core\\USWsSync.Core.csproj|solutionrelative:uswssync.core\\engine\\syncengine.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{434150A1-5B79-4B89-8D7B-BBEEAC967DA6}|USWsSync.Core\\USWsSync.Core.csproj|e:\\next\\uswsappintegracionaniasco\\uswssync.core\\serialization\\numericjsonconverters.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{434150A1-5B79-4B89-8D7B-BBEEAC967DA6}|USWsSync.Core\\USWsSync.Core.csproj|solutionrelative:uswssync.core\\serialization\\numericjsonconverters.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{6289730B-D708-4E6E-9A1F-FD3B5AB22FDA}|USWsLibrary\\USWsLibrary.csproj|e:\\next\\uswsappintegracionaniasco\\uswslibrary\\modeldobradatabase\\dobramodel.context.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{6289730B-D708-4E6E-9A1F-FD3B5AB22FDA}|USWsLibrary\\USWsLibrary.csproj|E:\\Next\\USWsAppIntegracionAniasco\\uswslibrary\\modeldobradatabase\\dobramodel.context.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{6289730B-D708-4E6E-9A1F-FD3B5AB22FDA}|USWsLibrary\\USWsLibrary.csproj|solutionrelative:uswslibrary\\modeldobradatabase\\dobramodel.context.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
@@ -21,10 +41,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{6289730B-D708-4E6E-9A1F-FD3B5AB22FDA}|USWsLibrary\\USWsLibrary.csproj|E:\\Next\\USWsAppIntegracionAniasco\\uswslibrary\\packages.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
       "RelativeMoniker": "D:0:0:{6289730B-D708-4E6E-9A1F-FD3B5AB22FDA}|USWsLibrary\\USWsLibrary.csproj|solutionrelative:uswslibrary\\packages.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E9092B92-5939-4996-9208-DF5DE8D46C33}|USWsApp\\USWsApp.csproj|E:\\Next\\USWsAppIntegracionAniasco\\uswsapp\\controllers\\clientescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E9092B92-5939-4996-9208-DF5DE8D46C33}|USWsApp\\USWsApp.csproj|solutionrelative:uswsapp\\controllers\\clientescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -34,7 +50,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 7,
           "Children": [
             {
               "$type": "Bookmark",
@@ -42,20 +58,72 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
+              "Title": "TableRegistry.cs",
+              "DocumentMoniker": "E:\\Next\\USWsAppIntegracionAniasco\\USWsSync.Core\\Registry\\TableRegistry.cs",
+              "RelativeDocumentMoniker": "USWsSync.Core\\Registry\\TableRegistry.cs",
+              "ToolTip": "E:\\Next\\USWsAppIntegracionAniasco\\USWsSync.Core\\Registry\\TableRegistry.cs",
+              "RelativeToolTip": "USWsSync.Core\\Registry\\TableRegistry.cs",
+              "ViewState": "AgIAAHkAAAAAAAAAAAAswJAAAABiAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-11T04:55:33.967Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "TableSyncDefinition.cs",
+              "DocumentMoniker": "E:\\Next\\USWsAppIntegracionAniasco\\USWsSync.Core\\Registry\\TableSyncDefinition.cs",
+              "RelativeDocumentMoniker": "USWsSync.Core\\Registry\\TableSyncDefinition.cs",
+              "ToolTip": "E:\\Next\\USWsAppIntegracionAniasco\\USWsSync.Core\\Registry\\TableSyncDefinition.cs",
+              "RelativeToolTip": "USWsSync.Core\\Registry\\TableSyncDefinition.cs",
+              "ViewState": "AgIAAAsAAAAAAAAAAAAewBQAAAAmAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-11T04:55:18.431Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "ISyncEngine.cs",
+              "DocumentMoniker": "E:\\Next\\USWsAppIntegracionAniasco\\USWsSync.Core\\Engine\\ISyncEngine.cs",
+              "RelativeDocumentMoniker": "USWsSync.Core\\Engine\\ISyncEngine.cs",
+              "ToolTip": "E:\\Next\\USWsAppIntegracionAniasco\\USWsSync.Core\\Engine\\ISyncEngine.cs",
+              "RelativeToolTip": "USWsSync.Core\\Engine\\ISyncEngine.cs",
+              "ViewState": "AgIAAAcAAAAAAAAAAIA8wBQAAAAcAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-11T04:55:16.693Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "SyncEngine.cs",
+              "DocumentMoniker": "E:\\Next\\USWsAppIntegracionAniasco\\USWsSync.Core\\Engine\\SyncEngine.cs",
+              "RelativeDocumentMoniker": "USWsSync.Core\\Engine\\SyncEngine.cs",
+              "ToolTip": "E:\\Next\\USWsAppIntegracionAniasco\\USWsSync.Core\\Engine\\SyncEngine.cs",
+              "RelativeToolTip": "USWsSync.Core\\Engine\\SyncEngine.cs",
+              "ViewState": "AgIAAE0AAAAAAAAAAAAIwFIAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-11T04:54:13.962Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
               "Title": "NumericJsonConverters.cs",
               "DocumentMoniker": "E:\\Next\\USWsAppIntegracionAniasco\\USWsSync.Core\\Serialization\\NumericJsonConverters.cs",
               "RelativeDocumentMoniker": "USWsSync.Core\\Serialization\\NumericJsonConverters.cs",
               "ToolTip": "E:\\Next\\USWsAppIntegracionAniasco\\USWsSync.Core\\Serialization\\NumericJsonConverters.cs",
               "RelativeToolTip": "USWsSync.Core\\Serialization\\NumericJsonConverters.cs",
-              "ViewState": "AgIAAAoAAAAAAAAAAAAgwBAAAAAZAAAAAAAAAA==",
+              "ViewState": "AgIAAA0AAAAAAAAAAAAgwAYAAAAcAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-09-11T04:44:10.241Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 6,
               "Title": "DobraModel.Context.cs",
               "DocumentMoniker": "E:\\Next\\USWsAppIntegracionAniasco\\USWsLibrary\\ModelDobraDatabase\\DobraModel.Context.cs",
               "RelativeDocumentMoniker": "USWsLibrary\\ModelDobraDatabase\\DobraModel.Context.cs",
@@ -63,24 +131,24 @@
               "RelativeToolTip": "USWsLibrary\\ModelDobraDatabase\\DobraModel.Context.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAqwBYAAAADAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-09-11T03:59:13.246Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-09-11T03:59:13.246Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 0,
               "Title": "ClientesController.cs",
               "DocumentMoniker": "E:\\Next\\USWsAppIntegracionAniasco\\USWsApp\\Controllers\\ClientesController.cs",
               "RelativeDocumentMoniker": "USWsApp\\Controllers\\ClientesController.cs",
               "ToolTip": "E:\\Next\\USWsAppIntegracionAniasco\\USWsApp\\Controllers\\ClientesController.cs",
               "RelativeToolTip": "USWsApp\\Controllers\\ClientesController.cs",
-              "ViewState": "AgIAABkBAAAAAAAAAAAAABwBAAAsAAAAAAAAAA==",
+              "ViewState": "AgIAAH8FAAAAAAAAAAAcwI0FAAA1AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-09-11T03:57:11.343Z"
+              "WhenOpened": "2026-09-11T03:57:11.343Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 9,
               "Title": "packages.config",
               "DocumentMoniker": "E:\\Next\\USWsAppIntegracionAniasco\\USWsLibrary\\packages.config",
               "RelativeDocumentMoniker": "USWsLibrary\\packages.config",
@@ -92,7 +160,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 8,
               "Title": "App.config",
               "DocumentMoniker": "E:\\Next\\USWsAppIntegracionAniasco\\USWsLibrary\\App.config",
               "RelativeDocumentMoniker": "USWsLibrary\\App.config",
@@ -104,7 +172,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 7,
               "Title": "Web.config",
               "DocumentMoniker": "E:\\Next\\USWsAppIntegracionAniasco\\USWsApp\\Web.config",
               "RelativeDocumentMoniker": "USWsApp\\Web.config",
