@@ -181,11 +181,57 @@ namespace USWsSync_UI.Pages
             TxtStatus.Text = "Cancelando operación...";
         }
 
+        private void BtnCopyLogs_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var text = TxtLogs.Text;
+                if (string.IsNullOrEmpty(text)) return;
+
+                var package = new Windows.ApplicationModel.DataTransfer.DataPackage();
+                package.RequestedOperation = Windows.ApplicationModel.DataTransfer.DataPackageOperation.Copy;
+                package.SetText(text);
+                Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(package);
+
+                TxtCopyBtnLabel.Text = "¡Copiado!";
+                var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
+                timer.Tick += (s, args) =>
+                {
+                    TxtCopyBtnLabel.Text = "Copiar Log";
+                    timer.Stop();
+                };
+                timer.Start();
+            }
+            catch
+            {
+                // Fallback silencioso si el portapapeles del SO está bloqueado
+            }
+        }
+
+        private void BtnClearLogs_Click(object sender, RoutedEventArgs e)
+        {
+            _logBuilder.Clear();
+            TxtLogs.Text = string.Empty;
+        }
+
         private void AppendLog(string message)
         {
             _logBuilder.AppendLine(message);
+
+            var hadSelection = TxtLogs.SelectionLength > 0;
+            var selStart = TxtLogs.SelectionStart;
+            var selLen = TxtLogs.SelectionLength;
+
             TxtLogs.Text = _logBuilder.ToString();
-            LogScrollViewer.ChangeView(null, LogScrollViewer.ScrollableHeight, null);
+
+            if (hadSelection)
+            {
+                TxtLogs.Select(selStart, selLen);
+            }
+            else
+            {
+                TxtLogs.SelectionStart = TxtLogs.Text.Length;
+            }
         }
     }
 }

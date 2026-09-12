@@ -7,28 +7,29 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Padding="28,20,28,24">
-        <Grid RowSpacing="20">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
+    <!-- Grid principal anclado al viewport sin ScrollViewer exterior que expanda infinito -->
+    <Grid Padding="28,20,28,24" RowSpacing="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
-            <!-- Encabezado (Fila 0) -->
-            <StackPanel Grid.Row="0" Spacing="4">
-                <TextBlock Text="Descarga de Datos" Style="{StaticResource TitleTextBlockStyle}" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
-                <TextBlock Text="Sincroniza información desde la Nube (API Pública) hacia la Base Local (ERP)." Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-            </StackPanel>
+        <!-- Encabezado (Fila 0) -->
+        <StackPanel Grid.Row="0" Spacing="4">
+            <TextBlock Text="Descarga de Datos" Style="{StaticResource TitleTextBlockStyle}" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
+            <TextBlock Text="Sincroniza información desde la Nube (API Pública) hacia la Base Local (ERP)." Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+        </StackPanel>
 
-            <!-- Contenido en 2 Columnas (Fila 1) -->
-            <Grid Grid.Row="1" ColumnSpacing="20">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="460" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
+        <!-- Contenido en 2 Columnas (Fila 1) -->
+        <Grid Grid.Row="1" ColumnSpacing="20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="460" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-                <!-- Panel Izquierdo: Parámetros y Progreso -->
-                <StackPanel Grid.Column="0" Spacing="16">
+            <!-- Panel Izquierdo: Parámetros y Progreso (Con ScrollViewer propio por si la ventana es muy baja) -->
+            <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,0,8,0">
+                <StackPanel Spacing="16">
                     <!-- Card de Parámetros de Sincronización -->
                     <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="20">
                         <StackPanel Spacing="16">
@@ -83,22 +84,53 @@
                         </StackPanel>
                     </Border>
                 </StackPanel>
+            </ScrollViewer>
 
-                <!-- Panel Derecho: Consola de Logs en Vivo -->
-                <Border Grid.Column="1" Background="{ThemeResource LayerFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="16">
-                    <Grid RowSpacing="10">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
+            <!-- Panel Derecho: Consola de Logs en Vivo -->
+            <Border Grid.Column="1" Background="{ThemeResource LayerFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="16">
+                <Grid RowSpacing="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
 
-                        <TextBlock Grid.Row="0" Text="Registro de Actividad (Trazabilidad)" Style="{StaticResource SubtitleTextBlockStyle}" />
-                        <ScrollViewer Grid.Row="1" x:Name="LogScrollViewer" VerticalScrollBarVisibility="Auto" MinHeight="360">
-                            <TextBox x:Name="TxtLogs" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" FontFamily="Consolas, Cascadia Code, Courier New" FontSize="12" Background="Transparent" BorderThickness="0" HorizontalAlignment="Stretch" />
-                        </ScrollViewer>
+                    <!-- Barra superior de la consola con acciones -->
+                    <Grid Grid.Row="0">
+                        <TextBlock Text="Registro de Actividad (Trazabilidad)" Style="{StaticResource SubtitleTextBlockStyle}" VerticalAlignment="Center" HorizontalAlignment="Left" />
+
+                        <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+                            <Button x:Name="BtnCopyLogs" Click="BtnCopyLogs_Click" ToolTipService.ToolTip="Copiar todo el registro al portapapeles" Padding="10,5">
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <FontIcon Glyph="&#xE8C8;" FontSize="13" />
+                                    <TextBlock x:Name="TxtCopyBtnLabel" Text="Copiar Log" Style="{StaticResource CaptionTextBlockStyle}" />
+                                </StackPanel>
+                            </Button>
+                            <Button x:Name="BtnClearLogs" Click="BtnClearLogs_Click" ToolTipService.ToolTip="Limpiar la consola de logs" Padding="10,5">
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <FontIcon Glyph="&#xE74D;" FontSize="13" />
+                                    <TextBlock Text="Limpiar" Style="{StaticResource CaptionTextBlockStyle}" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
                     </Grid>
-                </Border>
-            </Grid>
+
+                    <!-- TextBox con scroll propio sin conflicto de ScrollViewer externo -->
+                    <TextBox Grid.Row="1"
+                             x:Name="TxtLogs" 
+                             IsReadOnly="True" 
+                             AcceptsReturn="True" 
+                             TextWrapping="Wrap" 
+                             ScrollViewer.VerticalScrollBarVisibility="Auto"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                             ScrollViewer.VerticalScrollMode="Enabled"
+                             FontFamily="Consolas, Cascadia Code, Courier New" 
+                             FontSize="12" 
+                             Background="Transparent" 
+                             BorderThickness="0" 
+                             HorizontalAlignment="Stretch" 
+                             VerticalAlignment="Stretch" />
+                </Grid>
+            </Border>
         </Grid>
-    </ScrollViewer>
+    </Grid>
 </Page>
