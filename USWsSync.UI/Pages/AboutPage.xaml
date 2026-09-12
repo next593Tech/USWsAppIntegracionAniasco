@@ -8,7 +8,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="24">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="28,20,28,24">
         <StackPanel Spacing="20" HorizontalAlignment="Stretch">
             <!-- Encabezado -->
             <StackPanel Spacing="4">

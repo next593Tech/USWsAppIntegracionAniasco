@@ -36,6 +36,7 @@ namespace USWsSync_UI.Pages
             TxtIpLocal.Text = config.IpLocal;
             TxtIpPublica.Text = config.IpPublica;
             TxtLastDateUpdate.Text = config.LastDateUpdate.ToString("yyyy-MM-ddTHH:mm:ss");
+            TxtTimeoutSegundos.Text = (config.TimeoutSegundos > 0 ? config.TimeoutSegundos : 300).ToString();
         }
 
         private async void BtnTestConnection_Click(object sender, RoutedEventArgs e)
@@ -91,6 +92,11 @@ namespace USWsSync_UI.Pages
                 if (DateTime.TryParse(TxtLastDateUpdate.Text.Trim(), out var parsedDate))
                 {
                     config.LastDateUpdate = parsedDate;
+                }
+
+                if (int.TryParse(TxtTimeoutSegundos.Text.Trim(), out var timeout) && timeout > 0)
+                {
+                    config.TimeoutSegundos = timeout;
                 }
 
                 ConfigManager.SaveConfig(config);

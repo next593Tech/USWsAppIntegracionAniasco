@@ -49,10 +49,12 @@ namespace USWsSync.Core.Engine
 
         private SyncConfig GetConfig() => _configProvider?.Invoke() ?? ConfigManager.LoadConfig();
 
-        private HttpClient CreateClient(int timeoutSeconds = 120)
+        private HttpClient CreateClient(int? timeoutSeconds = null)
         {
             var client = _httpClientFactory.CreateClient("SyncEngineClient");
-            client.Timeout = TimeSpan.FromSeconds(timeoutSeconds);
+            var seconds = timeoutSeconds ?? GetConfig().TimeoutSegundos;
+            if (seconds <= 0) seconds = 300;
+            client.Timeout = TimeSpan.FromSeconds(seconds);
             return client;
         }
 
@@ -97,7 +99,7 @@ namespace USWsSync.Core.Engine
 
             try
             {
-                using var client = CreateClient(timeoutSeconds: 180);
+                using var client = CreateClient();
                 using var request = new HttpRequestMessage(HttpMethod.Post, url);
                 request.Headers.Accept.ParseAdd("application/json");
 
@@ -158,7 +160,7 @@ namespace USWsSync.Core.Engine
 
             try
             {
-                using var client = CreateClient(timeoutSeconds: 180);
+                using var client = CreateClient();
                 using var request = new HttpRequestMessage(HttpMethod.Post, url);
                 request.Headers.Accept.ParseAdd("application/json");
                 request.Content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");

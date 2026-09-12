@@ -7,7 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="24">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="28,20,28,24">
         <StackPanel Spacing="20" HorizontalAlignment="Stretch">
             <!-- Encabezado -->
             <StackPanel Spacing="4">
@@ -17,48 +17,62 @@
 
             <InfoBar x:Name="SettingsInfoBar" IsOpen="False" Severity="Informational" />
 
-            <!-- Card Conexión -->
-            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="20">
-                <StackPanel Spacing="16">
-                    <TextBlock Text="Servidores y Conexión" Style="{StaticResource SubtitleTextBlockStyle}" />
+            <!-- Contenido en 2 Columnas -->
+            <Grid ColumnSpacing="20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
 
-                    <StackPanel Spacing="6">
-                        <TextBlock Text="IP / Host Servidor Local (ERP):" FontWeight="SemiBold" />
-                        <TextBox x:Name="TxtIpLocal" PlaceholderText="Ej: 192.168.10.39:8484" HorizontalAlignment="Stretch" />
-                    </StackPanel>
+                <!-- Card Conexión -->
+                <Border Grid.Column="0" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="20">
+                    <StackPanel Spacing="16">
+                        <TextBlock Text="Servidores y Conexión" Style="{StaticResource SubtitleTextBlockStyle}" />
 
-                    <StackPanel Spacing="6">
-                        <TextBlock Text="IP / Host Servidor Nube (Público):" FontWeight="SemiBold" />
-                        <TextBox x:Name="TxtIpPublica" PlaceholderText="Ej: 190.15.140.20:8484 o miempresa.com" HorizontalAlignment="Stretch" />
-                    </StackPanel>
-
-                    <Button x:Name="BtnTestConnection" Click="BtnTestConnection_Click" Padding="16,8">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <FontIcon Glyph="&#xE8B9;" />
-                            <TextBlock Text="Probar Conexiones" />
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="IP / Host Servidor Local (ERP):" FontWeight="SemiBold" />
+                            <TextBox x:Name="TxtIpLocal" PlaceholderText="Ej: 192.168.10.39:8484" HorizontalAlignment="Stretch" />
                         </StackPanel>
-                    </Button>
-                </StackPanel>
-            </Border>
 
-            <!-- Card Parámetros de Sincronización -->
-            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="20">
-                <StackPanel Spacing="16">
-                    <TextBlock Text="Parámetros de Corte y Diagnóstico" Style="{StaticResource SubtitleTextBlockStyle}" />
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="IP / Host Servidor Nube (Público):" FontWeight="SemiBold" />
+                            <TextBox x:Name="TxtIpPublica" PlaceholderText="Ej: 190.15.140.20:8484 o miempresa.com" HorizontalAlignment="Stretch" />
+                        </StackPanel>
 
-                    <StackPanel Spacing="6">
-                        <TextBlock Text="Última Fecha de Corte Registrada:" FontWeight="SemiBold" />
-                        <TextBox x:Name="TxtLastDateUpdate" PlaceholderText="yyyy-MM-ddTHH:mm:ss" HorizontalAlignment="Stretch" />
-                        <TextBlock Text="Formato ISO: YYYY-MM-DDTHH:MM:SS. Modificar solo si necesita forzar un reenvío total desde una fecha anterior." Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        <Button x:Name="BtnTestConnection" Click="BtnTestConnection_Click" Padding="16,8">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon Glyph="&#xE8B9;" />
+                                <TextBlock Text="Probar Conexiones" />
+                            </StackPanel>
+                        </Button>
                     </StackPanel>
+                </Border>
 
-                    <StackPanel Spacing="6">
-                        <TextBlock Text="Ruta Base de Registros y Trazabilidad:" FontWeight="SemiBold" />
-                        <TextBox Text="C:\logs\{Componente}\{Año}\{Mes}\{Día}\" IsReadOnly="True" HorizontalAlignment="Stretch" />
-                        <TextBlock Text="Los logs se organizan automáticamente por componente (Consola, UI_Descarga, UI_Subida) y fecha/hora." Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                <!-- Card Parámetros de Sincronización -->
+                <Border Grid.Column="1" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="20">
+                    <StackPanel Spacing="16">
+                        <TextBlock Text="Parámetros de Corte y Diagnóstico" Style="{StaticResource SubtitleTextBlockStyle}" />
+
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="Última Fecha de Corte Registrada:" FontWeight="SemiBold" />
+                            <TextBox x:Name="TxtLastDateUpdate" PlaceholderText="yyyy-MM-ddTHH:mm:ss" HorizontalAlignment="Stretch" />
+                            <TextBlock Text="Formato ISO: YYYY-MM-DDTHH:MM:SS. Modificar solo si necesita forzar un reenvío total desde una fecha anterior." Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
+                        </StackPanel>
+
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="Timeout HTTP (Segundos):" FontWeight="SemiBold" />
+                            <TextBox x:Name="TxtTimeoutSegundos" PlaceholderText="300" HorizontalAlignment="Stretch" />
+                            <TextBlock Text="Tiempo máximo de espera por cada petición HTTP (por defecto: 300 seg = 5 min)." Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
+                        </StackPanel>
+
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="Ruta Base de Registros y Trazabilidad:" FontWeight="SemiBold" />
+                            <TextBox Text="C:\logs\{Componente}\{Año}\{Mes}\{Día}\" IsReadOnly="True" HorizontalAlignment="Stretch" />
+                            <TextBlock Text="Los logs se organizan automáticamente por componente (Consola, UI_Descarga, UI_Subida) y fecha/hora." Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
+                        </StackPanel>
                     </StackPanel>
-                </StackPanel>
-            </Border>
+                </Border>
+            </Grid>
 
             <!-- Botón Guardar -->
             <Button x:Name="BtnSave" Click="BtnSave_Click" Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Left" Padding="24,10">

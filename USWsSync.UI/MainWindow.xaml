@@ -52,7 +52,7 @@
                     Content="Subida Manual"
                     Tag="upload">
                     <NavigationViewItem.Icon>
-                        <FontIcon Glyph="&#xED25;" />
+                        <FontIcon Glyph="&#xE898;" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
                 <NavigationViewItem

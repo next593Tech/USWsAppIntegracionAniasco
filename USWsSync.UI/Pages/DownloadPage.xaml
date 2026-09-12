@@ -7,77 +7,98 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="24">
-        <StackPanel Spacing="20" HorizontalAlignment="Stretch">
-            <!-- Encabezado -->
-            <StackPanel Spacing="4">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Padding="28,20,28,24">
+        <Grid RowSpacing="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!-- Encabezado (Fila 0) -->
+            <StackPanel Grid.Row="0" Spacing="4">
                 <TextBlock Text="Descarga de Datos" Style="{StaticResource TitleTextBlockStyle}" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
                 <TextBlock Text="Sincroniza información desde la Nube (API Pública) hacia la Base Local (ERP)." Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
             </StackPanel>
 
-            <!-- Card de Parámetros de Sincronización -->
-            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="20">
-                <StackPanel Spacing="16">
-                    <TextBlock Text="Rango de Fechas" Style="{StaticResource SubtitleTextBlockStyle}" />
+            <!-- Contenido en 2 Columnas (Fila 1) -->
+            <Grid Grid.Row="1" ColumnSpacing="20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="460" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
 
-                    <Grid ColumnSpacing="16">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
+                <!-- Panel Izquierdo: Parámetros y Progreso -->
+                <StackPanel Grid.Column="0" Spacing="16">
+                    <!-- Card de Parámetros de Sincronización -->
+                    <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="20">
+                        <StackPanel Spacing="16">
+                            <TextBlock Text="Rango de Fechas" Style="{StaticResource SubtitleTextBlockStyle}" />
 
-                        <StackPanel Grid.Column="0" Spacing="6">
-                            <TextBlock Text="Fecha Inicio:" FontWeight="SemiBold" />
-                            <CalendarDatePicker x:Name="DpFechaInicio" HorizontalAlignment="Stretch" PlaceholderText="Seleccione fecha inicial" />
-                        </StackPanel>
+                            <Grid ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
 
-                        <StackPanel Grid.Column="1" Spacing="6">
-                            <TextBlock Text="Fecha Final:" FontWeight="SemiBold" />
-                            <CalendarDatePicker x:Name="DpFechaFinal" HorizontalAlignment="Stretch" PlaceholderText="Seleccione fecha final" />
-                        </StackPanel>
-                    </Grid>
+                                <StackPanel Grid.Column="0" Spacing="6">
+                                    <TextBlock Text="Fecha Inicio:" FontWeight="SemiBold" />
+                                    <CalendarDatePicker x:Name="DpFechaInicio" HorizontalAlignment="Stretch" PlaceholderText="Seleccione fecha inicial" />
+                                </StackPanel>
 
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <TextBlock Text="Última fecha registrada:" FontWeight="SemiBold" />
-                        <TextBlock x:Name="TxtLastDate" Text="---" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
-                    </StackPanel>
+                                <StackPanel Grid.Column="1" Spacing="6">
+                                    <TextBlock Text="Fecha Final:" FontWeight="SemiBold" />
+                                    <CalendarDatePicker x:Name="DpFechaFinal" HorizontalAlignment="Stretch" PlaceholderText="Seleccione fecha final" />
+                                </StackPanel>
+                            </Grid>
 
-                    <!-- Botón de Acción -->
-                    <StackPanel Orientation="Horizontal" Spacing="12">
-                        <Button x:Name="BtnStart" Click="BtnStart_Click" Style="{StaticResource AccentButtonStyle}" Padding="16,8">
                             <StackPanel Orientation="Horizontal" Spacing="8">
-                                <FontIcon Glyph="&#xE896;" />
-                                <TextBlock Text="Comenzar Descarga" />
+                                <TextBlock Text="Última fecha registrada:" FontWeight="SemiBold" />
+                                <TextBlock x:Name="TxtLastDate" Text="---" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
                             </StackPanel>
-                        </Button>
-                        <Button x:Name="BtnCancel" Click="BtnCancel_Click" IsEnabled="False" Content="Cancelar" Padding="16,8" />
-                    </StackPanel>
-                </StackPanel>
-            </Border>
 
-            <!-- Card de Progreso -->
-            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="20">
-                <StackPanel Spacing="12">
-                    <Grid>
-                        <TextBlock x:Name="TxtCurrentTable" Text="Tabla: Ninguna en ejecución" FontWeight="SemiBold" Style="{StaticResource BodyTextBlockStyle}" HorizontalAlignment="Left" />
-                        <TextBlock x:Name="TxtProgressPct" Text="0%" FontWeight="Bold" Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" HorizontalAlignment="Right" />
+                            <!-- Botón de Acción -->
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <Button x:Name="BtnStart" Click="BtnStart_Click" Style="{StaticResource AccentButtonStyle}" Padding="16,8">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <FontIcon Glyph="&#xE896;" />
+                                        <TextBlock Text="Comenzar Descarga" />
+                                    </StackPanel>
+                                </Button>
+                                <Button x:Name="BtnCancel" Click="BtnCancel_Click" IsEnabled="False" Content="Cancelar" Padding="16,8" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Card de Progreso -->
+                    <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="20">
+                        <StackPanel Spacing="12">
+                            <Grid>
+                                <TextBlock x:Name="TxtCurrentTable" Text="Tabla: Ninguna en ejecución" FontWeight="SemiBold" Style="{StaticResource BodyTextBlockStyle}" HorizontalAlignment="Left" />
+                                <TextBlock x:Name="TxtProgressPct" Text="0%" FontWeight="Bold" Style="{StaticResource BodyTextBlockStyle}" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" HorizontalAlignment="Right" />
+                            </Grid>
+
+                            <ProgressBar x:Name="PbSync" Value="0" Maximum="100" Height="14" CornerRadius="7" HorizontalAlignment="Stretch" />
+
+                            <TextBlock x:Name="TxtStatus" Text="Listo para iniciar" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- Panel Derecho: Consola de Logs en Vivo -->
+                <Border Grid.Column="1" Background="{ThemeResource LayerFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="16">
+                    <Grid RowSpacing="10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Text="Registro de Actividad (Trazabilidad)" Style="{StaticResource SubtitleTextBlockStyle}" />
+                        <ScrollViewer Grid.Row="1" x:Name="LogScrollViewer" VerticalScrollBarVisibility="Auto" MinHeight="360">
+                            <TextBox x:Name="TxtLogs" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" FontFamily="Consolas, Cascadia Code, Courier New" FontSize="12" Background="Transparent" BorderThickness="0" HorizontalAlignment="Stretch" />
+                        </ScrollViewer>
                     </Grid>
-
-                    <ProgressBar x:Name="PbSync" Value="0" Maximum="100" Height="14" CornerRadius="7" />
-
-                    <TextBlock x:Name="TxtStatus" Text="Listo para iniciar" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                </StackPanel>
-            </Border>
-
-            <!-- Consola de Logs en Vivo -->
-            <Border Background="{ThemeResource LayerFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="16">
-                <StackPanel Spacing="8">
-                    <TextBlock Text="Registro de Actividad" Style="{StaticResource SubtitleTextBlockStyle}" />
-                    <ScrollViewer x:Name="LogScrollViewer" Height="200" VerticalScrollBarVisibility="Auto">
-                        <TextBox x:Name="TxtLogs" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" FontFamily="Consolas" FontSize="12" Background="Transparent" BorderThickness="0" />
-                    </ScrollViewer>
-                </StackPanel>
-            </Border>
-        </StackPanel>
+                </Border>
+            </Grid>
+        </Grid>
     </ScrollViewer>
 </Page>
