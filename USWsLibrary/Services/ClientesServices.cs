@@ -28,66 +28,73 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveClient(PagedList<CLI_CLIENTES> clients)
 		{
+			var errorSave = new ErrorSave { Tabla = "CLI_CLIENTES", errorExit = false };
+			if (clients == null || clients.Results == null || clients.Results.Count == 0) return errorSave;
 
-			ErrorSave errorSave = new ErrorSave();
+			var totalCount = clients.Results.Count;
+			int chunkSize = 500;
 
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			using (var tx = db.Database.BeginTransaction())
+			for (int offset = 0; offset < totalCount; offset += chunkSize)
 			{
-				try
-				{
-					int count = 0;
-					foreach (var item in clients.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  ";
+				var chunk = clients.Results.Skip(offset).Take(chunkSize).ToList();
+				var distinctChunk = chunk.GroupBy(x => x.ID).Select(g => g.Key == null ? g.First() : g.Last()).ToList();
+				var chunkIds = distinctChunk.Select(c => c.ID).Where(id => id != null).Distinct().ToList();
+				var chunkCodes = distinctChunk.Select(c => c.Código != null ? c.Código.Trim() : "").Where(c => c != "").Distinct().ToList();
 
+				using (var db = new DobraConnection())
+				{
+					db.Configuration.AutoDetectChangesEnabled = false;
+					db.Configuration.ValidateOnSaveEnabled = false;
+
+					using (var tx = db.Database.BeginTransaction())
+					{
 						try
 						{
-							if (db.CLI_CLIENTES.Any(cl => cl.ID == item.ID && cl.Código.Trim()==item.Código.Trim()))
+							var existing = db.CLI_CLIENTES
+								.Where(c => chunkIds.Contains(c.ID) || chunkCodes.Contains(c.Código.Trim()))
+								.Select(c => new { c.ID, Código = c.Código.Trim() })
+								.ToList();
+
+							var existingById = existing.ToDictionary(c => c.ID, c => c.Código);
+							var existingByCode = existing.GroupBy(c => c.Código).ToDictionary(g => g.Key, g => g.First().ID);
+
+							foreach (var item in distinctChunk)
 							{
-								
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-							}
-							else
-							{
-								if (db.CLI_CLIENTES.Any(cl => cl.ID != item.ID && cl.Código.Trim() == item.Código.Trim()))
+								var itemCode = item.Código != null ? item.Código.Trim() : "";
+								var hasId = existingById.TryGetValue(item.ID, out var dbCodeForId);
+								var hasCode = existingByCode.TryGetValue(itemCode, out var dbIdForCode);
+
+								if (hasId && dbCodeForId == itemCode)
 								{
-									ErrorClienteCedula errorClienteCedula= new  ErrorClienteCedula();
-									errorSave.errorExit = true;
-									errorSave.errorMessage = errorSave.errorMessage + "id diferente y cedula igual:"+item.ID;
+									db.Entry(item).State = System.Data.Entity.EntityState.Modified;
 								}
-								else if(db.CLI_CLIENTES.Any(cl => cl.ID == item.ID && cl.Código != item.Código))
+								else if (hasCode && dbIdForCode != item.ID)
 								{
 									errorSave.errorExit = true;
-									errorSave.errorMessage = errorSave.errorMessage + "id igual y cedula diferente:" + item.ID;
+									errorSave.errorMessage = (errorSave.errorMessage ?? "") + "\nID diferente y cédula igual: " + item.ID;
+								}
+								else if (hasId && dbCodeForId != itemCode)
+								{
+									errorSave.errorExit = true;
+									errorSave.errorMessage = (errorSave.errorMessage ?? "") + "\nID igual y cédula diferente: " + item.ID;
 								}
 								else
 								{
 									db.CLI_CLIENTES.Add(item);
 								}
-							
 							}
 
-							count++;
-							if (count % 100 == 0)
-							{
-								db.SaveChanges();
-							}
+							db.Configuration.AutoDetectChangesEnabled = true;
+							db.SaveChanges();
+							tx.Commit();
 						}
-						catch (Exception e)
+						catch (Exception ex)
 						{
-							encontrarError(e, errorSave);
+							try { tx.Rollback(); } catch { }
+							BatchSyncHelper.FormatError(ex, "CLI_CLIENTES", distinctChunk, x => x.ID, errorSave);
+							return errorSave;
 						}
 					}
-					db.SaveChanges();
-					tx.Commit();
-				}
-				catch (Exception e)
-				{
-					try { tx.Rollback(); } catch { }
-					encontrarError(e, errorSave);
 				}
 			}
 			return errorSave;
@@ -115,7 +122,7 @@ namespace USWsLibrary.Services
 			PagedList<CLI_CLIENTES> cli = new PagedList<CLI_CLIENTES>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				cli.Results = db.CLI_CLIENTES.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
+				cli.Results = db.CLI_CLIENTES.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
 				cli.Total = cli.Results.Count;
 				cli.Count = cli.Results.Count;
 			}
@@ -128,7 +135,7 @@ namespace USWsLibrary.Services
 			PagedList<INV_PRODUCTOS> products = new PagedList<INV_PRODUCTOS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				products.Results = db.INV_PRODUCTOS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
+				products.Results = db.INV_PRODUCTOS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
 				products.Total = products.Results.Count;
 				products.Count = products.Results.Count;
 			}
@@ -137,53 +144,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveProducts(PagedList<INV_PRODUCTOS> products)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			using (var tx = db.Database.BeginTransaction())
-			{
-				try
-				{
-					int count = 0;
-					foreach (var item in products.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						Console.WriteLine(item.Código);
-						try
-						{
-							if (db.INV_PRODUCTOS.Any(pro => pro.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-							}
-							else
-							{
-								db.INV_PRODUCTOS.Add(item);
-							}
-
-							count++;
-							if (count % 100 == 0)
-							{
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-					db.SaveChanges();
-					tx.Commit();
-				}
-				catch (Exception e)
-				{
-					try { tx.Rollback(); } catch { }
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (products == null || products.Results == null || products.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				products.Results,
+				"INV_PRODUCTOS",
+				x => x.ID,
+				db => db.INV_PRODUCTOS,
+				(db, keys) => new HashSet<string>(db.INV_PRODUCTOS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -194,7 +162,7 @@ namespace USWsLibrary.Services
 			PagedList<INV_PRODUCTOS> products = new PagedList<INV_PRODUCTOS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				products.Results = db.INV_PRODUCTOS.Where(e => errorSave.Listid.Contains(e.ID)).ToList();
+				products.Results = db.INV_PRODUCTOS.AsNoTracking().Where(e => errorSave.Listid.Contains(e.ID)).ToList();
 				products.Total = products.Results.Count;
 				products.Count = products.Results.Count;
 			}
@@ -207,7 +175,7 @@ namespace USWsLibrary.Services
 			PagedList<INV_PRODUCTOS_EMPAQUES> products = new PagedList<INV_PRODUCTOS_EMPAQUES>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				products.Results = db.INV_PRODUCTOS_EMPAQUES.Where(e => errorSave.Listid.Contains(e.ProductoID)).ToList();
+				products.Results = db.INV_PRODUCTOS_EMPAQUES.AsNoTracking().Where(e => errorSave.Listid.Contains(e.ProductoID)).ToList();
 				products.Total = products.Results.Count;
 				products.Count = products.Results.Count;
 			}
@@ -220,7 +188,7 @@ namespace USWsLibrary.Services
 			PagedList<INV_PRODUCTOS_PRECIOS> products = new PagedList<INV_PRODUCTOS_PRECIOS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				products.Results = db.INV_PRODUCTOS_PRECIOS.Where(e => errorSave.Listid.Contains(e.ProductoID)).ToList();
+				products.Results = db.INV_PRODUCTOS_PRECIOS.AsNoTracking().Where(e => errorSave.Listid.Contains(e.ProductoID)).ToList();
 				products.Total = products.Results.Count;
 				products.Count = products.Results.Count;
 			}
@@ -232,46 +200,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveProductsListProductID(PagedList<INV_PRODUCTOS> products)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage = "ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in products.Results)
-					{
-						//errorSave.errorMessage = errorSave.errorMessage + "\n" + "ID:  " + item.ID;
-
-
-			
-						try
-						{
-							if (db.INV_PRODUCTOS.Any(pro => pro.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.INV_PRODUCTOS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (products == null || products.Results == null || products.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				products.Results,
+				"INV_PRODUCTOS",
+				x => x.ID,
+				db => db.INV_PRODUCTOS,
+				(db, keys) => new HashSet<string>(db.INV_PRODUCTOS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<INV_PRODUCTOS_EMPAQUES> listPackagesProducts(DateTime lastUpdate, DateTime lastUpdate2)
@@ -279,7 +215,7 @@ namespace USWsLibrary.Services
 			PagedList<INV_PRODUCTOS_EMPAQUES> packages = new PagedList<INV_PRODUCTOS_EMPAQUES>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				packages.Results = db.INV_PRODUCTOS_EMPAQUES.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList<INV_PRODUCTOS_EMPAQUES>();
+				packages.Results = db.INV_PRODUCTOS_EMPAQUES.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList<INV_PRODUCTOS_EMPAQUES>();
 				packages.Total = packages.Results.Count;
 				packages.Count = packages.Results.Count;
 			}
@@ -289,46 +225,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave savePackageProductos(PagedList<INV_PRODUCTOS_EMPAQUES> products)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-
-					foreach (var item in products.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-
-						try
-						{
-							if (db.INV_PRODUCTOS_EMPAQUES.Any(pro => pro.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.INV_PRODUCTOS_EMPAQUES.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (products == null || products.Results == null || products.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				products.Results,
+				"INV_PRODUCTOS_EMPAQUES",
+				x => x.ID,
+				db => db.INV_PRODUCTOS_EMPAQUES,
+				(db, keys) => new HashSet<string>(db.INV_PRODUCTOS_EMPAQUES.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -337,7 +241,7 @@ namespace USWsLibrary.Services
 			PagedList<INV_PRODUCTOS_PRECIOS> packages = new PagedList<INV_PRODUCTOS_PRECIOS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				packages.Results = db.INV_PRODUCTOS_PRECIOS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList<INV_PRODUCTOS_PRECIOS>();
+				packages.Results = db.INV_PRODUCTOS_PRECIOS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList<INV_PRODUCTOS_PRECIOS>();
 				packages.Total = packages.Results.Count;
 				packages.Count = packages.Results.Count;
 			}
@@ -346,55 +250,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave savePriceProducts(PagedList<INV_PRODUCTOS_PRECIOS> products)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-			var productoIDOLD = "";
-			var productoIDOLDnew = "";
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in products.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						if (String.IsNullOrEmpty(productoIDOLDnew))
-							productoIDOLDnew = item.ProductoID;
-						
-
-						try
-						{
-							//if(productoIDOLD.Equals())
-
-
-
-							if (db.INV_PRODUCTOS_PRECIOS.AsNoTracking().Where(pro => pro.ID == item.ID).Count() > 0)
-							{
-
-								var old = db.INV_PRODUCTOS_PRECIOS.Find(item.ID);
-								db.Entry(old).State = System.Data.Entity.EntityState.Detached;
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.INV_PRODUCTOS_PRECIOS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (products == null || products.Results == null || products.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				products.Results,
+				"INV_PRODUCTOS_PRECIOS",
+				x => x.ID,
+				db => db.INV_PRODUCTOS_PRECIOS,
+				(db, keys) => new HashSet<string>(db.INV_PRODUCTOS_PRECIOS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -403,7 +266,7 @@ namespace USWsLibrary.Services
 			PagedList<INV_COMBOS> packages = new PagedList<INV_COMBOS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				packages.Results = db.INV_COMBOS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList<INV_COMBOS>();
+				packages.Results = db.INV_COMBOS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList<INV_COMBOS>();
 				packages.Total = packages.Results.Count;
 				packages.Count = packages.Results.Count;
 			}
@@ -412,44 +275,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveCombos(PagedList<INV_COMBOS> products)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in products.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-
-						try
-						{
-							if (db.INV_COMBOS.Any(pro => pro.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.INV_COMBOS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (products == null || products.Results == null || products.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				products.Results,
+				"INV_COMBOS",
+				x => x.ID,
+				db => db.INV_COMBOS,
+				(db, keys) => new HashSet<string>(db.INV_COMBOS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<INV_COMBOS_COMPONENTES> listComboComponentesProducts(DateTime lastUpdate, DateTime lastUpdate2)
@@ -457,7 +290,7 @@ namespace USWsLibrary.Services
 			PagedList<INV_COMBOS_COMPONENTES> packages = new PagedList<INV_COMBOS_COMPONENTES>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				packages.Results = db.INV_COMBOS_COMPONENTES.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || e.ExportadoDate > lastUpdate).ToList<INV_COMBOS_COMPONENTES>();
+				packages.Results = db.INV_COMBOS_COMPONENTES.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || e.ExportadoDate > lastUpdate).ToList<INV_COMBOS_COMPONENTES>();
 				packages.Total = packages.Results.Count;
 				packages.Count = packages.Results.Count;
 			}
@@ -466,46 +299,23 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveComboComponente(PagedList<INV_COMBOS_COMPONENTES> comboComponentes)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
+			if (comboComponentes == null || comboComponentes.Results == null || comboComponentes.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSaveComposite(
+				comboComponentes.Results,
+				"INV_COMBOS_COMPONENTES",
+				x => x.ComboID + "|" + x.ProductoID,
+				db => db.INV_COMBOS_COMPONENTES,
+				(db, chunk) =>
 				{
-
-					foreach (var item in comboComponentes.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-
-						try
-						{
-							if (db.INV_COMBOS_COMPONENTES.Any(pro => pro.ProductoID == item.ProductoID && pro.ComboID == item.ComboID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.INV_COMBOS_COMPONENTES.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
+					var comboIds = chunk.Select(c => c.ComboID).Distinct().ToList();
+					var prodIds = chunk.Select(c => c.ProductoID).Distinct().ToList();
+					var existing = db.INV_COMBOS_COMPONENTES
+						.Where(x => comboIds.Contains(x.ComboID) && prodIds.Contains(x.ProductoID))
+						.Select(x => new { x.ComboID, x.ProductoID })
+						.ToList();
+					return new HashSet<string>(existing.Select(x => x.ComboID + "|" + x.ProductoID));
 				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
-
+			);
 		}
 
 
@@ -514,7 +324,7 @@ namespace USWsLibrary.Services
 			PagedList<INV_PD_BODEGA_STOCK> packages = new PagedList<INV_PD_BODEGA_STOCK>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				packages.Results = db.INV_PD_BODEGA_STOCK.Where(e => e.ExportadoDate > lastUpdate).ToList<INV_PD_BODEGA_STOCK>();
+				packages.Results = db.INV_PD_BODEGA_STOCK.AsNoTracking().Where(e => e.ExportadoDate > lastUpdate).ToList<INV_PD_BODEGA_STOCK>();
 				packages.Total = packages.Results.Count;
 				packages.Count = packages.Results.Count;
 			}
@@ -568,7 +378,7 @@ namespace USWsLibrary.Services
 			PagedList<INV_PRECIOS> packages = new PagedList<INV_PRECIOS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				packages.Results = db.INV_PRECIOS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
+				packages.Results = db.INV_PRECIOS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
 				packages.Total = packages.Results.Count;
 				packages.Count = packages.Results.Count;
 			}
@@ -577,44 +387,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveInvPrecio(PagedList<INV_PRECIOS> precios)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in precios.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-
-						try
-						{
-							if (db.INV_PRECIOS.Any(pro => pro.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.INV_PRECIOS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (precios == null || precios.Results == null || precios.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				precios.Results,
+				"INV_PRECIOS",
+				x => x.ID,
+				db => db.INV_PRECIOS,
+				(db, keys) => new HashSet<string>(db.INV_PRECIOS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<INV_PRECIOS_DT> listInvPreciosDt(DateTime lastUpdate, DateTime lastUpdate2)
@@ -622,7 +402,7 @@ namespace USWsLibrary.Services
 			PagedList<INV_PRECIOS_DT> packages = new PagedList<INV_PRECIOS_DT>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				packages.Results = db.INV_PRECIOS_DT.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
+				packages.Results = db.INV_PRECIOS_DT.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
 				packages.Total = packages.Results.Count;
 				packages.Count = packages.Results.Count;
 			}
@@ -631,45 +411,23 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveInvPrecioDt(PagedList<INV_PRECIOS_DT> precios)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
+			if (precios == null || precios.Results == null || precios.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSaveComposite(
+				precios.Results,
+				"INV_PRECIOS_DT",
+				x => x.PrecioID + "|" + x.ProductoID,
+				db => db.INV_PRECIOS_DT,
+				(db, chunk) =>
 				{
-					foreach (var item in precios.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-
-						try
-						{
-							if (db.INV_PRECIOS_DT.Any(pro => pro.PrecioID == item.PrecioID && pro.ProductoID == item.ProductoID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-
-							}
-							else
-							{
-								db.INV_PRECIOS_DT.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
+					var precioIds = chunk.Select(c => c.PrecioID).Distinct().ToList();
+					var prodIds = chunk.Select(c => c.ProductoID).Distinct().ToList();
+					var existing = db.INV_PRECIOS_DT
+						.Where(x => precioIds.Contains(x.PrecioID) && prodIds.Contains(x.ProductoID))
+						.Select(x => new { x.PrecioID, x.ProductoID })
+						.ToList();
+					return new HashSet<string>(existing.Select(x => x.PrecioID + "|" + x.ProductoID));
 				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			);
 		}
 
 
@@ -678,7 +436,7 @@ namespace USWsLibrary.Services
 			PagedList<INV_PRODUCTOS_STOCK> packages = new PagedList<INV_PRODUCTOS_STOCK>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				packages.Results = db.INV_PRODUCTOS_STOCK.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList<INV_PRODUCTOS_STOCK>();
+				packages.Results = db.INV_PRODUCTOS_STOCK.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList<INV_PRODUCTOS_STOCK>();
 				packages.Total = packages.Results.Count;
 				packages.Count = packages.Results.Count;
 			}
@@ -687,45 +445,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveInvProductsStock(PagedList<INV_PRODUCTOS_STOCK> precios)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in precios.Results)
-					{
-						errorSave.errorMessage=item.ProductoID;
-
-
-						try
-						{
-							if (db.INV_PRODUCTOS_STOCK.Any(pro => pro.ProductoID == item.ProductoID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-
-							}
-							else
-							{
-								db.INV_PRODUCTOS_STOCK.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (precios == null || precios.Results == null || precios.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				precios.Results,
+				"INV_PRODUCTOS_STOCK",
+				x => x.ProductoID,
+				db => db.INV_PRODUCTOS_STOCK,
+				(db, keys) => new HashSet<string>(db.INV_PRODUCTOS_STOCK.Where(x => keys.Contains(x.ProductoID)).Select(x => x.ProductoID))
+			);
 		}
 
 		public PagedList<INV_RUBROS> listInvRubros(DateTime lastUpdate, DateTime lastUpdate2)
@@ -733,7 +460,7 @@ namespace USWsLibrary.Services
 			PagedList<INV_RUBROS> packages = new PagedList<INV_RUBROS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				packages.Results = db.INV_RUBROS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
+				packages.Results = db.INV_RUBROS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
 				packages.Total = packages.Results.Count;
 				packages.Count = packages.Results.Count;
 			}
@@ -742,44 +469,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveInvRubros(PagedList<INV_RUBROS> precios)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-
-					foreach (var item in precios.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.INV_RUBROS.Any(pro => pro.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.INV_RUBROS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (precios == null || precios.Results == null || precios.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				precios.Results,
+				"INV_RUBROS",
+				x => x.ID,
+				db => db.INV_RUBROS,
+				(db, keys) => new HashSet<string>(db.INV_RUBROS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<ACC_CUENTAS> listAccCuentas(DateTime lastUpdate, DateTime lastUpdate2)
@@ -787,7 +484,7 @@ namespace USWsLibrary.Services
 			PagedList<ACC_CUENTAS> packages = new PagedList<ACC_CUENTAS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				packages.Results = db.ACC_CUENTAS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
+				packages.Results = db.ACC_CUENTAS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
 
 				packages.Total = packages.Results.Count;
 				packages.Count = packages.Results.Count;
@@ -797,43 +494,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveAccCuentas(PagedList<ACC_CUENTAS> cuentas)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in cuentas.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.ACC_CUENTAS.Any(pro => pro.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.ACC_CUENTAS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (cuentas == null || cuentas.Results == null || cuentas.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				cuentas.Results,
+				"ACC_CUENTAS",
+				x => x.ID,
+				db => db.ACC_CUENTAS,
+				(db, keys) => new HashSet<string>(db.ACC_CUENTAS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<EMP_EMPLEADOS> listEmployess(DateTime lastUpdate, DateTime lastUpdate2)
@@ -841,7 +509,7 @@ namespace USWsLibrary.Services
 			PagedList<EMP_EMPLEADOS> employess = new PagedList<EMP_EMPLEADOS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				employess.Results = db.EMP_EMPLEADOS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
+				employess.Results = db.EMP_EMPLEADOS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
 
 				employess.Total = employess.Results.Count;
 				employess.Count = employess.Results.Count;
@@ -851,43 +519,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveEmployess(PagedList<EMP_EMPLEADOS> employes)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in employes.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.EMP_EMPLEADOS.Any(emp => emp.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.EMP_EMPLEADOS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (employes == null || employes.Results == null || employes.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				employes.Results,
+				"EMP_EMPLEADOS",
+				x => x.ID,
+				db => db.EMP_EMPLEADOS,
+				(db, keys) => new HashSet<string>(db.EMP_EMPLEADOS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<BAN_BANCOS> listBanks(DateTime lastUpdate, DateTime lastUpdate2)
@@ -895,7 +534,7 @@ namespace USWsLibrary.Services
 			PagedList<BAN_BANCOS> bancos = new PagedList<BAN_BANCOS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				bancos.Results = db.BAN_BANCOS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList<BAN_BANCOS>();
+				bancos.Results = db.BAN_BANCOS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList<BAN_BANCOS>();
 
 				bancos.Total = bancos.Results.Count;
 				bancos.Count = bancos.Results.Count;
@@ -905,43 +544,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveBanks(PagedList<BAN_BANCOS> bancos)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in bancos.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.BAN_BANCOS.Any(banco => banco.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.BAN_BANCOS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (bancos == null || bancos.Results == null || bancos.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				bancos.Results,
+				"BAN_BANCOS",
+				x => x.ID,
+				db => db.BAN_BANCOS,
+				(db, keys) => new HashSet<string>(db.BAN_BANCOS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -950,7 +560,7 @@ namespace USWsLibrary.Services
 			PagedList<CLI_RUBROS> rubros = new PagedList<CLI_RUBROS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				rubros.Results = db.CLI_RUBROS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList<CLI_RUBROS>();
+				rubros.Results = db.CLI_RUBROS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList<CLI_RUBROS>();
 
 				rubros.Total = rubros.Results.Count;
 				rubros.Count = rubros.Results.Count;
@@ -960,44 +570,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveCliRubros(PagedList<CLI_RUBROS> cliRubros)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-
-					foreach (var item in cliRubros.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.CLI_RUBROS.Any(cliRubro => cliRubro.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.CLI_RUBROS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (cliRubros == null || cliRubros.Results == null || cliRubros.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				cliRubros.Results,
+				"CLI_RUBROS",
+				x => x.ID,
+				db => db.CLI_RUBROS,
+				(db, keys) => new HashSet<string>(db.CLI_RUBROS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<INV_EMPAQUES> listInvPackages(DateTime lastUpdate, DateTime lastUpdate2)
@@ -1005,7 +585,7 @@ namespace USWsLibrary.Services
 			PagedList<INV_EMPAQUES> empques = new PagedList<INV_EMPAQUES>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				empques.Results = db.INV_EMPAQUES.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList<INV_EMPAQUES>();
+				empques.Results = db.INV_EMPAQUES.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList<INV_EMPAQUES>();
 
 				empques.Total = empques.Results.Count;
 				empques.Count = empques.Results.Count;
@@ -1018,43 +598,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveInvPackages(PagedList<INV_EMPAQUES> empauqes)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in empauqes.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.INV_EMPAQUES.Any(empauqe => empauqe.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.INV_EMPAQUES.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (empauqes == null || empauqes.Results == null || empauqes.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				empauqes.Results,
+				"INV_EMPAQUES",
+				x => x.ID,
+				db => db.INV_EMPAQUES,
+				(db, keys) => new HashSet<string>(db.INV_EMPAQUES.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<SEG_PERFILES> listSegProfiles(DateTime lastUpdate, DateTime lastUpdate2)
@@ -1062,7 +613,7 @@ namespace USWsLibrary.Services
 			PagedList<SEG_PERFILES> perfiles = new PagedList<SEG_PERFILES>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				perfiles.Results = db.SEG_PERFILES.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
+				perfiles.Results = db.SEG_PERFILES.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
 
 				perfiles.Total = perfiles.Results.Count;
 				perfiles.Count = perfiles.Results.Count;
@@ -1073,43 +624,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveSegProfiles(PagedList<SEG_PERFILES> segPerfiles)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in segPerfiles.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.id;
-
-						try
-						{
-							if (db.SEG_PERFILES.Any(segPerfile => segPerfile.id == item.id))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.SEG_PERFILES.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (segPerfiles == null || segPerfiles.Results == null || segPerfiles.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				segPerfiles.Results,
+				"SEG_PERFILES",
+				x => x.id,
+				db => db.SEG_PERFILES,
+				(db, keys) => new HashSet<string>(db.SEG_PERFILES.Where(x => keys.Contains(x.id)).Select(x => x.id))
+			);
 		}
 
 		public PagedList<SEG_RECURSOS> listSegRecursos(DateTime lastUpdate, DateTime lastUpdate2)
@@ -1117,7 +639,7 @@ namespace USWsLibrary.Services
 			PagedList<SEG_RECURSOS> recursos = new PagedList<SEG_RECURSOS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				recursos.Results = db.SEG_RECURSOS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
+				recursos.Results = db.SEG_RECURSOS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
 
 				recursos.Total = recursos.Results.Count;
 				recursos.Count = recursos.Results.Count;
@@ -1128,43 +650,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveSegRecursos(PagedList<SEG_RECURSOS> segRecursos)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in segRecursos.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.SEG_RECURSOS.Any(segRecurso => segRecurso.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.SEG_RECURSOS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (segRecursos == null || segRecursos.Results == null || segRecursos.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				segRecursos.Results,
+				"SEG_RECURSOS",
+				x => x.ID,
+				db => db.SEG_RECURSOS,
+				(db, keys) => new HashSet<string>(db.SEG_RECURSOS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<SEG_USUARIOS> listSegUsuarios(DateTime lastUpdate, DateTime lastUpdate2)
@@ -1172,7 +665,7 @@ namespace USWsLibrary.Services
 			PagedList<SEG_USUARIOS> usuarios = new PagedList<SEG_USUARIOS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				usuarios.Results = db.SEG_USUARIOS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
+				usuarios.Results = db.SEG_USUARIOS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
 
 				usuarios.Total = usuarios.Results.Count;
 				usuarios.Count = usuarios.Results.Count;
@@ -1183,43 +676,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveSegUsuarios(PagedList<SEG_USUARIOS> segUsuarios)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in segUsuarios.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.SEG_USUARIOS.Any(segUsuario => segUsuario.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.SEG_USUARIOS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (segUsuarios == null || segUsuarios.Results == null || segUsuarios.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				segUsuarios.Results,
+				"SEG_USUARIOS",
+				x => x.ID,
+				db => db.SEG_USUARIOS,
+				(db, keys) => new HashSet<string>(db.SEG_USUARIOS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<SIS_DIVISIONES> listSisDivisiones(DateTime lastUpdate, DateTime lastUpdate2)
@@ -1227,7 +691,7 @@ namespace USWsLibrary.Services
 			PagedList<SIS_DIVISIONES> divisiones = new PagedList<SIS_DIVISIONES>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				divisiones.Results = db.SIS_DIVISIONES.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
+				divisiones.Results = db.SIS_DIVISIONES.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
 
 				divisiones.Total = divisiones.Results.Count;
 				divisiones.Count = divisiones.Results.Count;
@@ -1238,43 +702,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveDivisiones(PagedList<SIS_DIVISIONES> sisDivisiones)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in sisDivisiones.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.SIS_DIVISIONES.Any(sisDivision => sisDivision.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.SIS_DIVISIONES.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (sisDivisiones == null || sisDivisiones.Results == null || sisDivisiones.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				sisDivisiones.Results,
+				"SIS_DIVISIONES",
+				x => x.ID,
+				db => db.SIS_DIVISIONES,
+				(db, keys) => new HashSet<string>(db.SIS_DIVISIONES.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<SIS_PARAMETROS> listSisParametros(DateTime lastUpdate, DateTime lastUpdate2)
@@ -1283,7 +718,7 @@ namespace USWsLibrary.Services
 			PagedList<SIS_PARAMETROS> parametros = new PagedList<SIS_PARAMETROS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				parametros.Results = db.SIS_PARAMETROS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
+				parametros.Results = db.SIS_PARAMETROS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
 
 				parametros.Total = parametros.Results.Count;
 				parametros.Count = parametros.Results.Count;
@@ -1294,44 +729,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveSisParametros(PagedList<SIS_PARAMETROS> sisDivisiones)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in sisDivisiones.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.SIS_PARAMETROS.Any(sisDivision => sisDivision.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.SIS_PARAMETROS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (sisDivisiones == null || sisDivisiones.Results == null || sisDivisiones.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				sisDivisiones.Results,
+				"SIS_PARAMETROS",
+				x => x.ID,
+				db => db.SIS_PARAMETROS,
+				(db, keys) => new HashSet<string>(db.SIS_PARAMETROS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<SIS_SUCURSALES> listSisSucursales(DateTime lastUpdate, DateTime lastUpdate2)
@@ -1339,7 +744,7 @@ namespace USWsLibrary.Services
 			PagedList<SIS_SUCURSALES> sucursales = new PagedList<SIS_SUCURSALES>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				sucursales.Results = db.SIS_SUCURSALES.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
+				sucursales.Results = db.SIS_SUCURSALES.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
 
 				sucursales.Total = sucursales.Results.Count;
 				sucursales.Count = sucursales.Results.Count;
@@ -1354,7 +759,7 @@ namespace USWsLibrary.Services
 			PagedList<SIS_ZONAS> sucursales = new PagedList<SIS_ZONAS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				sucursales.Results = db.SIS_ZONAS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
+				sucursales.Results = db.SIS_ZONAS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
 
 				sucursales.Total = sucursales.Results.Count;
 				sucursales.Count = sucursales.Results.Count;
@@ -1365,86 +770,28 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveSisZonas(PagedList<SIS_ZONAS> sisZonas)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage = "ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in sisZonas.Results)
-					{
-						errorSave.errorMessage = errorSave.errorMessage + "\n" + "ID:  " + item.ID;
-
-						try
-						{
-							if (db.SIS_ZONAS.Any(sisSucursal => sisSucursal.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.SIS_ZONAS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (sisZonas == null || sisZonas.Results == null || sisZonas.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				sisZonas.Results,
+				"SIS_ZONAS",
+				x => x.ID,
+				db => db.SIS_ZONAS,
+				(db, keys) => new HashSet<string>(db.SIS_ZONAS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
 
 		public ErrorSave saveSisSucursales(PagedList<SIS_SUCURSALES> sisSucursales)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in sisSucursales.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.SIS_SUCURSALES.Any(sisSucursal => sisSucursal.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.SIS_SUCURSALES.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (sisSucursales == null || sisSucursales.Results == null || sisSucursales.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				sisSucursales.Results,
+				"SIS_SUCURSALES",
+				x => x.ID,
+				db => db.SIS_SUCURSALES,
+				(db, keys) => new HashSet<string>(db.SIS_SUCURSALES.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -1453,7 +800,7 @@ namespace USWsLibrary.Services
 			PagedList<SRI_SECUENCIAL> sriSecuencial = new PagedList<SRI_SECUENCIAL>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				sriSecuencial.Results = db.SRI_SECUENCIAL.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
+				sriSecuencial.Results = db.SRI_SECUENCIAL.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
 
 				sriSecuencial.Total = sriSecuencial.Results.Count;
 				sriSecuencial.Count = sriSecuencial.Results.Count;
@@ -1464,43 +811,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveSriSecuencial(PagedList<SRI_SECUENCIAL> sriSecuencial)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in sriSecuencial.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.SRI_SECUENCIAL.Any(sri => sri.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.SRI_SECUENCIAL.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (sriSecuencial == null || sriSecuencial.Results == null || sriSecuencial.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				sriSecuencial.Results,
+				"SRI_SECUENCIAL",
+				x => x.ID,
+				db => db.SRI_SECUENCIAL,
+				(db, keys) => new HashSet<string>(db.SRI_SECUENCIAL.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<SEG_PERFILES_RECURSOS> listSegPerfilesRecursos(DateTime lastUpdate, DateTime lastUpdate2)
@@ -1508,7 +826,7 @@ namespace USWsLibrary.Services
 			PagedList<SEG_PERFILES_RECURSOS> perfilesRecuros = new PagedList<SEG_PERFILES_RECURSOS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				perfilesRecuros.Results = db.SEG_PERFILES_RECURSOS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
+				perfilesRecuros.Results = db.SEG_PERFILES_RECURSOS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
 
 				perfilesRecuros.Total = perfilesRecuros.Results.Count;
 				perfilesRecuros.Count = perfilesRecuros.Results.Count;
@@ -1519,43 +837,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveSegPerfilesRecursos(PagedList<SEG_PERFILES_RECURSOS> perfilesRecuros)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in perfilesRecuros.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.id;
-
-						try
-						{
-							if (db.SEG_PERFILES_RECURSOS.Any(perfilRe => perfilRe.id == item.id))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.SEG_PERFILES_RECURSOS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (perfilesRecuros == null || perfilesRecuros.Results == null || perfilesRecuros.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				perfilesRecuros.Results,
+				"SEG_PERFILES_RECURSOS",
+				x => x.id,
+				db => db.SEG_PERFILES_RECURSOS,
+				(db, keys) => new HashSet<string>(db.SEG_PERFILES_RECURSOS.Where(x => keys.Contains(x.id)).Select(x => x.id))
+			);
 		}
 
 		public PagedList<ACC_ASIENTOS> listAccAsientos(DateTime lastUpdate, DateTime lastUpdate2)
@@ -1563,7 +852,7 @@ namespace USWsLibrary.Services
 			PagedList<ACC_ASIENTOS> accCuentas = new PagedList<ACC_ASIENTOS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				accCuentas.Results = db.ACC_ASIENTOS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
+				accCuentas.Results = db.ACC_ASIENTOS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
 
 				accCuentas.Total = accCuentas.Results.Count;
 				accCuentas.Count = accCuentas.Results.Count;
@@ -1574,43 +863,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveAccAsientos(PagedList<ACC_ASIENTOS> perfilesRecuros)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in perfilesRecuros.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.ACC_ASIENTOS.Any(perfilRe => perfilRe.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.ACC_ASIENTOS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (perfilesRecuros == null || perfilesRecuros.Results == null || perfilesRecuros.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				perfilesRecuros.Results,
+				"ACC_ASIENTOS",
+				x => x.ID,
+				db => db.ACC_ASIENTOS,
+				(db, keys) => new HashSet<string>(db.ACC_ASIENTOS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<ACC_ASIENTOS_DT> listAccAsientosDt(DateTime lastUpdate, DateTime lastUpdate2)
@@ -1618,7 +878,7 @@ namespace USWsLibrary.Services
 			PagedList<ACC_ASIENTOS_DT> accAsientos = new PagedList<ACC_ASIENTOS_DT>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				accAsientos.Results = db.ACC_ASIENTOS_DT.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || e.ExportadoDate > lastUpdate).ToList();
+				accAsientos.Results = db.ACC_ASIENTOS_DT.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || e.ExportadoDate > lastUpdate).ToList();
 
 				accAsientos.Total = accAsientos.Results.Count;
 				accAsientos.Count = accAsientos.Results.Count;
@@ -1629,43 +889,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveAccAsientosDt(PagedList<ACC_ASIENTOS_DT> accAsientosDt)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in accAsientosDt.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.ACC_ASIENTOS_DT.Any(accAsiento => accAsiento.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.ACC_ASIENTOS_DT.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (accAsientosDt == null || accAsientosDt.Results == null || accAsientosDt.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				accAsientosDt.Results,
+				"ACC_ASIENTOS_DT",
+				x => x.ID,
+				db => db.ACC_ASIENTOS_DT,
+				(db, keys) => new HashSet<string>(db.ACC_ASIENTOS_DT.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<BAN_INGRESOS> listBanIngresos(DateTime lastUpdate, DateTime lastUpdate2)
@@ -1673,7 +904,7 @@ namespace USWsLibrary.Services
 			PagedList<BAN_INGRESOS> banIngresos = new PagedList<BAN_INGRESOS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				banIngresos.Results = db.BAN_INGRESOS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
+				banIngresos.Results = db.BAN_INGRESOS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
 
 				banIngresos.Total = banIngresos.Results.Count;
 				banIngresos.Count = banIngresos.Results.Count;
@@ -1684,44 +915,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveBanIngresos(PagedList<BAN_INGRESOS> banIngresos)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-
-					foreach (var item in banIngresos.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.BAN_INGRESOS.Any(banIngreso => banIngreso.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.BAN_INGRESOS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (banIngresos == null || banIngresos.Results == null || banIngresos.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				banIngresos.Results,
+				"BAN_INGRESOS",
+				x => x.ID,
+				db => db.BAN_INGRESOS,
+				(db, keys) => new HashSet<string>(db.BAN_INGRESOS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<BAN_INGRESOS_DT> listBanIngresosDt(DateTime lastUpdate, DateTime lastUpdate2)
@@ -1729,7 +930,7 @@ namespace USWsLibrary.Services
 			PagedList<BAN_INGRESOS_DT> banIngresosDt = new PagedList<BAN_INGRESOS_DT>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				banIngresosDt.Results = db.BAN_INGRESOS_DT.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				banIngresosDt.Results = db.BAN_INGRESOS_DT.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				banIngresosDt.Total = banIngresosDt.Results.Count;
 				banIngresosDt.Count = banIngresosDt.Results.Count;
@@ -1740,44 +941,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveBanIngresosDt(PagedList<BAN_INGRESOS_DT> banIngresosDt)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-
-					foreach (var item in banIngresosDt.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.BAN_INGRESOS_DT.Any(banIngreso => banIngreso.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.BAN_INGRESOS_DT.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (banIngresosDt == null || banIngresosDt.Results == null || banIngresosDt.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				banIngresosDt.Results,
+				"BAN_INGRESOS_DT",
+				x => x.ID,
+				db => db.BAN_INGRESOS_DT,
+				(db, keys) => new HashSet<string>(db.BAN_INGRESOS_DT.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<CLI_CLIENTES_DEUDAS> listClientesDeduas(DateTime lastUpdate, DateTime lastUpdate2)
@@ -1785,7 +956,7 @@ namespace USWsLibrary.Services
 			PagedList<CLI_CLIENTES_DEUDAS> clienteDeduaas = new PagedList<CLI_CLIENTES_DEUDAS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				clienteDeduaas.Results = db.CLI_CLIENTES_DEUDAS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
+				clienteDeduaas.Results = db.CLI_CLIENTES_DEUDAS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
 
 				clienteDeduaas.Total = clienteDeduaas.Results.Count;
 				clienteDeduaas.Count = clienteDeduaas.Results.Count;
@@ -1796,44 +967,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveClienteDeudas(PagedList<CLI_CLIENTES_DEUDAS> clienteDeudas)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-
-					foreach (var item in clienteDeudas.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.CLI_CLIENTES_DEUDAS.Any(clienteDeuda => clienteDeuda.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.CLI_CLIENTES_DEUDAS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (clienteDeudas == null || clienteDeudas.Results == null || clienteDeudas.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				clienteDeudas.Results,
+				"CLI_CLIENTES_DEUDAS",
+				x => x.ID,
+				db => db.CLI_CLIENTES_DEUDAS,
+				(db, keys) => new HashSet<string>(db.CLI_CLIENTES_DEUDAS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -1842,7 +983,7 @@ namespace USWsLibrary.Services
 			PagedList<ModelDobraDatabase.CLI_CREDITOS> cliCreditos = new PagedList<ModelDobraDatabase.CLI_CREDITOS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				cliCreditos.Results = db.CLI_CREDITOS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
+				cliCreditos.Results = db.CLI_CREDITOS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
 
 				cliCreditos.Total = cliCreditos.Results.Count;
 				cliCreditos.Count = cliCreditos.Results.Count;
@@ -1853,44 +994,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveCliCreditos(PagedList<ModelDobraDatabase.CLI_CREDITOS> clienteDeudas)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in clienteDeudas.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.CLI_CREDITOS.Any(clienteDeuda => clienteDeuda.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.CLI_CREDITOS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (clienteDeudas == null || clienteDeudas.Results == null || clienteDeudas.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				clienteDeudas.Results,
+				"CLI_CREDITOS",
+				x => x.ID,
+				db => db.CLI_CREDITOS,
+				(db, keys) => new HashSet<string>(db.CLI_CREDITOS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -1899,7 +1010,7 @@ namespace USWsLibrary.Services
 			PagedList<ModelDobraDatabase.CLI_CREDITOS_PRODUCTOS> cliCreditosProductos = new PagedList<ModelDobraDatabase.CLI_CREDITOS_PRODUCTOS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				cliCreditosProductos.Results = db.CLI_CREDITOS_PRODUCTOS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				cliCreditosProductos.Results = db.CLI_CREDITOS_PRODUCTOS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				cliCreditosProductos.Total = cliCreditosProductos.Results.Count;
 				cliCreditosProductos.Count = cliCreditosProductos.Results.Count;
@@ -1910,43 +1021,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveCliCreditosProductos(PagedList<ModelDobraDatabase.CLI_CREDITOS_PRODUCTOS> clienteCreditoProductos)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in clienteCreditoProductos.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.CLI_CREDITOS_PRODUCTOS.Any(clienteCreditoProducto => clienteCreditoProducto.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.CLI_CREDITOS_PRODUCTOS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (clienteCreditoProductos == null || clienteCreditoProductos.Results == null || clienteCreditoProductos.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				clienteCreditoProductos.Results,
+				"CLI_CREDITOS_PRODUCTOS",
+				x => x.ID,
+				db => db.CLI_CREDITOS_PRODUCTOS,
+				(db, keys) => new HashSet<string>(db.CLI_CREDITOS_PRODUCTOS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -1955,7 +1037,7 @@ namespace USWsLibrary.Services
 			PagedList<INV_PRODUCTOS_CARDEX> invProductosCardex = new PagedList<INV_PRODUCTOS_CARDEX>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				invProductosCardex.Results = db.INV_PRODUCTOS_CARDEX.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				invProductosCardex.Results = db.INV_PRODUCTOS_CARDEX.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				invProductosCardex.Total = invProductosCardex.Results.Count;
 				invProductosCardex.Count = invProductosCardex.Results.Count;
@@ -1966,44 +1048,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveInvProductosCardex(PagedList<INV_PRODUCTOS_CARDEX> productosCardex)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-
-					foreach (var item in productosCardex.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.INV_PRODUCTOS_CARDEX.Any(productoCardex => productoCardex.ID==item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.INV_PRODUCTOS_CARDEX.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (productosCardex == null || productosCardex.Results == null || productosCardex.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				productosCardex.Results,
+				"INV_PRODUCTOS_CARDEX",
+				x => x.ID,
+				db => db.INV_PRODUCTOS_CARDEX,
+				(db, keys) => new HashSet<long>(db.INV_PRODUCTOS_CARDEX.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<POS_CIERRES_CAJA> listPosCierresCajas(DateTime lastUpdate, DateTime lastUpdate2)
@@ -2011,7 +1063,7 @@ namespace USWsLibrary.Services
 			PagedList<POS_CIERRES_CAJA> posCierresCaja = new PagedList<POS_CIERRES_CAJA>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				posCierresCaja.Results = db.POS_CIERRES_CAJA.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
+				posCierresCaja.Results = db.POS_CIERRES_CAJA.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
 
 				posCierresCaja.Total = posCierresCaja.Results.Count;
 				posCierresCaja.Count = posCierresCaja.Results.Count;
@@ -2022,43 +1074,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave savePosCierresCajas(PagedList<POS_CIERRES_CAJA> productosCardex)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage = "ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in productosCardex.Results)
-					{
-						errorSave.errorMessage = errorSave.errorMessage + "\n" + "ID:  " + item.ID;
-
-						try
-						{
-							if (db.POS_CIERRES_CAJA.Any(posCierreCaja => posCierreCaja.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.POS_CIERRES_CAJA.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (productosCardex == null || productosCardex.Results == null || productosCardex.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				productosCardex.Results,
+				"POS_CIERRES_CAJA",
+				x => x.ID,
+				db => db.POS_CIERRES_CAJA,
+				(db, keys) => new HashSet<string>(db.POS_CIERRES_CAJA.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -2067,7 +1090,7 @@ namespace USWsLibrary.Services
 			PagedList<POS_CIERRES> posCierres = new PagedList<POS_CIERRES>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				posCierres.Results = db.POS_CIERRES.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
+				posCierres.Results = db.POS_CIERRES.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
 
 				posCierres.Total = posCierres.Results.Count;
 				posCierres.Count = posCierres.Results.Count;
@@ -2078,44 +1101,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave savePosCierres(PagedList<POS_CIERRES> posCierres)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in posCierres.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.POS_CIERRES.Any(posCierre => posCierre.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.POS_CIERRES.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (posCierres == null || posCierres.Results == null || posCierres.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				posCierres.Results,
+				"POS_CIERRES",
+				x => x.ID,
+				db => db.POS_CIERRES,
+				(db, keys) => new HashSet<string>(db.POS_CIERRES.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<VEN_FACTURAS> listVenFacturas(DateTime lastUpdate, DateTime lastUpdate2)
@@ -2124,7 +1117,7 @@ namespace USWsLibrary.Services
 			using (DobraConnection db = new DobraConnection())
 			{
 
-				venFacturas.Results = db.VEN_FACTURAS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
+				venFacturas.Results = db.VEN_FACTURAS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
 
 				venFacturas.Total = venFacturas.Results.Count;
 				venFacturas.Count = venFacturas.Results.Count;
@@ -2135,66 +1128,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveVenFacturas(PagedList<VEN_FACTURAS> venFacturas)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			using (var tx = db.Database.BeginTransaction())
-			{
-				try
-				{
-					int count = 0;
-					foreach (var item in venFacturas.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							var clientes = db.CLI_CLIENTES.Where(cliente => cliente.Cédula.Trim() == item.Ruc.Trim() ||
-								cliente.Ruc.Trim() == item.Ruc.Trim()
-							);
-
-							if (db.VEN_FACTURAS.Any(venFactura => venFactura.ID == item.ID))
-							{
-								if (clientes.Count() > 0)
-								{
-									item.ClienteID = clientes.First<CLI_CLIENTES>().ID;
-								}
-
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-							}
-							else
-							{
-								if (clientes.Count() > 0)
-								{
-									item.ClienteID = clientes.First<CLI_CLIENTES>().ID;
-								}
-
-								db.VEN_FACTURAS.Add(item);
-							}
-
-							count++;
-							if (count % 100 == 0)
-							{
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-					db.SaveChanges();
-					tx.Commit();
-				}
-				catch (Exception e)
-				{
-					try { tx.Rollback(); } catch { }
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (venFacturas == null || venFacturas.Results == null || venFacturas.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				venFacturas.Results,
+				"VEN_FACTURAS",
+				x => x.ID,
+				db => db.VEN_FACTURAS,
+				(db, keys) => new HashSet<string>(db.VEN_FACTURAS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<VEN_FACTURAS_DT> listVenFacturasDt(DateTime lastUpdate, DateTime lastUpdate2)
@@ -2202,63 +1143,24 @@ namespace USWsLibrary.Services
 			PagedList<VEN_FACTURAS_DT> venFacturas = new PagedList<VEN_FACTURAS_DT>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				venFacturas.Results = db.VEN_FACTURAS_DT.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
+				venFacturas.Results = db.VEN_FACTURAS_DT.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
 
 				venFacturas.Total = venFacturas.Results.Count;
 				venFacturas.Count = venFacturas.Results.Count;
 			}
 			return venFacturas;
-
 		}
 
 		public ErrorSave saveVenFacturasDt(PagedList<VEN_FACTURAS_DT> venFacturas)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			using (var tx = db.Database.BeginTransaction())
-			{
-				try
-				{
-					int count = 0;
-					foreach (var item in venFacturas.Results)
-					{
-						errorSave.errorMessage = item.ID;
-
-						try
-						{
-							if (db.VEN_FACTURAS_DT.Any(venFactura => venFactura.ID.Trim() == item.ID.Trim()))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-							}
-							else
-							{
-								db.VEN_FACTURAS_DT.Add(item);
-							}
-
-							count++;
-							if (count % 100 == 0)
-							{
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-					db.SaveChanges();
-					tx.Commit();
-				}
-				catch (Exception e)
-				{
-					try { tx.Rollback(); } catch { }
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (venFacturas == null || venFacturas.Results == null || venFacturas.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				venFacturas.Results,
+				"VEN_FACTURAS_DT",
+				x => x.ID,
+				db => db.VEN_FACTURAS_DT,
+				(db, keys) => new HashSet<string>(db.VEN_FACTURAS_DT.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -2267,7 +1169,7 @@ namespace USWsLibrary.Services
 			PagedList<BAN_INGRESOS_DEUDAS> banIngresosDeudas = new PagedList<BAN_INGRESOS_DEUDAS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				banIngresosDeudas.Results = db.BAN_INGRESOS_DEUDAS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				banIngresosDeudas.Results = db.BAN_INGRESOS_DEUDAS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				banIngresosDeudas.Total = banIngresosDeudas.Results.Count;
 				banIngresosDeudas.Count = banIngresosDeudas.Results.Count;
@@ -2278,43 +1180,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveBanIngresoDeuda(PagedList<BAN_INGRESOS_DEUDAS> banIngresosDeudas)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in banIngresosDeudas.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.BAN_INGRESOS_DEUDAS.Any(banIngresoDeuda => banIngresoDeuda.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.BAN_INGRESOS_DEUDAS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (banIngresosDeudas == null || banIngresosDeudas.Results == null || banIngresosDeudas.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				banIngresosDeudas.Results,
+				"BAN_INGRESOS_DEUDAS",
+				x => x.ID,
+				db => db.BAN_INGRESOS_DEUDAS,
+				(db, keys) => new HashSet<string>(db.BAN_INGRESOS_DEUDAS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<BAN_BANCOS_CARDEX> listBanBancosCardex(DateTime lastUpdate, DateTime lastUpdate2)
@@ -2322,7 +1195,7 @@ namespace USWsLibrary.Services
 			PagedList<BAN_BANCOS_CARDEX> banBancoCardex = new PagedList<BAN_BANCOS_CARDEX>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				banBancoCardex.Results = db.BAN_BANCOS_CARDEX.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				banBancoCardex.Results = db.BAN_BANCOS_CARDEX.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				banBancoCardex.Total = banBancoCardex.Results.Count;
 				banBancoCardex.Count = banBancoCardex.Results.Count;
@@ -2333,44 +1206,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveBanBancosCardex(PagedList<BAN_BANCOS_CARDEX> banBancoCardex)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in banBancoCardex.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.BAN_BANCOS_CARDEX.Any(banbankCardex => banbankCardex.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.BAN_BANCOS_CARDEX.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (banBancoCardex == null || banBancoCardex.Results == null || banBancoCardex.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				banBancoCardex.Results,
+				"BAN_BANCOS_CARDEX",
+				x => x.ID,
+				db => db.BAN_BANCOS_CARDEX,
+				(db, keys) => new HashSet<string>(db.BAN_BANCOS_CARDEX.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<BAN_DEPOSITOS> listBanDepositos(DateTime lastUpdate, DateTime lastUpdate2)
@@ -2378,7 +1221,7 @@ namespace USWsLibrary.Services
 			PagedList<BAN_DEPOSITOS> banDepositos = new PagedList<BAN_DEPOSITOS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				banDepositos.Results = db.BAN_DEPOSITOS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				banDepositos.Results = db.BAN_DEPOSITOS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				banDepositos.Total = banDepositos.Results.Count;
 				banDepositos.Count = banDepositos.Results.Count;
@@ -2389,43 +1232,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveBanDepositos(PagedList<BAN_DEPOSITOS> banDepositos)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in banDepositos.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.BAN_DEPOSITOS.Any(banDeposito => banDeposito.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.BAN_DEPOSITOS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (banDepositos == null || banDepositos.Results == null || banDepositos.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				banDepositos.Results,
+				"BAN_DEPOSITOS",
+				x => x.ID,
+				db => db.BAN_DEPOSITOS,
+				(db, keys) => new HashSet<string>(db.BAN_DEPOSITOS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<BAN_DEPOSITOS_DT> listBanDepositosDt(DateTime lastUpdate, DateTime lastUpdate2)
@@ -2433,7 +1247,7 @@ namespace USWsLibrary.Services
 			PagedList<BAN_DEPOSITOS_DT> banDepositosDt = new PagedList<BAN_DEPOSITOS_DT>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				banDepositosDt.Results = db.BAN_DEPOSITOS_DT.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				banDepositosDt.Results = db.BAN_DEPOSITOS_DT.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				banDepositosDt.Total = banDepositosDt.Results.Count;
 				banDepositosDt.Count = banDepositosDt.Results.Count;
@@ -2444,43 +1258,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveBanDepositosDt(PagedList<BAN_DEPOSITOS_DT> banDepositosDt)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in banDepositosDt.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.BAN_DEPOSITOS_DT.Any(banDepositoDt => banDepositoDt.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.BAN_DEPOSITOS_DT.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (banDepositosDt == null || banDepositosDt.Results == null || banDepositosDt.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				banDepositosDt.Results,
+				"BAN_DEPOSITOS_DT",
+				x => x.ID,
+				db => db.BAN_DEPOSITOS_DT,
+				(db, keys) => new HashSet<string>(db.BAN_DEPOSITOS_DT.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -2489,8 +1274,8 @@ namespace USWsLibrary.Services
 			PagedList<BAN_DEPOSITOS_PAPELETAS> banDepositosDt = new PagedList<BAN_DEPOSITOS_PAPELETAS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				banDepositosDt.Results = db.BAN_DEPOSITOS_PAPELETAS.Where(e => e.CreadoDAte >= lastUpdate).ToList();
-				//banDepositosDt.Results = db.BAN_DEPOSITOS_PAPELETAS.Where(e => e.CreadoDate >= lastUpdate).ToList();
+				banDepositosDt.Results = db.BAN_DEPOSITOS_PAPELETAS.AsNoTracking().Where(e => e.CreadoDAte >= lastUpdate).ToList();
+				//banDepositosDt.Results = db.BAN_DEPOSITOS_PAPELETAS.AsNoTracking().Where(e => e.CreadoDate >= lastUpdate).ToList();
 				banDepositosDt.Total = banDepositosDt.Results.Count;
 				banDepositosDt.Count = banDepositosDt.Results.Count;
 			}
@@ -2500,43 +1285,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveBanDepositoPapeletas(PagedList<BAN_DEPOSITOS_PAPELETAS> banDepositosPapeletas)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage = "ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in banDepositosPapeletas.Results)
-					{
-						errorSave.errorMessage = errorSave.errorMessage + "\n" + "ID:  " + item.ID;
-
-						try
-						{
-							if (db.BAN_DEPOSITOS_PAPELETAS.Any(banDepositoPapelete => banDepositoPapelete.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.BAN_DEPOSITOS_PAPELETAS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (banDepositosPapeletas == null || banDepositosPapeletas.Results == null || banDepositosPapeletas.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				banDepositosPapeletas.Results,
+				"BAN_DEPOSITOS_PAPELETAS",
+				x => x.ID,
+				db => db.BAN_DEPOSITOS_PAPELETAS,
+				(db, keys) => new HashSet<string>(db.BAN_DEPOSITOS_PAPELETAS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<COM_FACTURAS> listComFacturas(DateTime lastUpdate, DateTime lastUpdate2)
@@ -2544,7 +1300,7 @@ namespace USWsLibrary.Services
 			PagedList<COM_FACTURAS> comFacturas = new PagedList<COM_FACTURAS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				comFacturas.Results = db.COM_FACTURAS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				comFacturas.Results = db.COM_FACTURAS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				comFacturas.Total = comFacturas.Results.Count;
 				comFacturas.Count = comFacturas.Results.Count;
@@ -2555,43 +1311,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveComFacturas(PagedList<COM_FACTURAS> comFacturas)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in comFacturas.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.COM_FACTURAS.Any(comFactura => comFactura.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.COM_FACTURAS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (comFacturas == null || comFacturas.Results == null || comFacturas.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				comFacturas.Results,
+				"COM_FACTURAS",
+				x => x.ID,
+				db => db.COM_FACTURAS,
+				(db, keys) => new HashSet<string>(db.COM_FACTURAS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<COM_FACTURAS_DT> listComFacturasDt(DateTime lastUpdate, DateTime lastUpdate2)
@@ -2599,7 +1326,7 @@ namespace USWsLibrary.Services
 			PagedList<COM_FACTURAS_DT> comFacturasDt = new PagedList<COM_FACTURAS_DT>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				comFacturasDt.Results = db.COM_FACTURAS_DT.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				comFacturasDt.Results = db.COM_FACTURAS_DT.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				comFacturasDt.Total = comFacturasDt.Results.Count;
 				comFacturasDt.Count = comFacturasDt.Results.Count;
@@ -2610,43 +1337,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveComFacturasDt(PagedList<COM_FACTURAS_DT> comFacturasDt)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in comFacturasDt.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.COM_FACTURAS_DT.Any(comFacturaDt => comFacturaDt.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.COM_FACTURAS_DT.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (comFacturasDt == null || comFacturasDt.Results == null || comFacturasDt.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				comFacturasDt.Results,
+				"COM_FACTURAS_DT",
+				x => x.ID,
+				db => db.COM_FACTURAS_DT,
+				(db, keys) => new HashSet<string>(db.COM_FACTURAS_DT.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<COM_FACTURAS_PAGOS> listComFacturasPagos(DateTime lastUpdate, DateTime lastUpdate2)
@@ -2654,7 +1352,7 @@ namespace USWsLibrary.Services
 			PagedList<COM_FACTURAS_PAGOS> comFacturasPagos = new PagedList<COM_FACTURAS_PAGOS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				comFacturasPagos.Results = db.COM_FACTURAS_PAGOS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				comFacturasPagos.Results = db.COM_FACTURAS_PAGOS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				comFacturasPagos.Total = comFacturasPagos.Results.Count;
 				comFacturasPagos.Count = comFacturasPagos.Results.Count;
@@ -2665,43 +1363,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveComFacturasPagos(PagedList<COM_FACTURAS_PAGOS> comFacturasPagos)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in comFacturasPagos.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.COM_FACTURAS_PAGOS.Any(comFacturaPago => comFacturaPago.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.COM_FACTURAS_PAGOS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (comFacturasPagos == null || comFacturasPagos.Results == null || comFacturasPagos.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				comFacturasPagos.Results,
+				"COM_FACTURAS_PAGOS",
+				x => x.ID,
+				db => db.COM_FACTURAS_PAGOS,
+				(db, keys) => new HashSet<string>(db.COM_FACTURAS_PAGOS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -2711,7 +1380,7 @@ namespace USWsLibrary.Services
 			PagedList<ACR_RETENCIONES> acrRetenciones = new PagedList<ACR_RETENCIONES>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				acrRetenciones.Results = db.ACR_RETENCIONES.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				acrRetenciones.Results = db.ACR_RETENCIONES.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				acrRetenciones.Total = acrRetenciones.Results.Count;
 				acrRetenciones.Count = acrRetenciones.Results.Count;
@@ -2722,43 +1391,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveAcrRetenciones(PagedList<ACR_RETENCIONES> acrRetenciones)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in acrRetenciones.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.ACR_RETENCIONES.Any(acrRetencion => acrRetencion.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.ACR_RETENCIONES.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (acrRetenciones == null || acrRetenciones.Results == null || acrRetenciones.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				acrRetenciones.Results,
+				"ACR_RETENCIONES",
+				x => x.ID,
+				db => db.ACR_RETENCIONES,
+				(db, keys) => new HashSet<string>(db.ACR_RETENCIONES.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -2770,7 +1410,7 @@ namespace USWsLibrary.Services
 			PagedList<ACR_RETENCIONES_DT> acrRetencionesDt = new PagedList<ACR_RETENCIONES_DT>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				acrRetencionesDt.Results = db.ACR_RETENCIONES_DT.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				acrRetencionesDt.Results = db.ACR_RETENCIONES_DT.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				acrRetencionesDt.Total = acrRetencionesDt.Results.Count;
 				acrRetencionesDt.Count = acrRetencionesDt.Results.Count;
@@ -2781,44 +1421,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveAcrRetencionesDt(PagedList<ACR_RETENCIONES_DT> acrRetencionesDt)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in acrRetencionesDt.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.ACR_RETENCIONES_DT.Any(acrRetencionDt => acrRetencionDt.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.ACR_RETENCIONES_DT.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (acrRetencionesDt == null || acrRetencionesDt.Results == null || acrRetencionesDt.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				acrRetencionesDt.Results,
+				"ACR_RETENCIONES_DT",
+				x => x.ID,
+				db => db.ACR_RETENCIONES_DT,
+				(db, keys) => new HashSet<string>(db.ACR_RETENCIONES_DT.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<ACR_RETENCIONES_DEUDAS> listAcrRetencionesDeudas(DateTime lastUpdate, DateTime lastUpdate2)
@@ -2826,7 +1436,7 @@ namespace USWsLibrary.Services
 			PagedList<ACR_RETENCIONES_DEUDAS> acrRetencionesDeudas = new PagedList<ACR_RETENCIONES_DEUDAS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				acrRetencionesDeudas.Results = db.ACR_RETENCIONES_DEUDAS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				acrRetencionesDeudas.Results = db.ACR_RETENCIONES_DEUDAS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				acrRetencionesDeudas.Total = acrRetencionesDeudas.Results.Count;
 				acrRetencionesDeudas.Count = acrRetencionesDeudas.Results.Count;
@@ -2838,43 +1448,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveAcrRetencionesDeudas(PagedList<ACR_RETENCIONES_DEUDAS> acrRetencionesDeudas)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in acrRetencionesDeudas.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.ACR_RETENCIONES_DEUDAS.Any(acrRetencionDeuda => acrRetencionDeuda.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.ACR_RETENCIONES_DEUDAS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (acrRetencionesDeudas == null || acrRetencionesDeudas.Results == null || acrRetencionesDeudas.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				acrRetencionesDeudas.Results,
+				"ACR_RETENCIONES_DEUDAS",
+				x => x.ID,
+				db => db.ACR_RETENCIONES_DEUDAS,
+				(db, keys) => new HashSet<string>(db.ACR_RETENCIONES_DEUDAS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -2884,7 +1465,7 @@ namespace USWsLibrary.Services
 			PagedList<ACR_ACREEDORES_DEUDAS> acrAcreedoresDeudas = new PagedList<ACR_ACREEDORES_DEUDAS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				acrAcreedoresDeudas.Results = db.ACR_ACREEDORES_DEUDAS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				acrAcreedoresDeudas.Results = db.ACR_ACREEDORES_DEUDAS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				acrAcreedoresDeudas.Total = acrAcreedoresDeudas.Results.Count;
 				acrAcreedoresDeudas.Count = acrAcreedoresDeudas.Results.Count;
@@ -2895,43 +1476,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveAcrAcreedoresDeudas(PagedList<ACR_ACREEDORES_DEUDAS> acrAcreedoresDeudas)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in acrAcreedoresDeudas.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.ACR_ACREEDORES_DEUDAS.Any(acrAcreedorDeuda => acrAcreedorDeuda.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.ACR_ACREEDORES_DEUDAS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (acrAcreedoresDeudas == null || acrAcreedoresDeudas.Results == null || acrAcreedoresDeudas.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				acrAcreedoresDeudas.Results,
+				"ACR_ACREEDORES_DEUDAS",
+				x => x.ID,
+				db => db.ACR_ACREEDORES_DEUDAS,
+				(db, keys) => new HashSet<string>(db.ACR_ACREEDORES_DEUDAS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<PRV_FACTURAS> listPvrFacturas(DateTime lastUpdate, DateTime lastUpdate2)
@@ -2939,7 +1491,7 @@ namespace USWsLibrary.Services
 			PagedList<PRV_FACTURAS> pvrFacturas = new PagedList<PRV_FACTURAS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				pvrFacturas.Results = db.PRV_FACTURAS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				pvrFacturas.Results = db.PRV_FACTURAS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				pvrFacturas.Total = pvrFacturas.Results.Count;
 				pvrFacturas.Count = pvrFacturas.Results.Count;
@@ -2950,44 +1502,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave savePvrFacturas(PagedList<PRV_FACTURAS> pvrFacturas)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-
-					foreach (var item in pvrFacturas.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.PRV_FACTURAS.Any(prvFactura => prvFactura.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.PRV_FACTURAS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (pvrFacturas == null || pvrFacturas.Results == null || pvrFacturas.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				pvrFacturas.Results,
+				"PRV_FACTURAS",
+				x => x.ID,
+				db => db.PRV_FACTURAS,
+				(db, keys) => new HashSet<string>(db.PRV_FACTURAS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -2996,7 +1518,7 @@ namespace USWsLibrary.Services
 			PagedList<PRV_FACTURAS_DT> pvrFacturasDt = new PagedList<PRV_FACTURAS_DT>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				pvrFacturasDt.Results = db.PRV_FACTURAS_DT.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				pvrFacturasDt.Results = db.PRV_FACTURAS_DT.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				pvrFacturasDt.Total = pvrFacturasDt.Results.Count;
 				pvrFacturasDt.Count = pvrFacturasDt.Results.Count;
@@ -3007,44 +1529,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave savePvrFacturasDt(PagedList<PRV_FACTURAS_DT> pvrFacturasDt)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in pvrFacturasDt.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.PRV_FACTURAS_DT.Any(prvFacturaDt => prvFacturaDt.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.PRV_FACTURAS_DT.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (pvrFacturasDt == null || pvrFacturasDt.Results == null || pvrFacturasDt.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				pvrFacturasDt.Results,
+				"PRV_FACTURAS_DT",
+				x => x.ID,
+				db => db.PRV_FACTURAS_DT,
+				(db, keys) => new HashSet<string>(db.PRV_FACTURAS_DT.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -3054,7 +1546,7 @@ namespace USWsLibrary.Services
 			PagedList<PRV_FACTURASCTA_DT> pvrFacturasCtaDt = new PagedList<PRV_FACTURASCTA_DT>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				pvrFacturasCtaDt.Results = db.PRV_FACTURASCTA_DT.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				pvrFacturasCtaDt.Results = db.PRV_FACTURASCTA_DT.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				pvrFacturasCtaDt.Total = pvrFacturasCtaDt.Results.Count;
 				pvrFacturasCtaDt.Count = pvrFacturasCtaDt.Results.Count;
@@ -3065,43 +1557,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave savePvrFacturasCtaDt(PagedList<PRV_FACTURASCTA_DT> pvrFacturasCtaDt)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in pvrFacturasCtaDt.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.PRV_FACTURASCTA_DT.Any(prvFacturaCtaDt => prvFacturaCtaDt.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.PRV_FACTURASCTA_DT.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (pvrFacturasCtaDt == null || pvrFacturasCtaDt.Results == null || pvrFacturasCtaDt.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				pvrFacturasCtaDt.Results,
+				"PRV_FACTURASCTA_DT",
+				x => x.ID,
+				db => db.PRV_FACTURASCTA_DT,
+				(db, keys) => new HashSet<string>(db.PRV_FACTURASCTA_DT.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<EMP_ROLES> listEmpRoles(DateTime lastUpdate, DateTime lastUpdate2)
@@ -3109,7 +1572,7 @@ namespace USWsLibrary.Services
 			PagedList<EMP_ROLES> empRoles = new PagedList<EMP_ROLES>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				empRoles.Results = db.EMP_ROLES.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				empRoles.Results = db.EMP_ROLES.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				empRoles.Total = empRoles.Results.Count;
 				empRoles.Count = empRoles.Results.Count;
@@ -3119,44 +1582,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveEmpRoles(PagedList<EMP_ROLES> empRoles)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in empRoles.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.EMP_ROLES.Any(empRol => empRol.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.EMP_ROLES.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (empRoles == null || empRoles.Results == null || empRoles.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				empRoles.Results,
+				"EMP_ROLES",
+				x => x.ID,
+				db => db.EMP_ROLES,
+				(db, keys) => new HashSet<string>(db.EMP_ROLES.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -3166,7 +1599,7 @@ namespace USWsLibrary.Services
 			PagedList<EMP_ROLES_EMPLEADOS> empRolesEmpleados = new PagedList<EMP_ROLES_EMPLEADOS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				empRolesEmpleados.Results = db.EMP_ROLES_EMPLEADOS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				empRolesEmpleados.Results = db.EMP_ROLES_EMPLEADOS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				empRolesEmpleados.Total = empRolesEmpleados.Results.Count;
 				empRolesEmpleados.Count = empRolesEmpleados.Results.Count;
@@ -3177,43 +1610,23 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveEmpRolesEmpleados(PagedList<EMP_ROLES_EMPLEADOS> empRolesEmpleados)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
+			if (empRolesEmpleados == null || empRolesEmpleados.Results == null || empRolesEmpleados.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSaveComposite(
+				empRolesEmpleados.Results,
+				"EMP_ROLES_EMPLEADOS",
+				x => x.RolID + "|" + x.EmpleadoID,
+				db => db.EMP_ROLES_EMPLEADOS,
+				(db, chunk) =>
 				{
-					foreach (var item in empRolesEmpleados.Results)
-					{
-						errorSave.errorMessage=item.RolID;
-
-						try
-						{
-							if (db.EMP_ROLES_EMPLEADOS.Any(empRolEmpleado => empRolEmpleado.RolID == item.RolID && empRolEmpleado.EmpleadoID == item.EmpleadoID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.EMP_ROLES_EMPLEADOS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
+					var rolIds = chunk.Select(c => c.RolID).Distinct().ToList();
+					var empIds = chunk.Select(c => c.EmpleadoID).Distinct().ToList();
+					var existing = db.EMP_ROLES_EMPLEADOS
+						.Where(x => rolIds.Contains(x.RolID) && empIds.Contains(x.EmpleadoID))
+						.Select(x => new { x.RolID, x.EmpleadoID })
+						.ToList();
+					return new HashSet<string>(existing.Select(x => x.RolID + "|" + x.EmpleadoID));
 				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			);
 		}
 
 		public PagedList<EMP_ROLES_RUBROS> listEmpRolesRubros(DateTime lastUpdate, DateTime lastUpdate2)
@@ -3221,7 +1634,7 @@ namespace USWsLibrary.Services
 			PagedList<EMP_ROLES_RUBROS> empRolesRubros = new PagedList<EMP_ROLES_RUBROS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				empRolesRubros.Results = db.EMP_ROLES_RUBROS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				empRolesRubros.Results = db.EMP_ROLES_RUBROS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				empRolesRubros.Total = empRolesRubros.Results.Count;
 				empRolesRubros.Count = empRolesRubros.Results.Count;
@@ -3232,43 +1645,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveEmpRolesRubros(PagedList<EMP_ROLES_RUBROS> empRolesRubros)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in empRolesRubros.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.EMP_ROLES_RUBROS.Any(empRolRubro => empRolRubro.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.EMP_ROLES_RUBROS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (empRolesRubros == null || empRolesRubros.Results == null || empRolesRubros.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				empRolesRubros.Results,
+				"EMP_ROLES_RUBROS",
+				x => x.ID,
+				db => db.EMP_ROLES_RUBROS,
+				(db, keys) => new HashSet<string>(db.EMP_ROLES_RUBROS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<EMP_EMPLEADOS_DEUDAS> listEmpEmpleadosDeudas(DateTime lastUpdate, DateTime lastUpdate2)
@@ -3276,7 +1660,7 @@ namespace USWsLibrary.Services
 			PagedList<EMP_EMPLEADOS_DEUDAS> empEmpleadosDeudas = new PagedList<EMP_EMPLEADOS_DEUDAS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				empEmpleadosDeudas.Results = db.EMP_EMPLEADOS_DEUDAS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				empEmpleadosDeudas.Results = db.EMP_EMPLEADOS_DEUDAS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				empEmpleadosDeudas.Total = empEmpleadosDeudas.Results.Count;
 				empEmpleadosDeudas.Count = empEmpleadosDeudas.Results.Count;
@@ -3287,43 +1671,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveEmpEmpleadosDeudas(PagedList<EMP_EMPLEADOS_DEUDAS> empEmpleadosDeudas)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in empEmpleadosDeudas.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.EMP_EMPLEADOS_DEUDAS.Any(empEmpleadoDeuda => empEmpleadoDeuda.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.EMP_EMPLEADOS_DEUDAS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (empEmpleadosDeudas == null || empEmpleadosDeudas.Results == null || empEmpleadosDeudas.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				empEmpleadosDeudas.Results,
+				"EMP_EMPLEADOS_DEUDAS",
+				x => x.ID,
+				db => db.EMP_EMPLEADOS_DEUDAS,
+				(db, keys) => new HashSet<string>(db.EMP_EMPLEADOS_DEUDAS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -3333,7 +1688,7 @@ namespace USWsLibrary.Services
 			PagedList<EMP_EMPLEADOS_HORAS> empEmpleadosHoras = new PagedList<EMP_EMPLEADOS_HORAS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				empEmpleadosHoras.Results = db.EMP_EMPLEADOS_HORAS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				empEmpleadosHoras.Results = db.EMP_EMPLEADOS_HORAS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				empEmpleadosHoras.Total = empEmpleadosHoras.Results.Count;
 				empEmpleadosHoras.Count = empEmpleadosHoras.Results.Count;
@@ -3344,44 +1699,22 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveEmpEmpleadosHoras(PagedList<EMP_EMPLEADOS_HORAS> empEmpleadosHoras)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
+			if (empEmpleadosHoras == null || empEmpleadosHoras.Results == null || empEmpleadosHoras.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSaveComposite(
+				empEmpleadosHoras.Results,
+				"EMP_EMPLEADOS_HORAS",
+				x => x.Año + "|" + x.Mes + "|" + x.EmpleadoID,
+				db => db.EMP_EMPLEADOS_HORAS,
+				(db, chunk) =>
 				{
-					foreach (var item in empEmpleadosHoras.Results)
-					{
-						errorSave.errorMessage=item.EmpleadoID;
-
-						try
-						{
-							if (db.EMP_EMPLEADOS_HORAS.Any(empEmpleadoHora => empEmpleadoHora.Año == item.Año
-						&& empEmpleadoHora.Mes == item.Mes && empEmpleadoHora.EmpleadoID == item.EmpleadoID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.EMP_EMPLEADOS_HORAS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
+					var empIds = chunk.Select(c => c.EmpleadoID).Distinct().ToList();
+					var existing = db.EMP_EMPLEADOS_HORAS
+						.Where(x => empIds.Contains(x.EmpleadoID))
+						.Select(x => new { x.Año, x.Mes, x.EmpleadoID })
+						.ToList();
+					return new HashSet<string>(existing.Select(x => x.Año + "|" + x.Mes + "|" + x.EmpleadoID));
 				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			);
 		}
 
 
@@ -3391,7 +1724,7 @@ namespace USWsLibrary.Services
 			PagedList<EMP_DEBITOS> empDebitos = new PagedList<EMP_DEBITOS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				empDebitos.Results = db.EMP_DEBITOS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				empDebitos.Results = db.EMP_DEBITOS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				empDebitos.Total = empDebitos.Results.Count;
 				empDebitos.Count = empDebitos.Results.Count;
@@ -3402,43 +1735,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveEmpDebitos(PagedList<EMP_DEBITOS> empDebitos)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in empDebitos.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.EMP_DEBITOS.Any(empDebito => empDebito.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.EMP_DEBITOS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (empDebitos == null || empDebitos.Results == null || empDebitos.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				empDebitos.Results,
+				"EMP_DEBITOS",
+				x => x.ID,
+				db => db.EMP_DEBITOS,
+				(db, keys) => new HashSet<string>(db.EMP_DEBITOS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -3449,7 +1753,7 @@ namespace USWsLibrary.Services
 			PagedList<EMP_DEBITOS_RUBROS> empDebitosRubros = new PagedList<EMP_DEBITOS_RUBROS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				empDebitosRubros.Results = db.EMP_DEBITOS_RUBROS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				empDebitosRubros.Results = db.EMP_DEBITOS_RUBROS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				empDebitosRubros.Total = empDebitosRubros.Results.Count;
 				empDebitosRubros.Count = empDebitosRubros.Results.Count;
@@ -3460,44 +1764,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveEmpDebitosRubros(PagedList<EMP_DEBITOS_RUBROS> empDebitosRubros)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in empDebitosRubros.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.EMP_DEBITOS_RUBROS.Any(empDebitoRubro => empDebitoRubro.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.EMP_DEBITOS_RUBROS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (empDebitosRubros == null || empDebitosRubros.Results == null || empDebitosRubros.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				empDebitosRubros.Results,
+				"EMP_DEBITOS_RUBROS",
+				x => x.ID,
+				db => db.EMP_DEBITOS_RUBROS,
+				(db, keys) => new HashSet<string>(db.EMP_DEBITOS_RUBROS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -3507,7 +1781,7 @@ namespace USWsLibrary.Services
 			PagedList<CLI_GRUPOS> cliGrupos = new PagedList<CLI_GRUPOS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				cliGrupos.Results = db.CLI_GRUPOS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				cliGrupos.Results = db.CLI_GRUPOS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				cliGrupos.Total = cliGrupos.Results.Count;
 				cliGrupos.Count = cliGrupos.Results.Count;
@@ -3518,43 +1792,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveCliGrupos(PagedList<CLI_GRUPOS> cliGrupos)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in cliGrupos.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.CLI_GRUPOS.Any(cliGrupo => cliGrupo.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.CLI_GRUPOS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (cliGrupos == null || cliGrupos.Results == null || cliGrupos.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				cliGrupos.Results,
+				"CLI_GRUPOS",
+				x => x.ID,
+				db => db.CLI_GRUPOS,
+				(db, keys) => new HashSet<string>(db.CLI_GRUPOS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<INV_BODEGAS> listInvBodegas(DateTime lastUpdate, DateTime lastUpdate2)
@@ -3562,7 +1807,7 @@ namespace USWsLibrary.Services
 			PagedList<INV_BODEGAS> invBodegas = new PagedList<INV_BODEGAS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				invBodegas.Results = db.INV_BODEGAS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				invBodegas.Results = db.INV_BODEGAS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				invBodegas.Total = invBodegas.Results.Count;
 				invBodegas.Count = invBodegas.Results.Count;
@@ -3573,43 +1818,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveInvBodegas(PagedList<INV_BODEGAS> invBodegas)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in invBodegas.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.INV_BODEGAS.Any(invBodega => invBodega.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.INV_BODEGAS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (invBodegas == null || invBodegas.Results == null || invBodegas.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				invBodegas.Results,
+				"INV_BODEGAS",
+				x => x.ID,
+				db => db.INV_BODEGAS,
+				(db, keys) => new HashSet<string>(db.INV_BODEGAS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -3618,7 +1834,7 @@ namespace USWsLibrary.Services
 			PagedList<INV_PRODUCTOS_EXHIBICION> inProductosExhibicion = new PagedList<INV_PRODUCTOS_EXHIBICION>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				inProductosExhibicion.Results = db.INV_PRODUCTOS_EXHIBICION.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				inProductosExhibicion.Results = db.INV_PRODUCTOS_EXHIBICION.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				inProductosExhibicion.Total = inProductosExhibicion.Results.Count;
 				inProductosExhibicion.Count = inProductosExhibicion.Results.Count;
@@ -3673,7 +1889,7 @@ namespace USWsLibrary.Services
 			PagedList<ACR_CREDITOS> empDebitosRubros = new PagedList<ACR_CREDITOS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				empDebitosRubros.Results = db.ACR_CREDITOS.Where(e => e.Fecha >= lastUpdate).ToList();
+				empDebitosRubros.Results = db.ACR_CREDITOS.AsNoTracking().Where(e => e.Fecha >= lastUpdate).ToList();
 
 				empDebitosRubros.Total = empDebitosRubros.Results.Count;
 				empDebitosRubros.Count = empDebitosRubros.Results.Count;
@@ -3684,43 +1900,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveAcrCreditos(PagedList<ACR_CREDITOS> empDebitosRubros)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in empDebitosRubros.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.ACR_CREDITOS.Any(empDebitoRubro => empDebitoRubro.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.ACR_CREDITOS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (empDebitosRubros == null || empDebitosRubros.Results == null || empDebitosRubros.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				empDebitosRubros.Results,
+				"ACR_CREDITOS",
+				x => x.ID,
+				db => db.ACR_CREDITOS,
+				(db, keys) => new HashSet<string>(db.ACR_CREDITOS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<ACR_CREDITOS_DEUDAS> listAcrCreditosDeudas(DateTime lastUpdate, DateTime lastUpdate2)
@@ -3728,7 +1915,7 @@ namespace USWsLibrary.Services
 			PagedList<ACR_CREDITOS_DEUDAS> acrCreditosDeudas = new PagedList<ACR_CREDITOS_DEUDAS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				acrCreditosDeudas.Results = db.ACR_CREDITOS_DEUDAS.Where(e => e.CreadoDate >= lastUpdate).ToList();
+				acrCreditosDeudas.Results = db.ACR_CREDITOS_DEUDAS.AsNoTracking().Where(e => e.CreadoDate >= lastUpdate).ToList();
 
 				acrCreditosDeudas.Total = acrCreditosDeudas.Results.Count;
 				acrCreditosDeudas.Count = acrCreditosDeudas.Results.Count;
@@ -3739,43 +1926,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveAcrCreditosDeudas(PagedList<ACR_CREDITOS_DEUDAS> acrCreditosDeudas)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in acrCreditosDeudas.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.ACR_CREDITOS_DEUDAS.Any(acrCreditosDeuda => acrCreditosDeuda.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.ACR_CREDITOS_DEUDAS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (acrCreditosDeudas == null || acrCreditosDeudas.Results == null || acrCreditosDeudas.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				acrCreditosDeudas.Results,
+				"ACR_CREDITOS_DEUDAS",
+				x => x.ID,
+				db => db.ACR_CREDITOS_DEUDAS,
+				(db, keys) => new HashSet<string>(db.ACR_CREDITOS_DEUDAS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -3785,7 +1943,7 @@ namespace USWsLibrary.Services
 			PagedList<ACR_CREDITOS_RUBROS> acrCreditosRubros = new PagedList<ACR_CREDITOS_RUBROS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				acrCreditosRubros.Results = db.ACR_CREDITOS_RUBROS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				acrCreditosRubros.Results = db.ACR_CREDITOS_RUBROS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				acrCreditosRubros.Total = acrCreditosRubros.Results.Count;
 				acrCreditosRubros.Count = acrCreditosRubros.Results.Count;
@@ -3796,43 +1954,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveAcrCreditosRubros(PagedList<ACR_CREDITOS_RUBROS> acrCreditosRubros)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in acrCreditosRubros.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.ACR_CREDITOS_RUBROS.Any(acrCreditoRubro => acrCreditoRubro.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.ACR_CREDITOS_RUBROS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (acrCreditosRubros == null || acrCreditosRubros.Results == null || acrCreditosRubros.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				acrCreditosRubros.Results,
+				"ACR_CREDITOS_RUBROS",
+				x => x.ID,
+				db => db.ACR_CREDITOS_RUBROS,
+				(db, keys) => new HashSet<string>(db.ACR_CREDITOS_RUBROS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -3842,7 +1971,7 @@ namespace USWsLibrary.Services
 			PagedList<ACR_DEBITOS> acrDebitos = new PagedList<ACR_DEBITOS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				acrDebitos.Results = db.ACR_DEBITOS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				acrDebitos.Results = db.ACR_DEBITOS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				acrDebitos.Total = acrDebitos.Results.Count;
 				acrDebitos.Count = acrDebitos.Results.Count;
@@ -3853,43 +1982,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveAcrDebitos(PagedList<ACR_DEBITOS> acrDebitos)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in acrDebitos.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.ACR_DEBITOS.Any(acrDebito => acrDebito.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.ACR_DEBITOS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (acrDebitos == null || acrDebitos.Results == null || acrDebitos.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				acrDebitos.Results,
+				"ACR_DEBITOS",
+				x => x.ID,
+				db => db.ACR_DEBITOS,
+				(db, keys) => new HashSet<string>(db.ACR_DEBITOS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -3899,7 +1999,7 @@ namespace USWsLibrary.Services
 			PagedList<ACR_DEBITOS_DEUDAS> acrDebitosDeudas = new PagedList<ACR_DEBITOS_DEUDAS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				acrDebitosDeudas.Results = db.ACR_DEBITOS_DEUDAS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				acrDebitosDeudas.Results = db.ACR_DEBITOS_DEUDAS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				acrDebitosDeudas.Total = acrDebitosDeudas.Results.Count;
 				acrDebitosDeudas.Count = acrDebitosDeudas.Results.Count;
@@ -3910,43 +2010,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveAcrDebitosDeudas(PagedList<ACR_DEBITOS_DEUDAS> acrDebitosDeudas)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in acrDebitosDeudas.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.ACR_DEBITOS_DEUDAS.Any(acrDebitosDeuda => acrDebitosDeuda.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.ACR_DEBITOS_DEUDAS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (acrDebitosDeudas == null || acrDebitosDeudas.Results == null || acrDebitosDeudas.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				acrDebitosDeudas.Results,
+				"ACR_DEBITOS_DEUDAS",
+				x => x.ID,
+				db => db.ACR_DEBITOS_DEUDAS,
+				(db, keys) => new HashSet<string>(db.ACR_DEBITOS_DEUDAS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -3956,7 +2027,7 @@ namespace USWsLibrary.Services
 			PagedList<ACR_DEBITOS_RUBROS> acrDebitosRubros = new PagedList<ACR_DEBITOS_RUBROS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				acrDebitosRubros.Results = db.ACR_DEBITOS_RUBROS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				acrDebitosRubros.Results = db.ACR_DEBITOS_RUBROS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				acrDebitosRubros.Total = acrDebitosRubros.Results.Count;
 				acrDebitosRubros.Count = acrDebitosRubros.Results.Count;
@@ -3967,43 +2038,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveAcrDebitoRubros(PagedList<ACR_DEBITOS_RUBROS> acrDebitosRubros)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in acrDebitosRubros.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.ACR_DEBITOS_RUBROS.Any(acrDebitosRubro => acrDebitosRubro.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.ACR_DEBITOS_RUBROS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (acrDebitosRubros == null || acrDebitosRubros.Results == null || acrDebitosRubros.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				acrDebitosRubros.Results,
+				"ACR_DEBITOS_RUBROS",
+				x => x.ID,
+				db => db.ACR_DEBITOS_RUBROS,
+				(db, keys) => new HashSet<string>(db.ACR_DEBITOS_RUBROS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -4012,7 +2054,7 @@ namespace USWsLibrary.Services
 			PagedList<ACR_DEBITOS_PRODUCTOS> acrDebitosProductos = new PagedList<ACR_DEBITOS_PRODUCTOS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				acrDebitosProductos.Results = db.ACR_DEBITOS_PRODUCTOS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				acrDebitosProductos.Results = db.ACR_DEBITOS_PRODUCTOS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				acrDebitosProductos.Total = acrDebitosProductos.Results.Count;
 				acrDebitosProductos.Count = acrDebitosProductos.Results.Count;
@@ -4023,43 +2065,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveAcrDebitosProductos(PagedList<ACR_DEBITOS_PRODUCTOS> acrDebitosProductos)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in acrDebitosProductos.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.ACR_DEBITOS_PRODUCTOS.Any(acrDebitosProducto => acrDebitosProducto.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.ACR_DEBITOS_PRODUCTOS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (acrDebitosProductos == null || acrDebitosProductos.Results == null || acrDebitosProductos.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				acrDebitosProductos.Results,
+				"ACR_DEBITOS_PRODUCTOS",
+				x => x.ID,
+				db => db.ACR_DEBITOS_PRODUCTOS,
+				(db, keys) => new HashSet<string>(db.ACR_DEBITOS_PRODUCTOS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -4069,7 +2082,7 @@ namespace USWsLibrary.Services
 			PagedList<ACR_RECIBOS> acrRecibos = new PagedList<ACR_RECIBOS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				acrRecibos.Results = db.ACR_RECIBOS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				acrRecibos.Results = db.ACR_RECIBOS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				acrRecibos.Total = acrRecibos.Results.Count;
 				acrRecibos.Count = acrRecibos.Results.Count;
@@ -4080,43 +2093,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveAcrRecibos(PagedList<ACR_RECIBOS> acrRecibos)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in acrRecibos.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.ACR_RECIBOS.Any(acrRecibo => acrRecibo.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.ACR_RECIBOS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (acrRecibos == null || acrRecibos.Results == null || acrRecibos.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				acrRecibos.Results,
+				"ACR_RECIBOS",
+				x => x.ID,
+				db => db.ACR_RECIBOS,
+				(db, keys) => new HashSet<string>(db.ACR_RECIBOS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -4125,7 +2109,7 @@ namespace USWsLibrary.Services
 			PagedList<ACR_RECIBOS_DT> acrRecibosDt = new PagedList<ACR_RECIBOS_DT>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				acrRecibosDt.Results = db.ACR_RECIBOS_DT.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				acrRecibosDt.Results = db.ACR_RECIBOS_DT.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				acrRecibosDt.Total = acrRecibosDt.Results.Count;
 				acrRecibosDt.Count = acrRecibosDt.Results.Count;
@@ -4137,43 +2121,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveAcrRecibosDt(PagedList<ACR_RECIBOS_DT> acrRecibosDt)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in acrRecibosDt.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.ACR_RECIBOS_DT.Any(acrReciboDt => acrReciboDt.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.ACR_RECIBOS_DT.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (acrRecibosDt == null || acrRecibosDt.Results == null || acrRecibosDt.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				acrRecibosDt.Results,
+				"ACR_RECIBOS_DT",
+				x => x.ID,
+				db => db.ACR_RECIBOS_DT,
+				(db, keys) => new HashSet<string>(db.ACR_RECIBOS_DT.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -4183,7 +2138,7 @@ namespace USWsLibrary.Services
 			PagedList<ACR_RECIBOS_DEUDAS> acrRecibosDeudas = new PagedList<ACR_RECIBOS_DEUDAS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				acrRecibosDeudas.Results = db.ACR_RECIBOS_DEUDAS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				acrRecibosDeudas.Results = db.ACR_RECIBOS_DEUDAS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				acrRecibosDeudas.Total = acrRecibosDeudas.Results.Count;
 				acrRecibosDeudas.Count = acrRecibosDeudas.Results.Count;
@@ -4194,43 +2149,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveAcrReciboDeudas(PagedList<ACR_RECIBOS_DEUDAS> acrRecibosDeudas)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in acrRecibosDeudas.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.ACR_RECIBOS_DEUDAS.Any(acrReciboDeuda => acrReciboDeuda.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.ACR_RECIBOS_DEUDAS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (acrRecibosDeudas == null || acrRecibosDeudas.Results == null || acrRecibosDeudas.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				acrRecibosDeudas.Results,
+				"ACR_RECIBOS_DEUDAS",
+				x => x.ID,
+				db => db.ACR_RECIBOS_DEUDAS,
+				(db, keys) => new HashSet<string>(db.ACR_RECIBOS_DEUDAS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<BAN_DEBITOS> listBanDebitos(DateTime lastUpdate, DateTime lastUpdate2)
@@ -4238,7 +2164,7 @@ namespace USWsLibrary.Services
 			PagedList<BAN_DEBITOS> banDebitos = new PagedList<BAN_DEBITOS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				banDebitos.Results = db.BAN_DEBITOS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				banDebitos.Results = db.BAN_DEBITOS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				banDebitos.Total = banDebitos.Results.Count;
 				banDebitos.Count = banDebitos.Results.Count;
@@ -4249,44 +2175,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveBanDebitos(PagedList<BAN_DEBITOS> banDebitos)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in banDebitos.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.BAN_DEBITOS.Any(banDebito => banDebito.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.BAN_DEBITOS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (banDebitos == null || banDebitos.Results == null || banDebitos.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				banDebitos.Results,
+				"BAN_DEBITOS",
+				x => x.ID,
+				db => db.BAN_DEBITOS,
+				(db, keys) => new HashSet<string>(db.BAN_DEBITOS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -4295,7 +2191,7 @@ namespace USWsLibrary.Services
 			PagedList<BAN_DEBITOS_CUENTAS> banDebitosCuentas = new PagedList<BAN_DEBITOS_CUENTAS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				banDebitosCuentas.Results = db.BAN_DEBITOS_CUENTAS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				banDebitosCuentas.Results = db.BAN_DEBITOS_CUENTAS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				banDebitosCuentas.Total = banDebitosCuentas.Results.Count;
 				banDebitosCuentas.Count = banDebitosCuentas.Results.Count;
@@ -4306,43 +2202,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveBanDebitosCuentas(PagedList<BAN_DEBITOS_CUENTAS> banDebitosCuentas)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in banDebitosCuentas.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.BAN_DEBITOS_CUENTAS.Any(banDebitoceunta => banDebitoceunta.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.BAN_DEBITOS_CUENTAS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (banDebitosCuentas == null || banDebitosCuentas.Results == null || banDebitosCuentas.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				banDebitosCuentas.Results,
+				"BAN_DEBITOS_CUENTAS",
+				x => x.ID,
+				db => db.BAN_DEBITOS_CUENTAS,
+				(db, keys) => new HashSet<string>(db.BAN_DEBITOS_CUENTAS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -4351,7 +2218,7 @@ namespace USWsLibrary.Services
 			PagedList<BAN_EGRESOS> banEgresos = new PagedList<BAN_EGRESOS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				banEgresos.Results = db.BAN_EGRESOS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				banEgresos.Results = db.BAN_EGRESOS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				banEgresos.Total = banEgresos.Results.Count;
 				banEgresos.Count = banEgresos.Results.Count;
@@ -4362,43 +2229,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave savebanEgresos(PagedList<BAN_EGRESOS> banEgresos)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in banEgresos.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.BAN_EGRESOS.Any(banEgreso => banEgreso.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.BAN_EGRESOS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (banEgresos == null || banEgresos.Results == null || banEgresos.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				banEgresos.Results,
+				"BAN_EGRESOS",
+				x => x.ID,
+				db => db.BAN_EGRESOS,
+				(db, keys) => new HashSet<string>(db.BAN_EGRESOS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -4407,7 +2245,7 @@ namespace USWsLibrary.Services
 			PagedList<BAN_EGRESOS_ANEXOS> banEgresosAnexos = new PagedList<BAN_EGRESOS_ANEXOS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				banEgresosAnexos.Results = db.BAN_EGRESOS_ANEXOS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				banEgresosAnexos.Results = db.BAN_EGRESOS_ANEXOS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				banEgresosAnexos.Total = banEgresosAnexos.Results.Count;
 				banEgresosAnexos.Count = banEgresosAnexos.Results.Count;
@@ -4418,43 +2256,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave savebanEgresosAnexos(PagedList<BAN_EGRESOS_ANEXOS> banEgresosAnexos)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in banEgresosAnexos.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.BAN_EGRESOS_ANEXOS.Any(banEgresoAnexo => banEgresoAnexo.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.BAN_EGRESOS_ANEXOS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (banEgresosAnexos == null || banEgresosAnexos.Results == null || banEgresosAnexos.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				banEgresosAnexos.Results,
+				"BAN_EGRESOS_ANEXOS",
+				x => x.ID,
+				db => db.BAN_EGRESOS_ANEXOS,
+				(db, keys) => new HashSet<string>(db.BAN_EGRESOS_ANEXOS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<BAN_EGRESOS_ANTICIPOS> listbanEgresosAnticipos(DateTime lastUpdate, DateTime lastUpdate2)
@@ -4462,7 +2271,7 @@ namespace USWsLibrary.Services
 			PagedList<BAN_EGRESOS_ANTICIPOS> banEgresosAnticipos = new PagedList<BAN_EGRESOS_ANTICIPOS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				banEgresosAnticipos.Results = db.BAN_EGRESOS_ANTICIPOS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				banEgresosAnticipos.Results = db.BAN_EGRESOS_ANTICIPOS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				banEgresosAnticipos.Total = banEgresosAnticipos.Results.Count;
 				banEgresosAnticipos.Count = banEgresosAnticipos.Results.Count;
@@ -4473,44 +2282,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave savebanEgresosAnticipos(PagedList<BAN_EGRESOS_ANTICIPOS> banEgresosAnticipos)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in banEgresosAnticipos.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.BAN_EGRESOS_ANTICIPOS.Any(banEgresoAnexoAnticipo => banEgresoAnexoAnticipo.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.BAN_EGRESOS_ANTICIPOS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (banEgresosAnticipos == null || banEgresosAnticipos.Results == null || banEgresosAnticipos.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				banEgresosAnticipos.Results,
+				"BAN_EGRESOS_ANTICIPOS",
+				x => x.ID,
+				db => db.BAN_EGRESOS_ANTICIPOS,
+				(db, keys) => new HashSet<string>(db.BAN_EGRESOS_ANTICIPOS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -4520,7 +2299,7 @@ namespace USWsLibrary.Services
 			PagedList<BAN_EGRESOS_CUENTAS> banEgresosCuentas = new PagedList<BAN_EGRESOS_CUENTAS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				banEgresosCuentas.Results = db.BAN_EGRESOS_CUENTAS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				banEgresosCuentas.Results = db.BAN_EGRESOS_CUENTAS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				banEgresosCuentas.Total = banEgresosCuentas.Results.Count;
 				banEgresosCuentas.Count = banEgresosCuentas.Results.Count;
@@ -4531,44 +2310,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave savebanEgresosCuentas(PagedList<BAN_EGRESOS_CUENTAS> banEgresosCuentas)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-
-					foreach (var item in banEgresosCuentas.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.BAN_EGRESOS_CUENTAS.Any(banEgresoCuenta => banEgresoCuenta.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.BAN_EGRESOS_CUENTAS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (banEgresosCuentas == null || banEgresosCuentas.Results == null || banEgresosCuentas.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				banEgresosCuentas.Results,
+				"BAN_EGRESOS_CUENTAS",
+				x => x.ID,
+				db => db.BAN_EGRESOS_CUENTAS,
+				(db, keys) => new HashSet<string>(db.BAN_EGRESOS_CUENTAS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -4577,7 +2326,7 @@ namespace USWsLibrary.Services
 			PagedList<BAN_EGRESOS_DEUDAS> banEgresosDeudas = new PagedList<BAN_EGRESOS_DEUDAS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				banEgresosDeudas.Results = db.BAN_EGRESOS_DEUDAS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				banEgresosDeudas.Results = db.BAN_EGRESOS_DEUDAS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				banEgresosDeudas.Total = banEgresosDeudas.Results.Count;
 				banEgresosDeudas.Count = banEgresosDeudas.Results.Count;
@@ -4588,44 +2337,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave savebanEgresosDeudas(PagedList<BAN_EGRESOS_DEUDAS> banEgresosDeudas)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in banEgresosDeudas.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.BAN_EGRESOS_DEUDAS.Any(banEgresoDeuda => banEgresoDeuda.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.BAN_EGRESOS_DEUDAS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (banEgresosDeudas == null || banEgresosDeudas.Results == null || banEgresosDeudas.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				banEgresosDeudas.Results,
+				"BAN_EGRESOS_DEUDAS",
+				x => x.ID,
+				db => db.BAN_EGRESOS_DEUDAS,
+				(db, keys) => new HashSet<string>(db.BAN_EGRESOS_DEUDAS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -4636,7 +2355,7 @@ namespace USWsLibrary.Services
 			PagedList<BAN_EGRESOS_DT> banEgresosDt = new PagedList<BAN_EGRESOS_DT>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				banEgresosDt.Results = db.BAN_EGRESOS_DT.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				banEgresosDt.Results = db.BAN_EGRESOS_DT.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				banEgresosDt.Total = banEgresosDt.Results.Count;
 				banEgresosDt.Count = banEgresosDt.Results.Count;
@@ -4647,43 +2366,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave savebanEgresosDt(PagedList<BAN_EGRESOS_DT> banEgresosDt)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in banEgresosDt.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.BAN_EGRESOS_DT.Any(banEgresoDeuda => banEgresoDeuda.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.BAN_EGRESOS_DT.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (banEgresosDt == null || banEgresosDt.Results == null || banEgresosDt.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				banEgresosDt.Results,
+				"BAN_EGRESOS_DT",
+				x => x.ID,
+				db => db.BAN_EGRESOS_DT,
+				(db, keys) => new HashSet<string>(db.BAN_EGRESOS_DT.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -4692,7 +2382,7 @@ namespace USWsLibrary.Services
 			PagedList<BAN_EGRESOS_PAGOS> banEgresosPagos = new PagedList<BAN_EGRESOS_PAGOS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				banEgresosPagos.Results = db.BAN_EGRESOS_PAGOS.Where(e => e.ExportadoDate > lastUpdate).ToList();
+				banEgresosPagos.Results = db.BAN_EGRESOS_PAGOS.AsNoTracking().Where(e => e.ExportadoDate > lastUpdate).ToList();
 
 				banEgresosPagos.Total = banEgresosPagos.Results.Count;
 				banEgresosPagos.Count = banEgresosPagos.Results.Count;
@@ -4703,44 +2393,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave savebanEgresosPagos(PagedList<BAN_EGRESOS_PAGOS> banEgresosPagos)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in banEgresosPagos.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.BAN_EGRESOS_PAGOS.Any(banEgresoDeuda => banEgresoDeuda.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.BAN_EGRESOS_PAGOS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (banEgresosPagos == null || banEgresosPagos.Results == null || banEgresosPagos.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				banEgresosPagos.Results,
+				"BAN_EGRESOS_PAGOS",
+				x => x.ID,
+				db => db.BAN_EGRESOS_PAGOS,
+				(db, keys) => new HashSet<string>(db.BAN_EGRESOS_PAGOS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<BAN_INGRESOS_CUENTAS> listbanIngresosCuentas(DateTime lastUpdate, DateTime lastUpdate2)
@@ -4748,7 +2408,7 @@ namespace USWsLibrary.Services
 			PagedList<BAN_INGRESOS_CUENTAS> banIngresosCuentas = new PagedList<BAN_INGRESOS_CUENTAS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				banIngresosCuentas.Results = db.BAN_INGRESOS_CUENTAS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				banIngresosCuentas.Results = db.BAN_INGRESOS_CUENTAS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				banIngresosCuentas.Total = banIngresosCuentas.Results.Count;
 				banIngresosCuentas.Count = banIngresosCuentas.Results.Count;
@@ -4758,43 +2418,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave savebanIngresosCuentas(PagedList<BAN_INGRESOS_CUENTAS> banIngresosCuentas)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in banIngresosCuentas.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.BAN_INGRESOS_CUENTAS.Any(banIngresoCuenta => banIngresoCuenta.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.BAN_INGRESOS_CUENTAS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (banIngresosCuentas == null || banIngresosCuentas.Results == null || banIngresosCuentas.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				banIngresosCuentas.Results,
+				"BAN_INGRESOS_CUENTAS",
+				x => x.ID,
+				db => db.BAN_INGRESOS_CUENTAS,
+				(db, keys) => new HashSet<string>(db.BAN_INGRESOS_CUENTAS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<BAN_INGRESOS_PINPAD> listBanIngresoPinpad(DateTime lastUpdate, DateTime lastUpdate2)
@@ -4802,7 +2433,7 @@ namespace USWsLibrary.Services
 			PagedList<BAN_INGRESOS_PINPAD> banIngresoPinPad = new PagedList<BAN_INGRESOS_PINPAD>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				banIngresoPinPad.Results = db.BAN_INGRESOS_PINPAD.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				banIngresoPinPad.Results = db.BAN_INGRESOS_PINPAD.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				banIngresoPinPad.Total = banIngresoPinPad.Results.Count;
 				banIngresoPinPad.Count = banIngresoPinPad.Results.Count;
@@ -4812,43 +2443,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveBanIngresoPinpad(PagedList<BAN_INGRESOS_PINPAD> banIngresosPinpad)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage = "ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in banIngresosPinpad.Results)
-					{
-						errorSave.errorMessage = errorSave.errorMessage + "\n" + "ID:  " + item.ID;
-
-						try
-						{
-							if (db.BAN_INGRESOS_PINPAD.Any(banIngresoPinpad => banIngresoPinpad.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.BAN_INGRESOS_PINPAD.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (banIngresosPinpad == null || banIngresosPinpad.Results == null || banIngresosPinpad.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				banIngresosPinpad.Results,
+				"BAN_INGRESOS_PINPAD",
+				x => x.ID,
+				db => db.BAN_INGRESOS_PINPAD,
+				(db, keys) => new HashSet<string>(db.BAN_INGRESOS_PINPAD.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -4860,7 +2462,7 @@ namespace USWsLibrary.Services
 			PagedList<BAN_INGRESOS_TARJETAS> banIngresosTarjetas = new PagedList<BAN_INGRESOS_TARJETAS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				banIngresosTarjetas.Results = db.BAN_INGRESOS_TARJETAS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				banIngresosTarjetas.Results = db.BAN_INGRESOS_TARJETAS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				banIngresosTarjetas.Total = banIngresosTarjetas.Results.Count;
 				banIngresosTarjetas.Count = banIngresosTarjetas.Results.Count;
@@ -4871,43 +2473,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave savebanIngresosTarjetas(PagedList<BAN_INGRESOS_TARJETAS> banIngresosTarjetas)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage = "ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in banIngresosTarjetas.Results)
-					{
-						errorSave.errorMessage = errorSave.errorMessage + "\n" + "ID:  " + item.ID;
-
-						try
-						{
-							if (db.BAN_INGRESOS_TARJETAS.Any(banIngresoTarjeta => banIngresoTarjeta.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.BAN_INGRESOS_TARJETAS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (banIngresosTarjetas == null || banIngresosTarjetas.Results == null || banIngresosTarjetas.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				banIngresosTarjetas.Results,
+				"BAN_INGRESOS_TARJETAS",
+				x => x.ID,
+				db => db.BAN_INGRESOS_TARJETAS,
+				(db, keys) => new HashSet<string>(db.BAN_INGRESOS_TARJETAS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -4916,7 +2489,7 @@ namespace USWsLibrary.Services
 			PagedList<BAN_PAPELETAS> banPapeletas = new PagedList<BAN_PAPELETAS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				banPapeletas.Results = db.BAN_PAPELETAS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				banPapeletas.Results = db.BAN_PAPELETAS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				banPapeletas.Total = banPapeletas.Results.Count;
 				banPapeletas.Count = banPapeletas.Results.Count;
@@ -4927,43 +2500,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave savebanPapeletas(PagedList<BAN_PAPELETAS> banPapeletas)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in banPapeletas.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.BAN_PAPELETAS.Any(banPapeleta => banPapeleta.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.BAN_PAPELETAS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (banPapeletas == null || banPapeletas.Results == null || banPapeletas.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				banPapeletas.Results,
+				"BAN_PAPELETAS",
+				x => x.ID,
+				db => db.BAN_PAPELETAS,
+				(db, keys) => new HashSet<string>(db.BAN_PAPELETAS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -4973,7 +2517,7 @@ namespace USWsLibrary.Services
 			PagedList<BAN_TRANSFERENCIAS> banTransferencias = new PagedList<BAN_TRANSFERENCIAS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				banTransferencias.Results = db.BAN_TRANSFERENCIAS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				banTransferencias.Results = db.BAN_TRANSFERENCIAS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				banTransferencias.Total = banTransferencias.Results.Count;
 				banTransferencias.Count = banTransferencias.Results.Count;
@@ -4984,43 +2528,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave savebanTransferencias(PagedList<BAN_TRANSFERENCIAS> banTransferencias)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in banTransferencias.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.BAN_TRANSFERENCIAS.Any(banTransferencia => banTransferencia.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.BAN_TRANSFERENCIAS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (banTransferencias == null || banTransferencias.Results == null || banTransferencias.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				banTransferencias.Results,
+				"BAN_TRANSFERENCIAS",
+				x => x.ID,
+				db => db.BAN_TRANSFERENCIAS,
+				(db, keys) => new HashSet<string>(db.BAN_TRANSFERENCIAS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -5029,7 +2544,7 @@ namespace USWsLibrary.Services
 			PagedList<BAN_TRANSFERENCIAS_DT> banTransferenciasDt = new PagedList<BAN_TRANSFERENCIAS_DT>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				banTransferenciasDt.Results = db.BAN_TRANSFERENCIAS_DT.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				banTransferenciasDt.Results = db.BAN_TRANSFERENCIAS_DT.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				banTransferenciasDt.Total = banTransferenciasDt.Results.Count;
 				banTransferenciasDt.Count = banTransferenciasDt.Results.Count;
@@ -5040,43 +2555,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave savebanTransferenciasDt(PagedList<BAN_TRANSFERENCIAS_DT> banTransferenciasDt)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in banTransferenciasDt.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.BAN_TRANSFERENCIAS_DT.Any(banTransferenciaDt => banTransferenciaDt.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.BAN_TRANSFERENCIAS_DT.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (banTransferenciasDt == null || banTransferenciasDt.Results == null || banTransferenciasDt.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				banTransferenciasDt.Results,
+				"BAN_TRANSFERENCIAS_DT",
+				x => x.ID,
+				db => db.BAN_TRANSFERENCIAS_DT,
+				(db, keys) => new HashSet<string>(db.BAN_TRANSFERENCIAS_DT.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -5086,7 +2572,7 @@ namespace USWsLibrary.Services
 			PagedList<VEN_FACTURAS_PAGOS> venFacturasPagos = new PagedList<VEN_FACTURAS_PAGOS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				venFacturasPagos.Results = db.VEN_FACTURAS_PAGOS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				venFacturasPagos.Results = db.VEN_FACTURAS_PAGOS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				venFacturasPagos.Total = venFacturasPagos.Results.Count;
 				venFacturasPagos.Count = venFacturasPagos.Results.Count;
@@ -5097,46 +2583,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave savevenFacturasPagos(PagedList<VEN_FACTURAS_PAGOS> venFacturasPagos)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in venFacturasPagos.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.id;
-
-
-					
-						try
-						{
-							if (db.VEN_FACTURAS_PAGOS.Any(venFacturasPago => venFacturasPago.id == item.id))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.VEN_FACTURAS_PAGOS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (venFacturasPagos == null || venFacturasPagos.Results == null || venFacturasPagos.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				venFacturasPagos.Results,
+				"VEN_FACTURAS_PAGOS",
+				x => x.id,
+				db => db.VEN_FACTURAS_PAGOS,
+				(db, keys) => new HashSet<string>(db.VEN_FACTURAS_PAGOS.Where(x => keys.Contains(x.id)).Select(x => x.id))
+			);
 		}
 
 		public PagedList<INV_EGRESOS> listinvEgresos(DateTime lastUpdate, DateTime lastUpdate2)
@@ -5144,7 +2598,7 @@ namespace USWsLibrary.Services
 			PagedList<INV_EGRESOS> invEgresos = new PagedList<INV_EGRESOS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				invEgresos.Results = db.INV_EGRESOS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				invEgresos.Results = db.INV_EGRESOS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				invEgresos.Total = invEgresos.Results.Count;
 				invEgresos.Count = invEgresos.Results.Count;
@@ -5155,43 +2609,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveinvEgresos(PagedList<INV_EGRESOS> invEgresos)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in invEgresos.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.INV_EGRESOS.Any(invEgreso => invEgreso.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.INV_EGRESOS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (invEgresos == null || invEgresos.Results == null || invEgresos.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				invEgresos.Results,
+				"INV_EGRESOS",
+				x => x.ID,
+				db => db.INV_EGRESOS,
+				(db, keys) => new HashSet<string>(db.INV_EGRESOS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<INV_EGRESOS_RUBROS> listinvEgresosRubros(DateTime lastUpdate, DateTime lastUpdate2)
@@ -5199,7 +2624,7 @@ namespace USWsLibrary.Services
 			PagedList<INV_EGRESOS_RUBROS> invEgresosRubros = new PagedList<INV_EGRESOS_RUBROS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				invEgresosRubros.Results = db.INV_EGRESOS_RUBROS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				invEgresosRubros.Results = db.INV_EGRESOS_RUBROS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				invEgresosRubros.Total = invEgresosRubros.Results.Count;
 				invEgresosRubros.Count = invEgresosRubros.Results.Count;
@@ -5210,44 +2635,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveinvEgresosRubros(PagedList<INV_EGRESOS_RUBROS> invEgresosRubros)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in invEgresosRubros.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.INV_EGRESOS_RUBROS.Any(invEgresosRubro => invEgresosRubro.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.INV_EGRESOS_RUBROS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (invEgresosRubros == null || invEgresosRubros.Results == null || invEgresosRubros.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				invEgresosRubros.Results,
+				"INV_EGRESOS_RUBROS",
+				x => x.ID,
+				db => db.INV_EGRESOS_RUBROS,
+				(db, keys) => new HashSet<string>(db.INV_EGRESOS_RUBROS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -5256,7 +2651,7 @@ namespace USWsLibrary.Services
 			PagedList<INV_EGRESOS_PRODUCTOS> invEgresosProductos = new PagedList<INV_EGRESOS_PRODUCTOS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				invEgresosProductos.Results = db.INV_EGRESOS_PRODUCTOS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				invEgresosProductos.Results = db.INV_EGRESOS_PRODUCTOS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				invEgresosProductos.Total = invEgresosProductos.Results.Count;
 				invEgresosProductos.Count = invEgresosProductos.Results.Count;
@@ -5267,43 +2662,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveinvEgresosProductos(PagedList<INV_EGRESOS_PRODUCTOS> invEgresosProductos)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in invEgresosProductos.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.INV_EGRESOS_PRODUCTOS.Any(invEgresosProducto => invEgresosProducto.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.INV_EGRESOS_PRODUCTOS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (invEgresosProductos == null || invEgresosProductos.Results == null || invEgresosProductos.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				invEgresosProductos.Results,
+				"INV_EGRESOS_PRODUCTOS",
+				x => x.ID,
+				db => db.INV_EGRESOS_PRODUCTOS,
+				(db, keys) => new HashSet<string>(db.INV_EGRESOS_PRODUCTOS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<ModelDobraDatabase.INV_INGRESOS> listinvIngresos(DateTime lastUpdate, DateTime lastUpdate2)
@@ -5311,7 +2677,7 @@ namespace USWsLibrary.Services
 			PagedList<ModelDobraDatabase.INV_INGRESOS> invIngresos = new PagedList<ModelDobraDatabase.INV_INGRESOS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				invIngresos.Results = db.INV_INGRESOS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				invIngresos.Results = db.INV_INGRESOS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				invIngresos.Total = invIngresos.Results.Count;
 				invIngresos.Count = invIngresos.Results.Count;
@@ -5322,43 +2688,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveinvIngresos(PagedList<ModelDobraDatabase.INV_INGRESOS> invIngresos)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in invIngresos.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.INV_INGRESOS.Any(invIngreso => invIngreso.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.INV_INGRESOS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (invIngresos == null || invIngresos.Results == null || invIngresos.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				invIngresos.Results,
+				"INV_INGRESOS",
+				x => x.ID,
+				db => db.INV_INGRESOS,
+				(db, keys) => new HashSet<string>(db.INV_INGRESOS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -5367,7 +2704,7 @@ namespace USWsLibrary.Services
 			PagedList<INV_INGRESOS_RUBROS> invIngresosRubros = new PagedList<INV_INGRESOS_RUBROS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				invIngresosRubros.Results = db.INV_INGRESOS_RUBROS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				invIngresosRubros.Results = db.INV_INGRESOS_RUBROS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				invIngresosRubros.Total = invIngresosRubros.Results.Count;
 				invIngresosRubros.Count = invIngresosRubros.Results.Count;
@@ -5378,43 +2715,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveinvIngresosRubros(PagedList<INV_INGRESOS_RUBROS> invIngresosRubros)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in invIngresosRubros.Results)
-					{
-						//errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.INV_INGRESOS_RUBROS.Any(invIngreso => invIngreso.DivisaID == item.DivisaID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.INV_INGRESOS_RUBROS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (invIngresosRubros == null || invIngresosRubros.Results == null || invIngresosRubros.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				invIngresosRubros.Results,
+				"INV_INGRESOS_RUBROS",
+				x => x.DivisaID,
+				db => db.INV_INGRESOS_RUBROS,
+				(db, keys) => new HashSet<string>(db.INV_INGRESOS_RUBROS.Where(x => keys.Contains(x.DivisaID)).Select(x => x.DivisaID))
+			);
 		}
 
 
@@ -5423,7 +2731,7 @@ namespace USWsLibrary.Services
 			PagedList<ModelDobraDatabase.INV_INGRESOS_PRODUCTOS> invIngresosProductos = new PagedList<ModelDobraDatabase.INV_INGRESOS_PRODUCTOS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				invIngresosProductos.Results = db.INV_INGRESOS_PRODUCTOS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				invIngresosProductos.Results = db.INV_INGRESOS_PRODUCTOS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				invIngresosProductos.Total = invIngresosProductos.Results.Count;
 				invIngresosProductos.Count = invIngresosProductos.Results.Count;
@@ -5434,44 +2742,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveinvIngresosProductos(PagedList<ModelDobraDatabase.INV_INGRESOS_PRODUCTOS> invIngresosProductos)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in invIngresosProductos.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.INV_INGRESOS_PRODUCTOS.Any(invIngreso => invIngreso.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.INV_INGRESOS_PRODUCTOS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (invIngresosProductos == null || invIngresosProductos.Results == null || invIngresosProductos.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				invIngresosProductos.Results,
+				"INV_INGRESOS_PRODUCTOS",
+				x => x.ID,
+				db => db.INV_INGRESOS_PRODUCTOS,
+				(db, keys) => new HashSet<string>(db.INV_INGRESOS_PRODUCTOS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<INV_PROMOCIONES> listinvPromociones(DateTime lastUpdate, DateTime lastUpdate2)
@@ -5479,7 +2757,7 @@ namespace USWsLibrary.Services
 			PagedList<INV_PROMOCIONES> invPromociones = new PagedList<INV_PROMOCIONES>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				invPromociones.Results = db.INV_PROMOCIONES.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
+				invPromociones.Results = db.INV_PROMOCIONES.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
 
 				invPromociones.Total = invPromociones.Results.Count;
 				invPromociones.Count = invPromociones.Results.Count;
@@ -5490,43 +2768,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveinvPromociones(PagedList<INV_PROMOCIONES> invPromociones)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage = "ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in invPromociones.Results)
-					{
-						errorSave.errorMessage = errorSave.errorMessage + "\n" + "ID:  " + item.ID;
-
-						try
-						{
-							if (db.INV_PROMOCIONES.Any(invPromocion => invPromocion.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.INV_PROMOCIONES.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (invPromociones == null || invPromociones.Results == null || invPromociones.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				invPromociones.Results,
+				"INV_PROMOCIONES",
+				x => x.ID,
+				db => db.INV_PROMOCIONES,
+				(db, keys) => new HashSet<string>(db.INV_PROMOCIONES.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<INV_PROMOCIONES_DT> listInvPromocionesDt(DateTime lastUpdate, DateTime lastUpdate2)
@@ -5534,7 +2783,7 @@ namespace USWsLibrary.Services
 			PagedList<INV_PROMOCIONES_DT> invPromocionesDt = new PagedList<INV_PROMOCIONES_DT>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				invPromocionesDt.Results = db.INV_PROMOCIONES_DT.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				invPromocionesDt.Results = db.INV_PROMOCIONES_DT.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				invPromocionesDt.Total = invPromocionesDt.Results.Count;
 				invPromocionesDt.Count = invPromocionesDt.Results.Count;
@@ -5545,43 +2794,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveInvPromocionesDt(PagedList<INV_PROMOCIONES_DT> invPromocionesDt)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage = "ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in invPromocionesDt.Results)
-					{
-						errorSave.errorMessage = item.id.ToString();
-
-						try
-						{
-							if (db.INV_PROMOCIONES_DT.Any(invPromocionDt => invPromocionDt.id == item.id))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.INV_PROMOCIONES_DT.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (invPromocionesDt == null || invPromocionesDt.Results == null || invPromocionesDt.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				invPromocionesDt.Results,
+				"INV_PROMOCIONES_DT",
+				x => x.id,
+				db => db.INV_PROMOCIONES_DT,
+				(db, keys) => new HashSet<string>(db.INV_PROMOCIONES_DT.Where(x => keys.Contains(x.id)).Select(x => x.id))
+			);
 		}
 
 		public PagedList<INV_PROMOCIONES_DT2> listInvPromocionesDt2(DateTime lastUpdate, DateTime lastUpdate2)
@@ -5589,7 +2809,7 @@ namespace USWsLibrary.Services
 			PagedList<INV_PROMOCIONES_DT2> invPromocionesDt2 = new PagedList<INV_PROMOCIONES_DT2>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				invPromocionesDt2.Results = db.INV_PROMOCIONES_DT2.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				invPromocionesDt2.Results = db.INV_PROMOCIONES_DT2.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				invPromocionesDt2.Total = invPromocionesDt2.Results.Count;
 				invPromocionesDt2.Count = invPromocionesDt2.Results.Count;
@@ -5600,43 +2820,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveInvPromocionesDt2(PagedList<INV_PROMOCIONES_DT2> invPromocionesDt2)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage = "";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in invPromocionesDt2.Results)
-					{
-						errorSave.errorMessage = item.id.ToString();
-
-						try
-						{
-							if (db.INV_PROMOCIONES_DT2.Any(invPromocionDt2 => invPromocionDt2.id == item.id))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.INV_PROMOCIONES_DT2.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (invPromocionesDt2 == null || invPromocionesDt2.Results == null || invPromocionesDt2.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				invPromocionesDt2.Results,
+				"INV_PROMOCIONES_DT2",
+				x => x.id,
+				db => db.INV_PROMOCIONES_DT2,
+				(db, keys) => new HashSet<long>(db.INV_PROMOCIONES_DT2.Where(x => keys.Contains(x.id)).Select(x => x.id))
+			);
 		}
 
 
@@ -5646,7 +2837,7 @@ namespace USWsLibrary.Services
 			PagedList<INV_TRANSFERENCIAS> invTransferencias = new PagedList<INV_TRANSFERENCIAS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				invTransferencias.Results = db.INV_TRANSFERENCIAS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
+				invTransferencias.Results = db.INV_TRANSFERENCIAS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
 
 				invTransferencias.Total = invTransferencias.Results.Count;
 				invTransferencias.Count = invTransferencias.Results.Count;
@@ -5657,46 +2848,59 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveinvTransferencias(PagedList<INV_TRANSFERENCIAS> invTransferencias)
 		{
-			ErrorSave errorSave = new ErrorSave();
+			var errorSave = new ErrorSave { Tabla = "INV_TRANSFERENCIAS", errorExit = false };
+			if (invTransferencias == null || invTransferencias.Results == null || invTransferencias.Results.Count == 0) return errorSave;
 
-			errorSave.errorMessage="ID:  ";
+			var totalCount = invTransferencias.Results.Count;
+			int chunkSize = 500;
 
-			using (DobraConnection db = new DobraConnection())
+			for (int offset = 0; offset < totalCount; offset += chunkSize)
 			{
-				try
-				{
-					foreach (var item in invTransferencias.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
+				var chunk = invTransferencias.Results.Skip(offset).Take(chunkSize).ToList();
+				var distinctChunk = chunk.GroupBy(x => x.ID).Select(g => g.Key == null ? g.First() : g.Last()).ToList();
+				var chunkKeys = distinctChunk.Select(x => x.ID).Where(k => k != null).Distinct().ToList();
 
+				using (var db = new DobraConnection())
+				{
+					db.Configuration.AutoDetectChangesEnabled = false;
+					db.Configuration.ValidateOnSaveEnabled = false;
+
+					using (var tx = db.Database.BeginTransaction())
+					{
 						try
 						{
-							if (db.INV_TRANSFERENCIAS.Any(invTransferencia => invTransferencia.ID == item.ID   &&  invTransferencia.Estado!= "RECIBIDO"))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
+							var existing = db.INV_TRANSFERENCIAS
+								.Where(x => chunkKeys.Contains(x.ID))
+								.Select(x => new { x.ID, x.Estado })
+								.ToList();
+							var estadoDict = existing.ToDictionary(x => x.ID, x => x.Estado);
 
-
-							}
-							else if (db.INV_TRANSFERENCIAS.Any(invTransferencia => invTransferencia.ID == item.ID && invTransferencia.Estado == "RECIBIDO"))
+							foreach (var item in distinctChunk)
 							{
+								if (estadoDict.TryGetValue(item.ID, out var dbEstado))
+								{
+									if (dbEstado != "RECIBIDO")
+									{
+										db.Entry(item).State = System.Data.Entity.EntityState.Modified;
+									}
+								}
+								else
+								{
+									db.INV_TRANSFERENCIAS.Add(item);
+								}
+							}
 
-							}
-							else
-							{
-								db.INV_TRANSFERENCIAS.Add(item);
-								db.SaveChanges();
-							}
+							db.Configuration.AutoDetectChangesEnabled = true;
+							db.SaveChanges();
+							tx.Commit();
 						}
-						catch (Exception e)
+						catch (Exception ex)
 						{
-							encontrarError(e, errorSave);
+							try { tx.Rollback(); } catch { }
+							BatchSyncHelper.FormatError(ex, "INV_TRANSFERENCIAS", distinctChunk, x => x.ID, errorSave);
+							return errorSave;
 						}
 					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
 				}
 			}
 			return errorSave;
@@ -5708,7 +2912,7 @@ namespace USWsLibrary.Services
 			PagedList<INV_TRANSFERENCIAS_DT> invTransferenciasDt = new PagedList<INV_TRANSFERENCIAS_DT>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				invTransferenciasDt.Results = db.INV_TRANSFERENCIAS_DT.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
+				invTransferenciasDt.Results = db.INV_TRANSFERENCIAS_DT.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2) || (e.EditadoDate >= lastUpdate && e.EditadoDate <= lastUpdate2)).ToList();
 
 				invTransferenciasDt.Total = invTransferenciasDt.Results.Count;
 				invTransferenciasDt.Count = invTransferenciasDt.Results.Count;
@@ -5719,49 +2923,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveinvTransferenciasDt(PagedList<INV_TRANSFERENCIAS_DT> invTransferenciasDt)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-
-				errorSave.Listid=  invTransferenciasDt.Results.Select(dt => dt.ProductoID).ToList();
-
-
-				try
-				{
-					foreach (var item in invTransferenciasDt.Results)
-					{
-						errorSave.errorMessage = errorSave.errorMessage + item.ID;
-
-						try
-						{
-							if (db.INV_TRANSFERENCIAS_DT.Any(invTransferenciaDt => invTransferenciaDt.ID == item.ID     ))
-							{
-
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.INV_TRANSFERENCIAS_DT.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (invTransferenciasDt == null || invTransferenciasDt.Results == null || invTransferenciasDt.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				invTransferenciasDt.Results,
+				"INV_TRANSFERENCIAS_DT",
+				x => x.ID,
+				db => db.INV_TRANSFERENCIAS_DT,
+				(db, keys) => new HashSet<string>(db.INV_TRANSFERENCIAS_DT.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -5770,7 +2939,7 @@ namespace USWsLibrary.Services
 			PagedList<POS_TRANSFERENCIAS> posTransferencias = new PagedList<POS_TRANSFERENCIAS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				posTransferencias.Results = db.POS_TRANSFERENCIAS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				posTransferencias.Results = db.POS_TRANSFERENCIAS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				posTransferencias.Total = posTransferencias.Results.Count;
 				posTransferencias.Count = posTransferencias.Results.Count;
@@ -5781,73 +2950,34 @@ namespace USWsLibrary.Services
 
 		public ErrorSave savePosTransferencias(PagedList<POS_TRANSFERENCIAS> posTransferencias)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in posTransferencias.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.POS_TRANSFERENCIAS.Any(posTransferencia => posTransferencia.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.POS_TRANSFERENCIAS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (posTransferencias == null || posTransferencias.Results == null || posTransferencias.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				posTransferencias.Results,
+				"POS_TRANSFERENCIAS",
+				x => x.ID,
+				db => db.POS_TRANSFERENCIAS,
+				(db, keys) => new HashSet<string>(db.POS_TRANSFERENCIAS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
 		public void encontrarError(Exception e, ErrorSave errorSave)
 		{
-
-			if (e.InnerException == null)
+			errorSave.errorExit = true;
+			var cleanMsg = BatchSyncHelper.FormatGeneralException(e);
+			if (string.IsNullOrEmpty(errorSave.errorMessage) || errorSave.errorMessage.StartsWith("ID:"))
 			{
-				errorSave.errorMessage = errorSave.errorMessage +"  Error de excepcion: "+e.Message;
-				errorSave.errorExit = true;
+				errorSave.errorMessage = cleanMsg;
 			}
-			else
+			else if (!errorSave.errorMessage.Contains(cleanMsg))
 			{
-				encontrarError(e.InnerException, errorSave);
+				errorSave.errorMessage = errorSave.errorMessage + "\n" + cleanMsg;
 			}
 		}
 
 		public void encontrarError2<T>(Exception e, ErrorSave errorSave)
 		{
-
-			if (e.InnerException == null)
-			{
-				errorSave.errorMessage = errorSave.errorMessage + "  Error de excepcion: " + e.Message;
-				errorSave.errorExit = true;
-			}
-			else
-			{
-				encontrarError2<T>(e.InnerException, errorSave);
-			}
+			encontrarError(e, errorSave);
 		}
 
 
@@ -5856,7 +2986,7 @@ namespace USWsLibrary.Services
 			PagedList<POS_TRANSFERENCIAS_DT> posTransferenciasDt = new PagedList<POS_TRANSFERENCIAS_DT>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				posTransferenciasDt.Results = db.POS_TRANSFERENCIAS_DT.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				posTransferenciasDt.Results = db.POS_TRANSFERENCIAS_DT.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 				posTransferenciasDt.Total = posTransferenciasDt.Results.Count;
 				posTransferenciasDt.Count = posTransferenciasDt.Results.Count;
 			}
@@ -5866,43 +2996,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave savePosTransferenciasDt(PagedList<POS_TRANSFERENCIAS_DT> posTransferenciasDt)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in posTransferenciasDt.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.POS_TRANSFERENCIAS_DT.Any(posTransferenciaDt => posTransferenciaDt.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.POS_TRANSFERENCIAS_DT.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (posTransferenciasDt == null || posTransferenciasDt.Results == null || posTransferenciasDt.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				posTransferenciasDt.Results,
+				"POS_TRANSFERENCIAS_DT",
+				x => x.ID,
+				db => db.POS_TRANSFERENCIAS_DT,
+				(db, keys) => new HashSet<string>(db.POS_TRANSFERENCIAS_DT.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -5911,7 +3012,7 @@ namespace USWsLibrary.Services
 			PagedList<CLI_CREDITOS_DEUDAS> cliCreditosDeudas = new PagedList<CLI_CREDITOS_DEUDAS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				cliCreditosDeudas.Results = db.CLI_CREDITOS_DEUDAS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				cliCreditosDeudas.Results = db.CLI_CREDITOS_DEUDAS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				cliCreditosDeudas.Total = cliCreditosDeudas.Results.Count;
 				cliCreditosDeudas.Count = cliCreditosDeudas.Results.Count;
@@ -5922,43 +3023,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveCliCreditosDuedas(PagedList<CLI_CREDITOS_DEUDAS> cliCreditosDeudas)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in cliCreditosDeudas.Results)
-					{
-						errorSave.errorMessage = errorSave.errorMessage + "\n" + "ID:  " + item.id;
-
-						try
-						{
-							if (db.CLI_CREDITOS_DEUDAS.Any(cliCreditoDeuda => cliCreditoDeuda.id == item.id))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.CLI_CREDITOS_DEUDAS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (cliCreditosDeudas == null || cliCreditosDeudas.Results == null || cliCreditosDeudas.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				cliCreditosDeudas.Results,
+				"CLI_CREDITOS_DEUDAS",
+				x => x.id,
+				db => db.CLI_CREDITOS_DEUDAS,
+				(db, keys) => new HashSet<string>(db.CLI_CREDITOS_DEUDAS.Where(x => keys.Contains(x.id)).Select(x => x.id))
+			);
 		}
 
 
@@ -5968,7 +3040,7 @@ namespace USWsLibrary.Services
 			PagedList<CLI_CREDITOS_RUBROS> cliCreditosRubros = new PagedList<CLI_CREDITOS_RUBROS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				cliCreditosRubros.Results = db.CLI_CREDITOS_RUBROS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				cliCreditosRubros.Results = db.CLI_CREDITOS_RUBROS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				cliCreditosRubros.Total = cliCreditosRubros.Results.Count;
 				cliCreditosRubros.Count = cliCreditosRubros.Results.Count;
@@ -5979,44 +3051,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveCliCreditosRubros(PagedList<CLI_CREDITOS_RUBROS> cliCreditosRubros)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in cliCreditosRubros.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.CLI_CREDITOS_RUBROS.Any(cliCreditoRubro => cliCreditoRubro.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.CLI_CREDITOS_RUBROS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (cliCreditosRubros == null || cliCreditosRubros.Results == null || cliCreditosRubros.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				cliCreditosRubros.Results,
+				"CLI_CREDITOS_RUBROS",
+				x => x.ID,
+				db => db.CLI_CREDITOS_RUBROS,
+				(db, keys) => new HashSet<string>(db.CLI_CREDITOS_RUBROS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -6026,7 +3068,7 @@ namespace USWsLibrary.Services
 			PagedList<CLI_DEBITOS> cliDebitos = new PagedList<CLI_DEBITOS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				cliDebitos.Results = db.CLI_DEBITOS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				cliDebitos.Results = db.CLI_DEBITOS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				cliDebitos.Total = cliDebitos.Results.Count;
 				cliDebitos.Count = cliDebitos.Results.Count;
@@ -6037,43 +3079,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveCliDebitos(PagedList<CLI_DEBITOS> cliDebitos)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in cliDebitos.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.CLI_DEBITOS.Any(cliDebito => cliDebito.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.CLI_DEBITOS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (cliDebitos == null || cliDebitos.Results == null || cliDebitos.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				cliDebitos.Results,
+				"CLI_DEBITOS",
+				x => x.ID,
+				db => db.CLI_DEBITOS,
+				(db, keys) => new HashSet<string>(db.CLI_DEBITOS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -6082,7 +3095,7 @@ namespace USWsLibrary.Services
 			PagedList<CLI_DEBITOS_RUBROS> cliDebitosRubros = new PagedList<CLI_DEBITOS_RUBROS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				cliDebitosRubros.Results = db.CLI_DEBITOS_RUBROS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				cliDebitosRubros.Results = db.CLI_DEBITOS_RUBROS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				cliDebitosRubros.Total = cliDebitosRubros.Results.Count;
 				cliDebitosRubros.Count = cliDebitosRubros.Results.Count;
@@ -6093,43 +3106,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveCliDebitosRubros(PagedList<CLI_DEBITOS_RUBROS> cliDebitosRubros)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in cliDebitosRubros.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.CLI_DEBITOS_RUBROS.Any(cliDebitoRubro => cliDebitoRubro.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.CLI_DEBITOS_RUBROS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (cliDebitosRubros == null || cliDebitosRubros.Results == null || cliDebitosRubros.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				cliDebitosRubros.Results,
+				"CLI_DEBITOS_RUBROS",
+				x => x.ID,
+				db => db.CLI_DEBITOS_RUBROS,
+				(db, keys) => new HashSet<string>(db.CLI_DEBITOS_RUBROS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<CLI_RETENCIONES> listCliRetenciones(DateTime lastUpdate, DateTime lastUpdate2)
@@ -6137,7 +3121,7 @@ namespace USWsLibrary.Services
 			PagedList<CLI_RETENCIONES> cliRetenciones = new PagedList<CLI_RETENCIONES>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				cliRetenciones.Results = db.CLI_RETENCIONES.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				cliRetenciones.Results = db.CLI_RETENCIONES.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				cliRetenciones.Total = cliRetenciones.Results.Count;
 				cliRetenciones.Count = cliRetenciones.Results.Count;
@@ -6148,43 +3132,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveCliRetenciones(PagedList<CLI_RETENCIONES> cliRetenciones)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in cliRetenciones.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.CLI_RETENCIONES.Any(cliRetencion => cliRetencion.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.CLI_RETENCIONES.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (cliRetenciones == null || cliRetenciones.Results == null || cliRetenciones.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				cliRetenciones.Results,
+				"CLI_RETENCIONES",
+				x => x.ID,
+				db => db.CLI_RETENCIONES,
+				(db, keys) => new HashSet<string>(db.CLI_RETENCIONES.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<CLI_RETENCIONES_DEUDAS> listCliRetencionesDeudas(DateTime lastUpdate, DateTime lastUpdate2)
@@ -6192,7 +3147,7 @@ namespace USWsLibrary.Services
 			PagedList<CLI_RETENCIONES_DEUDAS> cliRetencionesDeudas = new PagedList<CLI_RETENCIONES_DEUDAS>();
 			using (DobraConnection db = new DobraConnection())
 			{
-				cliRetencionesDeudas.Results = db.CLI_RETENCIONES_DEUDAS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				cliRetencionesDeudas.Results = db.CLI_RETENCIONES_DEUDAS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				cliRetencionesDeudas.Total = cliRetencionesDeudas.Results.Count;
 				cliRetencionesDeudas.Count = cliRetencionesDeudas.Results.Count;
@@ -6203,43 +3158,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveCliRetencionesDeudas(PagedList<CLI_RETENCIONES_DEUDAS> cliRetencionesDeudas)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in cliRetencionesDeudas.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.DivisaID;
-
-						try
-						{
-							if (db.CLI_RETENCIONES_DEUDAS.Any(cliRetencionDeuda => cliRetencionDeuda.DivisaID == item.DivisaID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.CLI_RETENCIONES_DEUDAS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (cliRetencionesDeudas == null || cliRetencionesDeudas.Results == null || cliRetencionesDeudas.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				cliRetencionesDeudas.Results,
+				"CLI_RETENCIONES_DEUDAS",
+				x => x.DivisaID,
+				db => db.CLI_RETENCIONES_DEUDAS,
+				(db, keys) => new HashSet<string>(db.CLI_RETENCIONES_DEUDAS.Where(x => keys.Contains(x.DivisaID)).Select(x => x.DivisaID))
+			);
 		}
 
 		public PagedList<CLI_RETENCIONES_DT> listCliRetencionesDt(DateTime lastUpdate, DateTime lastUpdate2)
@@ -6248,7 +3174,7 @@ namespace USWsLibrary.Services
 			using (DobraConnection db = new DobraConnection())
 			{
 
-				cliRetencionesDt.Results = db.CLI_RETENCIONES_DT.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				cliRetencionesDt.Results = db.CLI_RETENCIONES_DT.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				cliRetencionesDt.Total = cliRetencionesDt.Results.Count;
 				cliRetencionesDt.Count = cliRetencionesDt.Results.Count;
@@ -6259,44 +3185,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveCliRetencionesDt(PagedList<CLI_RETENCIONES_DT> cliRetencionesDt)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-
-					foreach (var item in cliRetencionesDt.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.id;
-
-						try
-						{
-							if (db.CLI_RETENCIONES_DT.Any(cliRetencionDt => cliRetencionDt.id == item.id))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.CLI_RETENCIONES_DT.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (cliRetencionesDt == null || cliRetencionesDt.Results == null || cliRetencionesDt.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				cliRetencionesDt.Results,
+				"CLI_RETENCIONES_DT",
+				x => x.id,
+				db => db.CLI_RETENCIONES_DT,
+				(db, keys) => new HashSet<string>(db.CLI_RETENCIONES_DT.Where(x => keys.Contains(x.id)).Select(x => x.id))
+			);
 		}
 
 		public PagedList<ACR_ACREEDORES> listAcrAcreedores(DateTime lastUpdate, DateTime lastUpdate2)
@@ -6305,7 +3201,7 @@ namespace USWsLibrary.Services
 			using (DobraConnection db = new DobraConnection())
 			{
 
-				acrAcreedores.Results = db.ACR_ACREEDORES.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				acrAcreedores.Results = db.ACR_ACREEDORES.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				acrAcreedores.Total = acrAcreedores.Results.Count;
 				acrAcreedores.Count = acrAcreedores.Results.Count;
@@ -6316,43 +3212,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveAcrAcreedores(PagedList<ACR_ACREEDORES> acrAcreedores)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in acrAcreedores.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.ACR_ACREEDORES.Any(acrAcrredor => acrAcrredor.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.ACR_ACREEDORES.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (acrAcreedores == null || acrAcreedores.Results == null || acrAcreedores.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				acrAcreedores.Results,
+				"ACR_ACREEDORES",
+				x => x.ID,
+				db => db.ACR_ACREEDORES,
+				(db, keys) => new HashSet<string>(db.ACR_ACREEDORES.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 		public PagedList<INV_GRUPOS> listInvGrupos(DateTime lastUpdate, DateTime lastUpdate2)
@@ -6361,7 +3228,7 @@ namespace USWsLibrary.Services
 			using (DobraConnection db = new DobraConnection())
 			{
 
-				invGrupos.Results = db.INV_GRUPOS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				invGrupos.Results = db.INV_GRUPOS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				invGrupos.Total = invGrupos.Results.Count;
 				invGrupos.Count = invGrupos.Results.Count;
@@ -6372,43 +3239,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveInvGrupos(PagedList<INV_GRUPOS> invGrupos)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in invGrupos.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.INV_GRUPOS.Any(invGrupo => invGrupo.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.INV_GRUPOS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (invGrupos == null || invGrupos.Results == null || invGrupos.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				invGrupos.Results,
+				"INV_GRUPOS",
+				x => x.ID,
+				db => db.INV_GRUPOS,
+				(db, keys) => new HashSet<string>(db.INV_GRUPOS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -6418,7 +3256,7 @@ namespace USWsLibrary.Services
 			using (DobraConnection db = new DobraConnection())
 			{
 
-				prvFacturasPagos.Results = db.PRV_FACTURAS_PAGOS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				prvFacturasPagos.Results = db.PRV_FACTURAS_PAGOS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				prvFacturasPagos.Total = prvFacturasPagos.Results.Count;
 				prvFacturasPagos.Count = prvFacturasPagos.Results.Count;
@@ -6474,7 +3312,7 @@ namespace USWsLibrary.Services
 			using (DobraConnection db = new DobraConnection())
 			{
 
-				banCreditos.Results = db.BAN_CREDITOS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				banCreditos.Results = db.BAN_CREDITOS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				banCreditos.Total = banCreditos.Results.Count;
 				banCreditos.Count = banCreditos.Results.Count;
@@ -6486,43 +3324,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveBanCreditos(PagedList<BAN_CREDITOS> banCreditos)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in banCreditos.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.BAN_CREDITOS.Any(banCredito => banCredito.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.BAN_CREDITOS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (banCreditos == null || banCreditos.Results == null || banCreditos.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				banCreditos.Results,
+				"BAN_CREDITOS",
+				x => x.ID,
+				db => db.BAN_CREDITOS,
+				(db, keys) => new HashSet<string>(db.BAN_CREDITOS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -6532,7 +3341,7 @@ namespace USWsLibrary.Services
 			using (DobraConnection db = new DobraConnection())
 			{
 
-				banCreditosCuentas.Results = db.BAN_CREDITOS_CUENTAS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				banCreditosCuentas.Results = db.BAN_CREDITOS_CUENTAS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				banCreditosCuentas.Total = banCreditosCuentas.Results.Count;
 				banCreditosCuentas.Count = banCreditosCuentas.Results.Count;
@@ -6544,43 +3353,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveBanCreditosCuentas(PagedList<BAN_CREDITOS_CUENTAS> banCreditosCuentas)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in banCreditosCuentas.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.BAN_CREDITOS_CUENTAS.Any(banCreditoCuenta => banCreditoCuenta.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.BAN_CREDITOS_CUENTAS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (banCreditosCuentas == null || banCreditosCuentas.Results == null || banCreditosCuentas.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				banCreditosCuentas.Results,
+				"BAN_CREDITOS_CUENTAS",
+				x => x.ID,
+				db => db.BAN_CREDITOS_CUENTAS,
+				(db, keys) => new HashSet<string>(db.BAN_CREDITOS_CUENTAS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -6590,7 +3370,7 @@ namespace USWsLibrary.Services
 			using (DobraConnection db = new DobraConnection())
 			{
 
-				orgBuzones.Results = db.ORG_BUZONES.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				orgBuzones.Results = db.ORG_BUZONES.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				orgBuzones.Total = orgBuzones.Results.Count;
 				orgBuzones.Count = orgBuzones.Results.Count;
@@ -6602,43 +3382,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveOrgBuzones(PagedList<ORG_BUZONES> orgBuzones)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in orgBuzones.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.ORG_BUZONES.Any(orgBuzon => orgBuzon.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.ORG_BUZONES.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (orgBuzones == null || orgBuzones.Results == null || orgBuzones.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				orgBuzones.Results,
+				"ORG_BUZONES",
+				x => x.ID,
+				db => db.ORG_BUZONES,
+				(db, keys) => new HashSet<string>(db.ORG_BUZONES.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -6648,7 +3399,7 @@ namespace USWsLibrary.Services
 			using (DobraConnection db = new DobraConnection())
 			{
 
-				orgDocumentos.Results = db.ORG_DOCUMENTOS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				orgDocumentos.Results = db.ORG_DOCUMENTOS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				orgDocumentos.Total = orgDocumentos.Results.Count;
 				orgDocumentos.Count = orgDocumentos.Results.Count;
@@ -6659,43 +3410,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveOrgDocumentos(PagedList<ORG_DOCUMENTOS> orgDocuemntos)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in orgDocuemntos.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.ORG_DOCUMENTOS.Any(orgDocumento => orgDocumento.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.ORG_DOCUMENTOS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (orgDocuemntos == null || orgDocuemntos.Results == null || orgDocuemntos.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				orgDocuemntos.Results,
+				"ORG_DOCUMENTOS",
+				x => x.ID,
+				db => db.ORG_DOCUMENTOS,
+				(db, keys) => new HashSet<string>(db.ORG_DOCUMENTOS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 
@@ -6705,7 +3427,7 @@ namespace USWsLibrary.Services
 			using (DobraConnection db = new DobraConnection())
 			{
 
-				orgTareas.Results = db.ORG_TAREAS.Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
+				orgTareas.Results = db.ORG_TAREAS.AsNoTracking().Where(e => (e.CreadoDate >= lastUpdate && e.CreadoDate <= lastUpdate2)).ToList();
 
 				orgTareas.Total = orgTareas.Results.Count;
 				orgTareas.Count = orgTareas.Results.Count;
@@ -6716,43 +3438,14 @@ namespace USWsLibrary.Services
 
 		public ErrorSave saveOrgTareas(PagedList<ORG_TAREAS> orgTareas)
 		{
-			ErrorSave errorSave = new ErrorSave();
-
-			errorSave.errorMessage="ID:  ";
-
-			using (DobraConnection db = new DobraConnection())
-			{
-				try
-				{
-					foreach (var item in orgTareas.Results)
-					{
-						errorSave.errorMessage=errorSave.errorMessage+"\n" + "ID:  "+item.ID;
-
-						try
-						{
-							if (db.ORG_TAREAS.Any(orgTarea => orgTarea.ID == item.ID))
-							{
-								db.Entry(item).State = System.Data.Entity.EntityState.Modified;
-								db.SaveChanges();
-							}
-							else
-							{
-								db.ORG_TAREAS.Add(item);
-								db.SaveChanges();
-							}
-						}
-						catch (Exception e)
-						{
-							encontrarError(e, errorSave);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					encontrarError(e, errorSave);
-				}
-			}
-			return errorSave;
+			if (orgTareas == null || orgTareas.Results == null || orgTareas.Results.Count == 0) return new ErrorSave();
+			return BatchSyncHelper.ExecuteBatchSave(
+				orgTareas.Results,
+				"ORG_TAREAS",
+				x => x.ID,
+				db => db.ORG_TAREAS,
+				(db, keys) => new HashSet<string>(db.ORG_TAREAS.Where(x => keys.Contains(x.ID)).Select(x => x.ID))
+			);
 		}
 
 

@@ -88,22 +88,30 @@ namespace USWsSync.Console
                 });
 
                 // 3. Fase 1: Descarga (Nube -> Local)
-                Log.Information(">>> FASE 1: DESCARGA DE NOVEDADES (Nube -> Local)");
+                Log.Information(">>> FASE 1: DESCARGA DE NOVEDADES (Nube -> Local) con Estado Granular");
                 var downloadOk = await engine.ExecuteDownloadBatchAsync(
                     config.GetPublicApiBase(),
                     config.GetLocalApiBase(),
                     fechaInicio,
                     fechaCorte,
-                    progressReporter);
+                    progressReporter,
+                    tableFilter: null,
+                    moduleFilter: null,
+                    updateWatermark: true,
+                    useIndividualTableDates: true);
 
                 // 4. Fase 2: Subida (Local -> Nube)
-                Log.Information(">>> FASE 2: SUBIDA DE NOVEDADES (Local -> Nube)");
+                Log.Information(">>> FASE 2: SUBIDA DE NOVEDADES (Local -> Nube) con Estado Granular");
                 var uploadOk = await engine.ExecuteUploadBatchAsync(
                     config.GetLocalApiBase(),
                     config.GetPublicApiBase(),
                     fechaInicio,
                     fechaCorte,
-                    progressReporter);
+                    progressReporter,
+                    tableFilter: null,
+                    moduleFilter: null,
+                    updateWatermark: true,
+                    useIndividualTableDates: true);
 
                 // 5. Evaluación de Regla de Oro
                 if (downloadOk && uploadOk)

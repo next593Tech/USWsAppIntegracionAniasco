@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Text.Encodings.Web;
@@ -13,6 +15,7 @@ using USWsLibrary.Models;
 using USWsSync.Core.Configuration;
 using USWsSync.Core.Registry;
 using USWsSync.Core.Serialization;
+using USWsSync.Core.State;
 
 namespace USWsSync.Core.Engine
 {
@@ -135,11 +138,56 @@ namespace USWsSync.Core.Engine
             string baseUrl,
             string methodName,
             PagedList<T> payload,
+            int batchSize = 1000,
             CancellationToken ct = default) where T : class, new()
+        {
+            if (payload.Results == null || payload.Results.Count <= batchSize || batchSize <= 0)
+            {
+                return await SendUploadPayloadAsync(baseUrl, methodName, payload, ct);
+            }
+
+            var totalItems = payload.Results.Count;
+            var chunksCount = (int)Math.Ceiling((double)totalItems / batchSize);
+            _logger.LogInformation("Dividiendo {Table} ({Total} registros) en {Chunks} sub-lotes de hasta {Size}",
+                typeof(T).Name, totalItems, chunksCount, batchSize);
+
+            for (int i = 0; i < totalItems; i += batchSize)
+            {
+                ct.ThrowIfCancellationRequested();
+                var chunk = payload.Results.Skip(i).Take(batchSize).ToList();
+                var chunkPayload = new PagedList<T>
+                {
+                    Count = chunk.Count,
+                    Results = chunk,
+                    LastUpdate = payload.LastUpdate
+                };
+
+                var chunkIndex = (i / batchSize) + 1;
+                var chunkResult = await SendUploadPayloadAsync(baseUrl, methodName, chunkPayload, ct);
+                if (chunkResult.errorExit)
+                {
+                    _logger.LogWarning("Fallo en lote {ChunkNum}/{TotalChunks} de {Table}: {Error}",
+                        chunkIndex, chunksCount, typeof(T).Name, chunkResult.errorMessage);
+                    return chunkResult;
+                }
+            }
+
+            return new ErrorSave
+            {
+                Tabla = typeof(T).Name,
+                errorExit = false,
+                errorMessage = null
+            };
+        }
+
+        private async Task<ErrorSave> SendUploadPayloadAsync<T>(
+            string baseUrl,
+            string methodName,
+            PagedList<T> payload,
+            CancellationToken ct) where T : class, new()
         {
             var cleanBase = SyncConfig.CleanIp(baseUrl);
             var url = $"{cleanBase}/Clientes/{methodName}";
-
             var tableName = typeof(T).Name;
 
             string jsonPayload;
@@ -223,13 +271,33 @@ namespace USWsSync.Core.Engine
             DateTime f1,
             DateTime f2,
             IProgress<SyncProgressInfo>? progress,
+            IEnumerable<string>? tableFilter = null,
+            SyncModule? moduleFilter = null,
+            bool updateWatermark = false,
+            bool useIndividualTableDates = false,
             CancellationToken ct = default)
         {
-            var tables = TableRegistry.DownloadTables;
+            var query = TableRegistry.DownloadTables.AsEnumerable();
+
+            if (moduleFilter.HasValue && moduleFilter.Value != SyncModule.Todos)
+            {
+                query = query.Where(t => t.Module == moduleFilter.Value);
+            }
+
+            if (tableFilter != null)
+            {
+                var filterSet = new HashSet<string>(tableFilter, StringComparer.OrdinalIgnoreCase);
+                if (filterSet.Count > 0)
+                {
+                    query = query.Where(t => filterSet.Contains(t.TableName));
+                }
+            }
+
+            var tables = query.ToList();
             var total = tables.Count;
             var allSuccess = true;
 
-            _logger.LogInformation("Iniciando lote de Descarga (Nube -> Local). Tablas: {Total}. Rango: {F1} a {F2}", total, f1, f2);
+            _logger.LogInformation("Iniciando lote de Descarga (Nube -> Local). Tablas: {Total}. Rango general: {F1} a {F2}", total, f1, f2);
 
             for (int i = 0; i < total; i++)
             {
@@ -239,29 +307,39 @@ namespace USWsSync.Core.Engine
                 var currentIndex = i + 1;
                 var pct = (double)currentIndex / total;
 
+                var effectiveF1 = useIndividualTableDates
+                    ? SyncStateManager.GetTableCutDate(isUpload: false, item.TableName, f1)
+                    : f1;
+
                 progress?.Report(new SyncProgressInfo(
                     item.TableName, currentIndex, total, pct, true,
-                    $"[Descarga {currentIndex}/{total}] Descargando {item.TableName}..."
+                    $"[Descarga {currentIndex}/{total}] Descargando {item.TableName} ({effectiveF1:yyyy-MM-dd} a {f2:yyyy-MM-dd})..."
                 ));
 
                 try
                 {
-                    var data = await item.DownloadFunc(this, sourceApiBase, f1, f2, ct);
+                    var data = await item.DownloadFunc(this, sourceApiBase, effectiveF1, f2, ct);
                     if (data == null)
                     {
                         allSuccess = false;
                         var errorMsg = $"Error o respuesta nula al descargar {item.TableName}";
                         _logger.LogWarning("{Msg}", errorMsg);
+                        if (updateWatermark)
+                        {
+                            SyncStateManager.RecordTableResult(isUpload: false, item.TableName, f2, isSuccess: false, recordsCount: 0, error: errorMsg);
+                        }
                         progress?.Report(new SyncProgressInfo(
                             item.TableName, currentIndex, total, pct, false, errorMsg
                         ));
                         continue;
                     }
 
-                    // Guardar en destino local
+                    var recordCount = item.GetRecordCount(data);
+
                     progress?.Report(new SyncProgressInfo(
                         item.TableName, currentIndex, total, pct, true,
-                        $"[Descarga {currentIndex}/{total}] Guardando {item.TableName} en base local..."
+                        $"[Descarga {currentIndex}/{total}] Guardando {recordCount} reg en {item.TableName} local...",
+                        RecordsCount: recordCount
                     ));
 
                     var saveResult = await item.UploadFunc(this, targetApiBase, data, ct);
@@ -270,16 +348,24 @@ namespace USWsSync.Core.Engine
                         allSuccess = false;
                         var errorMsg = $"Error guardando {item.TableName}: {saveResult.errorMessage}";
                         _logger.LogError("{Msg}", errorMsg);
+                        if (updateWatermark)
+                        {
+                            SyncStateManager.RecordTableResult(isUpload: false, item.TableName, f2, isSuccess: false, recordsCount: recordCount, error: errorMsg);
+                        }
                         progress?.Report(new SyncProgressInfo(
-                            item.TableName, currentIndex, total, pct, false, errorMsg
+                            item.TableName, currentIndex, total, pct, false, errorMsg, RecordsCount: recordCount
                         ));
                     }
                     else
                     {
-                        var okMsg = $"[OK {currentIndex}/{total}] {item.TableName} sincronizada con éxito.";
+                        if (updateWatermark)
+                        {
+                            SyncStateManager.RecordTableResult(isUpload: false, item.TableName, f2, isSuccess: true, recordsCount: recordCount);
+                        }
+                        var okMsg = $"[OK {currentIndex}/{total}] {item.TableName} sincronizada con éxito ({recordCount} reg).";
                         _logger.LogInformation("{Msg}", okMsg);
                         progress?.Report(new SyncProgressInfo(
-                            item.TableName, currentIndex, total, pct, true, okMsg
+                            item.TableName, currentIndex, total, pct, true, okMsg, RecordsCount: recordCount
                         ));
                     }
                 }
@@ -288,10 +374,21 @@ namespace USWsSync.Core.Engine
                     allSuccess = false;
                     var errorMsg = $"Excepción no controlada procesando {item.TableName}: {ex.Message}";
                     _logger.LogError(ex, "{Msg}", errorMsg);
+                    if (updateWatermark)
+                    {
+                        SyncStateManager.RecordTableResult(isUpload: false, item.TableName, f2, isSuccess: false, recordsCount: 0, error: errorMsg);
+                    }
                     progress?.Report(new SyncProgressInfo(
                         item.TableName, currentIndex, total, pct, false, errorMsg
                     ));
                 }
+            }
+
+            if (allSuccess && updateWatermark)
+            {
+                var state = SyncStateManager.LoadState(isUpload: false);
+                state.LastGlobalSuccess = f2;
+                SyncStateManager.SaveState(isUpload: false, state);
             }
 
             _logger.LogInformation("Fin del lote de Descarga. Resultado global: {Result}", allSuccess ? "EXITOSO" : "CON ERRORES");
@@ -304,13 +401,33 @@ namespace USWsSync.Core.Engine
             DateTime f1,
             DateTime f2,
             IProgress<SyncProgressInfo>? progress,
+            IEnumerable<string>? tableFilter = null,
+            SyncModule? moduleFilter = null,
+            bool updateWatermark = false,
+            bool useIndividualTableDates = false,
             CancellationToken ct = default)
         {
-            var tables = TableRegistry.UploadTables;
+            var query = TableRegistry.UploadTables.AsEnumerable();
+
+            if (moduleFilter.HasValue && moduleFilter.Value != SyncModule.Todos)
+            {
+                query = query.Where(t => t.Module == moduleFilter.Value);
+            }
+
+            if (tableFilter != null)
+            {
+                var filterSet = new HashSet<string>(tableFilter, StringComparer.OrdinalIgnoreCase);
+                if (filterSet.Count > 0)
+                {
+                    query = query.Where(t => filterSet.Contains(t.TableName));
+                }
+            }
+
+            var tables = query.ToList();
             var total = tables.Count;
             var allSuccess = true;
 
-            _logger.LogInformation("Iniciando lote de Subida (Local -> Nube). Tablas: {Total}. Rango: {F1} a {F2}", total, f1, f2);
+            _logger.LogInformation("Iniciando lote de Subida (Local -> Nube). Tablas: {Total}. Rango general: {F1} a {F2}", total, f1, f2);
 
             for (int i = 0; i < total; i++)
             {
@@ -320,28 +437,39 @@ namespace USWsSync.Core.Engine
                 var currentIndex = i + 1;
                 var pct = (double)currentIndex / total;
 
+                var effectiveF1 = useIndividualTableDates
+                    ? SyncStateManager.GetTableCutDate(isUpload: true, item.TableName, f1)
+                    : f1;
+
                 progress?.Report(new SyncProgressInfo(
                     item.TableName, currentIndex, total, pct, true,
-                    $"[Subida {currentIndex}/{total}] Consultando {item.TableName} en base local..."
+                    $"[Subida {currentIndex}/{total}] Consultando {item.TableName} ({effectiveF1:yyyy-MM-dd} a {f2:yyyy-MM-dd})..."
                 ));
 
                 try
                 {
-                    var data = await item.DownloadFunc(this, sourceApiBase, f1, f2, ct);
+                    var data = await item.DownloadFunc(this, sourceApiBase, effectiveF1, f2, ct);
                     if (data == null)
                     {
                         allSuccess = false;
                         var errorMsg = $"Error o respuesta nula al obtener {item.TableName} desde local";
                         _logger.LogWarning("{Msg}", errorMsg);
+                        if (updateWatermark)
+                        {
+                            SyncStateManager.RecordTableResult(isUpload: true, item.TableName, f2, isSuccess: false, recordsCount: 0, error: errorMsg);
+                        }
                         progress?.Report(new SyncProgressInfo(
                             item.TableName, currentIndex, total, pct, false, errorMsg
                         ));
                         continue;
                     }
 
+                    var recordCount = item.GetRecordCount(data);
+
                     progress?.Report(new SyncProgressInfo(
                         item.TableName, currentIndex, total, pct, true,
-                        $"[Subida {currentIndex}/{total}] Subiendo {item.TableName} a la nube..."
+                        $"[Subida {currentIndex}/{total}] Subiendo {recordCount} reg de {item.TableName} a la nube...",
+                        RecordsCount: recordCount
                     ));
 
                     var saveResult = await item.UploadFunc(this, targetApiBase, data, ct);
@@ -350,16 +478,24 @@ namespace USWsSync.Core.Engine
                         allSuccess = false;
                         var errorMsg = $"Error guardando {item.TableName} en nube: {saveResult.errorMessage}";
                         _logger.LogError("{Msg}", errorMsg);
+                        if (updateWatermark)
+                        {
+                            SyncStateManager.RecordTableResult(isUpload: true, item.TableName, f2, isSuccess: false, recordsCount: recordCount, error: errorMsg);
+                        }
                         progress?.Report(new SyncProgressInfo(
-                            item.TableName, currentIndex, total, pct, false, errorMsg
+                            item.TableName, currentIndex, total, pct, false, errorMsg, RecordsCount: recordCount
                         ));
                     }
                     else
                     {
-                        var okMsg = $"[OK {currentIndex}/{total}] {item.TableName} subida con éxito.";
+                        if (updateWatermark)
+                        {
+                            SyncStateManager.RecordTableResult(isUpload: true, item.TableName, f2, isSuccess: true, recordsCount: recordCount);
+                        }
+                        var okMsg = $"[OK {currentIndex}/{total}] {item.TableName} subida con éxito ({recordCount} reg).";
                         _logger.LogInformation("{Msg}", okMsg);
                         progress?.Report(new SyncProgressInfo(
-                            item.TableName, currentIndex, total, pct, true, okMsg
+                            item.TableName, currentIndex, total, pct, true, okMsg, RecordsCount: recordCount
                         ));
                     }
                 }
@@ -368,10 +504,21 @@ namespace USWsSync.Core.Engine
                     allSuccess = false;
                     var errorMsg = $"Excepción no controlada procesando {item.TableName}: {ex.Message}";
                     _logger.LogError(ex, "{Msg}", errorMsg);
+                    if (updateWatermark)
+                    {
+                        SyncStateManager.RecordTableResult(isUpload: true, item.TableName, f2, isSuccess: false, recordsCount: 0, error: errorMsg);
+                    }
                     progress?.Report(new SyncProgressInfo(
                         item.TableName, currentIndex, total, pct, false, errorMsg
                     ));
                 }
+            }
+
+            if (allSuccess && updateWatermark)
+            {
+                var state = SyncStateManager.LoadState(isUpload: true);
+                state.LastGlobalSuccess = f2;
+                SyncStateManager.SaveState(isUpload: true, state);
             }
 
             _logger.LogInformation("Fin del lote de Subida. Resultado global: {Result}", allSuccess ? "EXITOSO" : "CON ERRORES");

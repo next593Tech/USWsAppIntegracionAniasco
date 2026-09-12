@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,6 +12,8 @@ using Microsoft.UI.Xaml.Controls;
 using USWsSync.Core.Configuration;
 using USWsSync.Core.Engine;
 using USWsSync.Core.Logging;
+using USWsSync.Core.Registry;
+using USWsSync.Core.State;
 
 namespace USWsSync_UI.Pages
 {
@@ -19,6 +22,7 @@ namespace USWsSync_UI.Pages
         private readonly ISyncEngine _syncEngine;
         private CancellationTokenSource? _cts;
         private readonly StringBuilder _logBuilder = new();
+        private readonly List<string> _failedTablesList = new();
         private bool _isInitialized;
 
         public DownloadPage()
@@ -36,12 +40,37 @@ namespace USWsSync_UI.Pages
                 var config = ConfigManager.LoadConfig();
                 DpFechaInicio.Date = DateTimeOffset.Now.Date;
                 DpFechaFinal.Date = DateTimeOffset.Now.Date;
-                TxtLastDate.Text = config.LastDateDownload.ToString("yyyy-MM-dd HH:mm:ss");
+
+                var dlState = SyncStateManager.LoadState(isUpload: false);
+                TxtLastDate.Text = dlState.LastGlobalSuccess > DateTime.MinValue
+                    ? dlState.LastGlobalSuccess.ToString("yyyy-MM-dd HH:mm:ss")
+                    : config.LastDateDownload.ToString("yyyy-MM-dd HH:mm:ss");
+
+                var priorFailed = SyncStateManager.GetFailedTables(isUpload: false);
+                if (priorFailed.Count > 0)
+                {
+                    _failedTablesList.Clear();
+                    _failedTablesList.AddRange(priorFailed);
+                    BtnRetryFailed.Visibility = Visibility.Visible;
+                    TxtRetryFailed.Text = $"⚠️ Reintentar tablas fallidas previas ({_failedTablesList.Count})";
+                }
+
                 _isInitialized = true;
             }
         }
 
         private async void BtnStart_Click(object sender, RoutedEventArgs e)
+        {
+            await RunSyncAsync(tableFilter: null);
+        }
+
+        private async void BtnRetryFailed_Click(object sender, RoutedEventArgs e)
+        {
+            if (_failedTablesList.Count == 0) return;
+            await RunSyncAsync(tableFilter: new List<string>(_failedTablesList));
+        }
+
+        private async Task RunSyncAsync(IEnumerable<string>? tableFilter)
         {
             var f1Offset = DpFechaInicio.Date ?? DateTimeOffset.Now.Date;
             var f2Offset = DpFechaFinal.Date ?? DateTimeOffset.Now.Date;
@@ -51,8 +80,17 @@ namespace USWsSync_UI.Pages
 
             var config = ConfigManager.LoadConfig();
 
+            SyncModule? moduleFilter = null;
+            if (CmbModule.SelectedItem is ComboBoxItem item && item.Tag is string tag && Enum.TryParse<SyncModule>(tag, out var parsedModule) && parsedModule != SyncModule.Todos)
+            {
+                moduleFilter = parsedModule;
+            }
+
+            var updateWatermark = ChkUpdateWatermark.IsChecked == true;
+
             BtnStart.IsEnabled = false;
             BtnCancel.IsEnabled = true;
+            BtnRetryFailed.IsEnabled = false;
             PbSync.Value = 0;
             PbSync.ShowError = false;
             TxtProgressPct.Text = "0%";
@@ -64,12 +102,20 @@ namespace USWsSync_UI.Pages
             _cts = new CancellationTokenSource();
             var ct = _cts.Token;
 
-            AppendLog($"[{DateTime.Now:HH:mm:ss}] Iniciando descarga de datos desde {config.IpPublica} hacia {config.IpLocal}");
-            AppendLog($"[{DateTime.Now:HH:mm:ss}] Rango seleccionado: {f1:yyyy-MM-dd HH:mm:ss} - {f2:yyyy-MM-dd HH:mm:ss}");
+            var isRetry = tableFilter != null && tableFilter.Any();
+            var targetDesc = isRetry 
+                ? $"Reintento de {tableFilter!.Count()} tablas" 
+                : (moduleFilter.HasValue ? $"Módulo {moduleFilter.Value}" : "Todos los módulos");
 
-            var errorCount = 0;
+            AppendLog($"[{DateTime.Now:HH:mm:ss}] Iniciando descarga de datos ({targetDesc}) desde {config.IpPublica} hacia {config.IpLocal}");
+            AppendLog($"[{DateTime.Now:HH:mm:ss}] Rango seleccionado: {f1:yyyy-MM-dd HH:mm:ss} - {f2:yyyy-MM-dd HH:mm:ss}");
+            if (updateWatermark)
+            {
+                AppendLog($"[{DateTime.Now:HH:mm:ss}] MODO CHECKPOINT: Las marcas de agua se actualizarán para las tablas exitosas.");
+            }
+
+            var currentFailedTables = new List<string>();
             var successCount = 0;
-            var failedTables = new List<string>();
 
             try
             {
@@ -94,10 +140,9 @@ namespace USWsSync_UI.Pages
 
                         if (!info.IsSuccess)
                         {
-                            if (!failedTables.Contains(info.TableName))
+                            if (!currentFailedTables.Contains(info.TableName))
                             {
-                                failedTables.Add(info.TableName);
-                                errorCount++;
+                                currentFailedTables.Add(info.TableName);
                             }
                             PbSync.ShowError = true;
                         }
@@ -116,10 +161,14 @@ namespace USWsSync_UI.Pages
                     f1,
                     f2,
                     progress,
-                    ct
+                    tableFilter: tableFilter,
+                    moduleFilter: moduleFilter,
+                    updateWatermark: updateWatermark,
+                    useIndividualTableDates: false,
+                    ct: ct
                 ), ct);
 
-                if (success && errorCount == 0)
+                if (success && currentFailedTables.Count == 0)
                 {
                     PbSync.ShowError = false;
                     PbSync.Value = 100;
@@ -127,16 +176,33 @@ namespace USWsSync_UI.Pages
                     TxtStatus.Text = $"Descarga exitosa al 100% ({successCount} tablas procesadas sin errores).";
 
                     AppendLog($"[{DateTime.Now:HH:mm:ss}] DESCARGA FINALIZADA CON ÉXITO AL 100% ({successCount} tablas).");
-                    AppendLog($"[{DateTime.Now:HH:mm:ss}] NOTA: La fecha de corte se mantiene intacta para la tarea programada.");
+                    
+                    _failedTablesList.Clear();
+                    BtnRetryFailed.Visibility = Visibility.Collapsed;
+
+                    if (updateWatermark)
+                    {
+                        var dlState = SyncStateManager.LoadState(isUpload: false);
+                        TxtLastDate.Text = dlState.LastGlobalSuccess.ToString("yyyy-MM-dd HH:mm:ss");
+                        AppendLog($"[{DateTime.Now:HH:mm:ss}] Marca de agua de descarga actualizada a {dlState.LastGlobalSuccess:yyyy-MM-dd HH:mm:ss}.");
+                    }
+                    else
+                    {
+                        AppendLog($"[{DateTime.Now:HH:mm:ss}] NOTA: La marca de agua se mantuvo intacta por solicitud del usuario.");
+                    }
                 }
                 else
                 {
                     PbSync.ShowError = true;
-                    TxtStatus.Text = $"Descarga con errores en {failedTables.Count} tabla(s): {string.Join(", ", failedTables)}. (Exitosas: {successCount})";
+                    TxtStatus.Text = $"Descarga con errores en {currentFailedTables.Count} tabla(s): {string.Join(", ", currentFailedTables)}. (Exitosas: {successCount})";
 
-                    AppendLog($"[{DateTime.Now:HH:mm:ss}] DESCARGA FINALIZADA CON ERRORES: {failedTables.Count} tablas fallaron ({string.Join(", ", failedTables)}).");
+                    AppendLog($"[{DateTime.Now:HH:mm:ss}] DESCARGA FINALIZADA CON ERRORES: {currentFailedTables.Count} tablas fallaron ({string.Join(", ", currentFailedTables)}).");
                     AppendLog($"[{DateTime.Now:HH:mm:ss}] Tablas exitosas: {successCount}.");
-                    AppendLog($"[{DateTime.Now:HH:mm:ss}] REGLA DE ORO: La fecha de corte NO se actualiza.");
+
+                    _failedTablesList.Clear();
+                    _failedTablesList.AddRange(currentFailedTables);
+                    BtnRetryFailed.Visibility = Visibility.Visible;
+                    TxtRetryFailed.Text = $"⚠️ Reintentar solo tablas fallidas ({_failedTablesList.Count})";
                 }
             }
             catch (OperationCanceledException)
@@ -155,6 +221,7 @@ namespace USWsSync_UI.Pages
             {
                 BtnStart.IsEnabled = true;
                 BtnCancel.IsEnabled = false;
+                BtnRetryFailed.IsEnabled = true;
                 var savedPath = TraceLogger.WriteTraceLog(LogComponents.UiDescarga, _logBuilder.ToString());
                 if (!string.IsNullOrEmpty(savedPath))
                 {

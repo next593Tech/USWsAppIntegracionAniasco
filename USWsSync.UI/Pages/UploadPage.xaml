@@ -52,20 +52,50 @@
                                 </StackPanel>
                             </Grid>
 
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <TextBlock Text="Última fecha de envío de información:" FontWeight="SemiBold" />
-                                <TextBlock x:Name="TxtLastDate" Text="---" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
+                            <StackPanel Spacing="6">
+                                 <TextBlock Text="Módulo a Sincronizar:" FontWeight="SemiBold" />
+                                 <ComboBox x:Name="CmbModule" HorizontalAlignment="Stretch" SelectedIndex="0">
+                                     <ComboBoxItem Content="🌐 Todos los Módulos" Tag="Todos" />
+                                     <ComboBoxItem Content="🛒 Ventas y Facturación" Tag="Ventas" />
+                                     <ComboBoxItem Content="📦 Inventarios y Artículos" Tag="Inventarios" />
+                                     <ComboBoxItem Content="👥 Clientes y Personas" Tag="Personas" />
+                                     <ComboBoxItem Content="🏦 Bancos y Tesorería" Tag="Bancos" />
+                                     <ComboBoxItem Content="🚚 Compras y Proveedores" Tag="Compras" />
+                                     <ComboBoxItem Content="📊 Contabilidad" Tag="Cuentas" />
+                                     <ComboBoxItem Content="🔄 Movimientos y Transferencias" Tag="Movimientos" />
+                                     <ComboBoxItem Content="⚙️ Sistema y Seguridad" Tag="Sistema" />
+                                 </ComboBox>
                             </StackPanel>
 
-                            <!-- Botón de Acción -->
-                            <StackPanel Orientation="Horizontal" Spacing="12">
-                                <Button x:Name="BtnStart" Click="BtnStart_Click" Style="{StaticResource AccentButtonStyle}" Padding="16,8">
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <FontIcon Glyph="&#xE898;" />
-                                        <TextBlock Text="Comenzar Subida" />
+                            <CheckBox x:Name="ChkUpdateWatermark" 
+                                      Content="Actualizar marcas de agua del sincronizador con esta corrida" 
+                                      FontSize="12" 
+                                      IsChecked="False" />
+
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                 <TextBlock Text="Última fecha de envío de información:" FontWeight="SemiBold" />
+                                 <TextBlock x:Name="TxtLastDate" Text="---" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
+                            </StackPanel>
+
+                            <!-- Botones de Acción -->
+                            <StackPanel Spacing="10">
+                                <StackPanel Orientation="Horizontal" Spacing="12">
+                                    <Button x:Name="BtnStart" Click="BtnStart_Click" Style="{StaticResource AccentButtonStyle}" Padding="16,8">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <FontIcon Glyph="&#xE898;" />
+                                            <TextBlock Text="Comenzar Subida" />
+                                        </StackPanel>
+                                    </Button>
+                                    <Button x:Name="BtnCancel" Click="BtnCancel_Click" IsEnabled="False" Content="Cancelar" Padding="16,8" />
+                                </StackPanel>
+
+                                <!-- Botón Dinámico de Reintento de Fallidas -->
+                                <Button x:Name="BtnRetryFailed" Click="BtnRetryFailed_Click" Visibility="Collapsed" HorizontalAlignment="Stretch" Padding="16,8">
+                                    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+                                        <FontIcon Glyph="&#xE783;" Foreground="Orange" />
+                                        <TextBlock x:Name="TxtRetryFailed" Text="⚠️ Reintentar solo tablas fallidas (0)" FontWeight="SemiBold" Foreground="Orange" />
                                     </StackPanel>
                                 </Button>
-                                <Button x:Name="BtnCancel" Click="BtnCancel_Click" IsEnabled="False" Content="Cancelar" Padding="16,8" />
                             </StackPanel>
                         </StackPanel>
                     </Border>

@@ -3,6 +3,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using USWsLibrary.Models;
 
+using System.Collections.Generic;
+using USWsSync.Core.Registry;
+
 namespace USWsSync.Core.Engine
 {
     public record SyncProgressInfo(
@@ -19,8 +22,28 @@ namespace USWsSync.Core.Engine
     {
         Task<bool> CheckConnectionAsync(string ipOrUrl, CancellationToken ct = default);
         Task<PagedList<T>?> DownloadAsync<T>(string baseUrl, string methodName, DateTime f1, DateTime f2, CancellationToken ct = default) where T : class, new();
-        Task<ErrorSave> UploadAsync<T>(string baseUrl, string methodName, PagedList<T> payload, CancellationToken ct = default) where T : class, new();
-        Task<bool> ExecuteDownloadBatchAsync(string sourceApiBase, string targetApiBase, DateTime f1, DateTime f2, IProgress<SyncProgressInfo>? progress, CancellationToken ct = default);
-        Task<bool> ExecuteUploadBatchAsync(string sourceApiBase, string targetApiBase, DateTime f1, DateTime f2, IProgress<SyncProgressInfo>? progress, CancellationToken ct = default);
+        Task<ErrorSave> UploadAsync<T>(string baseUrl, string methodName, PagedList<T> payload, int batchSize = 1000, CancellationToken ct = default) where T : class, new();
+        Task<bool> ExecuteDownloadBatchAsync(
+            string sourceApiBase, 
+            string targetApiBase, 
+            DateTime f1, 
+            DateTime f2, 
+            IProgress<SyncProgressInfo>? progress, 
+            IEnumerable<string>? tableFilter = null,
+            SyncModule? moduleFilter = null,
+            bool updateWatermark = false,
+            bool useIndividualTableDates = false,
+            CancellationToken ct = default);
+        Task<bool> ExecuteUploadBatchAsync(
+            string sourceApiBase, 
+            string targetApiBase, 
+            DateTime f1, 
+            DateTime f2, 
+            IProgress<SyncProgressInfo>? progress, 
+            IEnumerable<string>? tableFilter = null,
+            SyncModule? moduleFilter = null,
+            bool updateWatermark = false,
+            bool useIndividualTableDates = false,
+            CancellationToken ct = default);
     }
 }
