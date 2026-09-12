@@ -1,5 +1,30 @@
 {
   "direction": "Download",
-  "lastGlobalSuccess": "2026-09-11T00:00:00-05:00",
-  "tables": {}
+  "lastGlobalSuccess": "2026-09-12T13:00:00-05:00",
+  "tables": {
+    "SIS_PARAMETROS": {
+      "tableName": "SIS_PARAMETROS",
+      "lastSuccessDate": "2026-09-12T13:00:00-05:00",
+      "lastAttemptDate": "2026-09-12T13:00:00-05:00",
+      "isSuccess": true,
+      "recordsCount": 15,
+      "lastError": null
+    },
+    "INV_PRODUCTOS": {
+      "tableName": "INV_PRODUCTOS",
+      "lastSuccessDate": "2026-09-12T13:00:00-05:00",
+      "lastAttemptDate": "2026-09-12T13:00:00-05:00",
+      "isSuccess": true,
+      "recordsCount": 240,
+      "lastError": null
+    },
+    "CLI_CLIENTES": {
+      "tableName": "CLI_CLIENTES",
+      "lastSuccessDate": "0001-01-01T00:00:00",
+      "lastAttemptDate": "2026-09-12T13:00:05-05:00",
+      "isSuccess": false,
+      "recordsCount": 0,
+      "lastError": "Error de conexión o clave foránea: SqlException (0x80131904): The INSERT statement conflicted with the FOREIGN KEY constraint 'FK_CLI_CLIENTES_CLI_RUBROS'."
+    }
+  }
 }

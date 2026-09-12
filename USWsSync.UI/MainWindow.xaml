@@ -56,6 +56,13 @@
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
                 <NavigationViewItem
+                    Content="Monitor de Tablas"
+                    Tag="monitor">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE9D9;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem
                     Content="Acerca de"
                     Tag="about">
                     <NavigationViewItem.Icon>

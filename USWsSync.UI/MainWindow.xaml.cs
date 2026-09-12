@@ -39,6 +39,7 @@ public sealed partial class MainWindow : Window
             {
                 "download" => typeof(DownloadPage),
                 "upload" => typeof(UploadPage),
+                "monitor" => typeof(MonitorPage),
                 "about" => typeof(AboutPage),
                 _ => typeof(DownloadPage)
             };

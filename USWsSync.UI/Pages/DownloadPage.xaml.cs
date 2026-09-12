@@ -52,7 +52,7 @@ namespace USWsSync_UI.Pages
                     _failedTablesList.Clear();
                     _failedTablesList.AddRange(priorFailed);
                     BtnRetryFailed.Visibility = Visibility.Visible;
-                    TxtRetryFailed.Text = $"⚠️ Reintentar tablas fallidas previas ({_failedTablesList.Count})";
+                    TxtRetryFailed.Text = $"Reintentar tablas fallidas previas ({_failedTablesList.Count})";
                 }
 
                 _isInitialized = true;
@@ -202,7 +202,7 @@ namespace USWsSync_UI.Pages
                     _failedTablesList.Clear();
                     _failedTablesList.AddRange(currentFailedTables);
                     BtnRetryFailed.Visibility = Visibility.Visible;
-                    TxtRetryFailed.Text = $"⚠️ Reintentar solo tablas fallidas ({_failedTablesList.Count})";
+                    TxtRetryFailed.Text = $"Reintentar solo tablas fallidas ({_failedTablesList.Count})";
                 }
             }
             catch (OperationCanceledException)
