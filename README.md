@@ -10,6 +10,12 @@
 
 El sistema está optimizado para transferir cientos de miles de registros de forma incremental, garantizando cero caídas por agotamiento de memoria, prevención estricta de bloqueos N+1, trazabilidad granular por tabla y cumplimiento total de la integridad referencial sin sentencias SQL manuales ni dependencias propietarias no estándar.
 
+> [!TIP]
+> **¿Buscando la guía de uso u operaciones en el servidor?**  
+> Hemos preparado una guía completa independiente para operadores y administradores:  
+> 📖 **[Manual de Operación y Puesta en Producción (MANUAL_OPERATIVO.md)](./MANUAL_OPERATIVO.md)**  
+> Incluye el instructivo de la interfaz gráfica WinUI 3, el nuevo Historial de Auditoría con corte contable vs técnico, explicación de `appsettings.json`, marcas de agua (Watermarks) y el paso a paso detallado para configurar la **Tarea Programada en Windows (Task Scheduler)**.
+
 ---
 
 ## 📑 Tabla de Contenidos
@@ -22,6 +28,7 @@ El sistema está optimizado para transferir cientos de miles de registros de for
 6. [Guía: Cómo Agregar una Nueva Tabla a la Sincronización](#-guía-cómo-agregar-una-nueva-tabla-a-la-sincronización)
 7. [Flujo de Compilación y Despliegue (Publish)](#-flujo-de-compilación-y-despliegue-publish)
 8. [Configuración y Monitoreo](#-configuración-y-monitoreo)
+9. [📘 Manual de Operación y Configuración del Servidor (Task Scheduler, UI y appsettings)](./MANUAL_OPERATIVO.md)
 
 ---
 
@@ -386,26 +393,36 @@ powershell -Command "[System.Reflection.Assembly]::LoadFrom('Publish\USWsLibrary
 
 ## ⚙️ Configuración y Monitoreo
 
+> [!NOTE]
+> Para una explicación detallada de cada parámetro, la regla de avance de marcas de agua (Watermarks), recuperación automática de la base de datos `sync_history.db` y el instructivo con capturas y pasos para crear la **Tarea Programada en Windows (Task Scheduler)**, consulta el [📘 Manual de Operación y Administración (MANUAL_OPERATIVO.md)](./MANUAL_OPERATIVO.md).
+
 ### Archivo `appsettings.json`
-Ubicado en el directorio de ejecución (`Publish\appsettings.json`), compartido por la UI y la Consola:
+Ubicado en el directorio de ejecución (`Publish\appsettings.json`), compartido por la UI (`USWsSync.UI.exe`) y la Consola (`USWsSync.Console.exe`):
 
 ```json
 {
-  "SyncConfig": {
-    "IpLocal": "http://192.168.1.50:8080",
-    "IpPublica": "https://api.empresa.com",
-    "LastDateUpdate": "2026-09-12T00:00:00",
-    "TimeoutSeconds": 180,
-    "MaxBatchSize": 500,
-    "RetryAttempts": 3
+  "syncConfig": {
+    "ipLocal": "192.168.100.242:8484",
+    "ipPublica": "186.3.193.198:444",
+    "lastDateUpdate": "2026-09-01T00:00:00",
+    "lastDateDownload": "2026-09-01T00:00:00",
+    "timeoutSegundos": 300,
+    "cleanIpLocal": "192.168.100.242:8484",
+    "cleanIpPublica": "186.3.193.198:444"
   }
 }
 ```
 
-### Ubicación de Logs
-El sistema registra actividad estructurada mediante Serilog con rotación diaria automática:
+### Ubicación de Logs y Base de Auditoría
+El sistema registra actividad estructurada con rotación diaria automática y trazabilidad histórica completa:
 - **Consola (Tarea Programada):** `Publish\Logs\Consola\Consola-yyyyMMdd.log`
 - **Interfaz Gráfica (UI):** `Publish\Logs\UI\UI-yyyyMMdd.log`
+- **Base de Datos SQLite de Auditoría:** `Publish\sync_history.db` (modo WAL de alta concurrencia, auto-creable si se elimina y auto-purgada a 60 días).
+- **Estados Temporales Granulares:** `Publish\sync_state_download.json` y `Publish\sync_state_upload.json` (para reintentar únicamente tablas rezagadas sin reiniciar todo el lote).
+
+### Automatización en Windows
+Para la puesta en marcha desatendida del sincronizador cada 5 minutos en el servidor mediante el **Programador de Tareas de Windows (Task Scheduler)**, revisa la sección dedicada en el manual:
+👉 [Guía Paso a Paso: Tarea Programada en Windows (Task Scheduler)](./MANUAL_OPERATIVO.md#4-guía-paso-a-paso-tarea-programada-en-windows-task-scheduler)
 
 ---
 
