@@ -256,5 +256,21 @@ namespace USWsLibrary.Services
             while (cur.InnerException != null) cur = cur.InnerException;
             return cur;
         }
+
+        /// <summary>
+        /// Ejecuta una consulta de lectura optimizada con AsNoTracking, ChangeTracker desactivado y carga a PagedList.
+        /// </summary>
+        public static PagedList<T> ExecuteList<T>(Func<DobraConnection, IQueryable<T>> querySelector)
+        {
+            var packages = new PagedList<T>();
+            using (var db = new DobraConnection())
+            {
+                db.Configuration.AutoDetectChangesEnabled = false;
+                packages.Results = querySelector(db).ToList();
+                packages.Total = packages.Results.Count;
+                packages.Count = packages.Results.Count;
+            }
+            return packages;
+        }
     }
 }

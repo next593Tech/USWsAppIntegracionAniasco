@@ -7,6 +7,7 @@ using Serilog;
 using USWsSync.Core.Configuration;
 using USWsSync.Core.Engine;
 using USWsSync.Core.Logging;
+using USWsSync.Core.History;
 
 namespace USWsSync.Console
 {
@@ -34,6 +35,66 @@ namespace USWsSync.Console
                 Log.Information("========================================================================");
                 Log.Information("=== Bizor Sync Console - Tarea Programada de Integración Dobra ERP ===");
                 Log.Information("========================================================================");
+
+                if (args.Length > 0 && args[0].Equals("--test-history", StringComparison.OrdinalIgnoreCase))
+                {
+                    Log.Information(">>> EJECUTANDO AUTO-DIAGNÓSTICO DE AUDITORÍA SQLITE (--test-history)...");
+                    await SyncHistoryRepository.InitializeDatabaseAsync();
+                    Log.Information("Base de datos SQLite inicializada en: {DbPath}", SyncHistoryRepository.DbPath);
+
+                    var testRun = new SyncRunRecord
+                    {
+                        RunId = Guid.NewGuid().ToString("N"),
+                        StartTime = DateTime.Now.AddMinutes(-5),
+                        EndTime = DateTime.Now,
+                        DurationMs = 300000,
+                        Direction = SyncDirection.Download,
+                        TriggerSource = SyncTriggerSource.Scheduled,
+                        Status = SyncRunStatus.Warning,
+                        TotalTables = 90,
+                        TablesWithChanges = 2,
+                        TablesWithErrors = 1,
+                        TotalRecords = 125,
+                        DataFromDate = DateTime.Now.AddDays(-2),
+                        DataToDate = DateTime.Now.AddMinutes(-5),
+                        ErrorSummary = "Error simulado para verificación de diagnósticos."
+                    };
+
+                    var testItems = new List<SyncRunItemRecord>
+                    {
+                        new() { TableName = "CXC_CLIENTES", RecordsCount = 125, IsSuccess = true, DurationMs = 850 },
+                        new() { TableName = "VEN_FACTURAS", RecordsCount = 0, IsSuccess = false, ErrorMessage = "Timeout simulado al consultar endpoint de facturación.", DurationMs = 5000 }
+                    };
+
+                    var savedId = await SyncHistoryRepository.SaveRunAsync(testRun, testItems);
+                    Log.Information("Sincronización de prueba guardada exitosamente con ID SQLite: {Id}", savedId);
+
+                    var runs = await SyncHistoryRepository.GetRunsAsync(new SyncHistoryFilter { PageSize = 5 });
+                    Log.Information("Sincronizaciones recuperadas: {Count}", runs.Count);
+                    if (runs.Count > 0)
+                    {
+                        var first = runs[0];
+                        Log.Information("  -> Ventana de Datos: Desde {From:yyyy-MM-dd HH:mm} hasta {To:yyyy-MM-dd HH:mm}", first.DataFromDate, first.DataToDate);
+                    }
+
+                    var items = await SyncHistoryRepository.GetRunItemsAsync(savedId);
+                    Log.Information("Ítems delta recuperados para la sincronización {Id}: {Count}", savedId, items.Count);
+                    foreach (var itm in items)
+                    {
+                        Log.Information("  -> Tabla: {Table} | Regs: {Regs} | OK: {Ok} | Error: {Err}",
+                            itm.TableName, itm.RecordsCount, itm.IsSuccess, itm.ErrorMessage ?? "Ninguno");
+                    }
+
+                    var stats = await SyncHistoryRepository.GetStatisticsAsync(DateTime.Today.AddDays(-7), DateTime.Today.AddDays(1));
+                    Log.Information("Estadísticas del periodo: Total={Total}, OK={Ok}, Avisos={Warn}, Errores={Err}, Regs={Regs}",
+                        stats.TotalRuns, stats.SuccessRuns, stats.WarningRuns, stats.ErrorRuns, stats.TotalRecordsTransferred);
+
+                    var pruned = await SyncHistoryRepository.PruneOldRecordsAsync(60);
+                    Log.Information("Purga de retención (60 días): {Pruned} eliminados.", pruned);
+
+                    Log.Information("AUTO-DIAGNÓSTICO FINALIZADO CON ÉXITO 100%.");
+                    return 0;
+                }
 
                 // Configurar Inyección de Dependencias
                 var services = new ServiceCollection();
@@ -87,6 +148,9 @@ namespace USWsSync.Console
                     }
                 });
 
+                // Inicializar base de datos de auditoría SQLite
+                await SyncHistoryRepository.InitializeDatabaseAsync();
+
                 // 3. Fase 1: Descarga (Nube -> Local)
                 Log.Information(">>> FASE 1: DESCARGA DE NOVEDADES (Nube -> Local) con Estado Granular");
                 var downloadOk = await engine.ExecuteDownloadBatchAsync(
@@ -98,7 +162,8 @@ namespace USWsSync.Console
                     tableFilter: null,
                     moduleFilter: null,
                     updateWatermark: true,
-                    useIndividualTableDates: true);
+                    useIndividualTableDates: true,
+                    trigger: SyncTriggerSource.Scheduled);
 
                 // 4. Fase 2: Subida (Local -> Nube)
                 Log.Information(">>> FASE 2: SUBIDA DE NOVEDADES (Local -> Nube) con Estado Granular");
@@ -111,7 +176,8 @@ namespace USWsSync.Console
                     tableFilter: null,
                     moduleFilter: null,
                     updateWatermark: true,
-                    useIndividualTableDates: true);
+                    useIndividualTableDates: true,
+                    trigger: SyncTriggerSource.Scheduled);
 
                 // 5. Evaluación de Regla de Oro
                 if (downloadOk && uploadOk)

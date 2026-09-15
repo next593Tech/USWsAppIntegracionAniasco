@@ -5,6 +5,7 @@ using USWsLibrary.Models;
 
 using System.Collections.Generic;
 using USWsSync.Core.Registry;
+using USWsSync.Core.History;
 
 namespace USWsSync.Core.Engine
 {
@@ -33,6 +34,7 @@ namespace USWsSync.Core.Engine
             SyncModule? moduleFilter = null,
             bool updateWatermark = false,
             bool useIndividualTableDates = false,
+            SyncTriggerSource trigger = SyncTriggerSource.Scheduled,
             CancellationToken ct = default);
         Task<bool> ExecuteUploadBatchAsync(
             string sourceApiBase, 
@@ -44,6 +46,7 @@ namespace USWsSync.Core.Engine
             SyncModule? moduleFilter = null,
             bool updateWatermark = false,
             bool useIndividualTableDates = false,
+            SyncTriggerSource trigger = SyncTriggerSource.Scheduled,
             CancellationToken ct = default);
     }
 }

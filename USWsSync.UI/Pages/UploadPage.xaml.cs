@@ -14,6 +14,7 @@ using USWsSync.Core.Engine;
 using USWsSync.Core.Logging;
 using USWsSync.Core.Registry;
 using USWsSync.Core.State;
+using USWsSync.Core.History;
 
 namespace USWsSync_UI.Pages
 {
@@ -174,6 +175,7 @@ namespace USWsSync_UI.Pages
                     moduleFilter: moduleFilter,
                     updateWatermark: updateWatermark,
                     useIndividualTableDates: false,
+                    trigger: SyncTriggerSource.ManualUI,
                     ct: ct
                 ), ct);
 

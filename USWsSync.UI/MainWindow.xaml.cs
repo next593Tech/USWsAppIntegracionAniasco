@@ -40,6 +40,7 @@ public sealed partial class MainWindow : Window
             {
                 "download" => typeof(DownloadPage),
                 "upload" => typeof(UploadPage),
+                "history" => typeof(HistoryPage),
                 "monitor" => typeof(MonitorPage),
                 "about" => typeof(AboutPage),
                 _ => typeof(DownloadPage)

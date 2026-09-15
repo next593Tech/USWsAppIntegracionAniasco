@@ -56,6 +56,13 @@
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
                 <NavigationViewItem
+                    Content="Historial de Auditoría"
+                    Tag="history">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE81C;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem
                     Content="Monitor de Tablas"
                     Tag="monitor">
                     <NavigationViewItem.Icon>
